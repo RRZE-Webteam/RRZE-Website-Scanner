@@ -83,8 +83,6 @@ if ($argc !== 2) {
 }
 
 $index = get_index();
-var_dump($index);
-exit;
 
 $table = create_indextable($index,4,$servertyp);
 // Schreibt den Inhalt in die Datei zurück
@@ -317,7 +315,7 @@ function get_index() {
 		    
 		    foreach ($ignore_domains as $ignore) {
 			if (preg_match($ignore, $url)) {
-			    echo "IGNORE ".$url."\n";
+		//	    echo "IGNORE ".$url."\n";
 			    $addthis = false;
 			}
 		    }
