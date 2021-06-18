@@ -126,6 +126,31 @@ class cURL {
 	die;
     }
     function get_ssl_info() {
+	if (!$this->is_valid_url($this->url)) {
+	    return false;
+	}
+	
+	$contextOptions = array(
+	    'ssl' => array(
+		'verify_peer' => false, // You could skip all of the trouble by changing this to false, but it's WAY uncool for security reasons.
+		'cafile' => '/etc/ssl/certs/cacert.pem',
+		'CN_match' => 'fau.de', // Change this to your certificates Common Name (or just comment this line out if not needed)
+		'ciphers' => 'HIGH:!SSLv2:!SSLv3',
+		'disable_compression' => true,
+		"capture_peer_cert"=> true
+	    )
+	);
+
+	
+	$orignal_parse = parse_url($this->url, PHP_URL_HOST);
+	$get = stream_context_create($contextOptions);
+	@ $read = stream_socket_client("ssl://".$orignal_parse.":443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $get);
+	if ($read) {
+	    $cert = stream_context_get_params($read);
+	    $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
+	    return $certinfo;
+	}
+	return false;
 	
     }
     function is_valid_url($urlinput) {

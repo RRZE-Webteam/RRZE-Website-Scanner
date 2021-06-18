@@ -103,6 +103,9 @@ class Analyse {
 	    if (strlen(trim($cms->version))>0) {
 		$this->generator['version'] = $cms->version;
 	    }
+	    $this->generator['classname'] = $cms->classname;
+	    $this->generator['icon'] = $cms->icon;
+	    $this->generator['url'] = $cms->url;
 	}
 	
 
@@ -381,6 +384,25 @@ class Analyse {
 			
 		    }
 		}
+		// ausnahmebehandlung fau-theme
+		// Wenn das Logo das Default vom Theme ist, dann entferne ist
+		if ($template == 'fau-theme') {
+		    if (preg_match('/wp\-content\/themes\/FAU\-[a-z]+\/img\//i', $logo)) {
+			// Default Logo aus Theme-Verzeichnis verwendet.
+			// Dies ist nur erlaubt für die 5 Fakultätsdomains und die Startdomain
+			if (in_array($this->url, ["https://www.fau.de", "https://www.fau.eu", 
+			    "https://www.phil.fau.de", "https://www.phil.fau.eu",
+			    "https://www.nat.fau.de", "https://www.nat.fau.eu",
+			    "https://www.med.fau.de", "https://www.med.fau.eu",
+			    "https://www.tf.fau.de", "https://www.tf.fau.eu",
+			    "https://www.rw.fau.de", "https://www.rw.fau.eu"])) {
+			    // Bin auf einer der Hauptdomains, die einen Default nutzen dürfen
+			} else {
+			    $logo = '';
+			}
+		    }
+		}
+		
 		return $logo;
 		
 	    } else {

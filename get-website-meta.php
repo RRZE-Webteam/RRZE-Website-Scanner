@@ -46,6 +46,11 @@ function parse_website($url) {
     $cc = new cURL();
     $data = $cc->get($url);
     
+    
+    if ($data['meta']['http_code'] < 0 ) {
+	echo "Invalid URL to analyse: \"".$url."\"\n";
+	exit;
+    }
     echo "Status Code:        ".$data['meta']['http_code']."\n";
     echo "connect_time:       ".$data['meta']['connect_time']."\n";
     echo "pretransfer_time:   ".$data['meta']['pretransfer_time']."\n";
@@ -55,16 +60,46 @@ function parse_website($url) {
     echo "primary_ip:         ".$data['meta']['primary_ip']."\n";
     echo "\n";
     
-    if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
+    $certinfo = $cc->get_ssl_info();
+    if ($certinfo) {
+//	 var_dump($certinfo);
+	  echo "SSL Infos: \n";
+	if (isset($certinfo['issuer'])) {
 
+	    if (isset($certinfo['issuer']['O'])) {
+		echo "\tO: ".$certinfo['issuer']['O']."\n";
+	    }
+	    if (isset($certinfo['issuer']['OU'])) {
+		echo "\tOU: ".$certinfo['issuer']['OU']."\n";
+	    }
+	     if (isset($certinfo['issuer']['CN'])) {
+		echo "\tCN: ".$certinfo['issuer']['CN']."\n";
+	    }
+	}
+	if (isset($certinfo['extensions'])) {
+	     if (isset($certinfo['extensions']['authorityKeyIdentifier'])) {
+		echo "\tauthorityKeyIdentifier: ".trim($certinfo['extensions']['authorityKeyIdentifier'])."\n";
+	    }
+	///     if (isset($certinfo['extensions']['certificatePolicies'])) {
+	//	echo "\tcertificatePolicies: ".$certinfo['extensions']['certificatePolicies']."\n";
+	//    }
+	      if (isset($certinfo['extensions']['subjectAltName'])) {
+		echo "\tsubjectAltName: ".$certinfo['extensions']['subjectAltName']."\n";
+	    }
+	}
+	echo "\n";
+    }
+    
+    if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
+	
 	$analyse = new Analyse($url);
-	//$analyse->set_url($url);
 	$analyse->init($data);
 
 	echo "Analyse:\n";
 	
-	
 	echo "Title:              ".$analyse->title."\n";
+	echo "Original-URL:       ",$analyse->url."\n";
+
 	if (isset($analyse->canonical)){
 	    echo "Canonical URL:      ".$analyse->canonical;
 	    echo "\n";
@@ -79,6 +114,15 @@ function parse_website($url) {
 		echo " (".$analyse->generator['version'].")";
 	    }
 	    echo "\n";
+	     if (isset($analyse->generator['classname'])) {
+		echo "\t\t classname: ".$analyse->generator['classname']."\n";
+	    }
+	    if (isset($analyse->generator['icon'])) {
+		echo "\t\t icon: ".$analyse->generator['icon']."\n";
+	    }
+	     if (isset($analyse->generator['url'])) {
+		echo "\t\t url: ".$analyse->generator['url']."\n";
+	    }
 	}
 	if (isset($analyse->template)) {
 	    echo "Template:           ".$analyse->template;
@@ -112,6 +156,8 @@ function parse_website($url) {
 		echo "\t".$link."\n";
 	    }
 	}
+    } else {
+	echo "Fehler beim Zugriff: ".$data['meta']['http_code']."\n";
     }
 	
 }

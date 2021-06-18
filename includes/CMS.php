@@ -9,6 +9,9 @@ class CMS {
     var $version;
     var $info;
     var $content;
+    var $classname;
+    var $icon;
+    var $url; 
     
     public function __construct() {
          $this->name = '';
@@ -35,7 +38,7 @@ class CMS {
 			$this->version = $output_array[2];
 		    }
 		}
-
+		$res = $this->add_generator_info($res);
 		return $res;
 	    } elseif (is_array($genatorstring)) {
 		
@@ -58,6 +61,7 @@ class CMS {
 		    }
 		    $this->name = $res['name'];
 		}
+		$this->add_generator_info($res);
 		return $res;
 	    }
 	}
@@ -68,5 +72,22 @@ class CMS {
 
     }
     
-   
+   function add_generator_info($info) {
+       if (!isset($info)) {
+	   return;
+       }
+       $searchname = $info['name'];
+       $searchname = preg_replace('/[^a-z0-9A-Z]+/', "", $searchname);
+       if (in_array( $searchname, ["WordPress"])) {
+	    $controller = 'CMS\\'.$searchname;
+	    $cmsdata = new $controller;
+	    $info['classname'] = $cmsdata->classname;
+	    $info['icon'] = $cmsdata->icon;
+	    $this->classname = $cmsdata->classname;
+	    $this->icon = $cmsdata->icon;
+	    $this->url= $cmsdata->url;
+	    $info['url'] = $cmsdata->url;
+	}
+       return $info;
+   }
 }

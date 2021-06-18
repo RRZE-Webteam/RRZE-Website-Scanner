@@ -8,6 +8,15 @@
 namespace CMS;
 
 class WordPress {
+    
+    
+    public function __construct() {
+         $this->classname = 'wordpress';
+      //   $this->icon = '';
+	 $this->url = 'https://de.wordpress.com';
+
+     } 
+     
     function get_theme_main_style($linkarray, $genname, $genversion) {
 	if (!is_array($linkarray)) {
 	    return;

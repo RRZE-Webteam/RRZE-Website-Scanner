@@ -15,6 +15,7 @@ $servertypen = [
 
 $ignore_domains = [
     '/cms\.rrze\.uni\-erlangen\.de$/',
+    '/cms\.tun\.rrze\.net$/',
     '/[a-z0-9\-]+\.cms\.rrze\.de/',
     '/[0-9]+\.kurse.rrze\.fau\.de$/',
     '/[a-z0-9\-]+\.kurse\.rrze\uni\-erlangen\.de/',
@@ -83,6 +84,10 @@ if ($argc !== 2) {
 }
 
 $index = get_index();
+usort($index, function($a, $b) {
+    return $a['url'] <=> $b['url'];
+});
+
 
 $table = create_indextable($index,4,$servertyp);
 // Schreibt den Inhalt in die Datei zurück
@@ -102,7 +107,7 @@ function sanitize_filename($name) {
     }
 }
 
-function create_indextable($index, $refstatus = 4, $refserver = 1) {
+function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks = true) {
     if (!isset($index)){
 	return;
     }
@@ -111,6 +116,8 @@ function create_indextable($index, $refstatus = 4, $refserver = 1) {
     $table = '';
     $cnt = 0;
     $maxcnt = 1500;
+    $breakat = 100;
+    $breakcnt = 0;
      
     foreach ($index as $num => $entry) {
 	$line = '';
@@ -134,15 +141,9 @@ function create_indextable($index, $refstatus = 4, $refserver = 1) {
 		if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 400) {
 		    $line .= '<tr>';
 		    $analyse = new Analyse($entry['url']);
-		    //$analyse->set_url($url);
 		    $analyse->init($data);
 
-		    if (isset($analyse->favicon)) {;
-			$line .= '<td class="favicon"><img src="'.$analyse->favicon['href'].' style="width: 32px; height: 32px;" alt=""></td>';
-		    } else {
-			$line .= '<td class="favicon"></td>';
-		    }
-
+		   
 		    $line .= '<td class="title">';
 		    if (isset($analyse->lang)){
 			$line .= '<span lang="'.$analyse->lang.'">';
@@ -155,57 +156,62 @@ function create_indextable($index, $refstatus = 4, $refserver = 1) {
 		    $line .=  '<br><span class="url"><a href="'.$analyse->canonical.'">'.$analyse->canonical.'</a></span></td>';
 
 		    if (isset($analyse->logosrc)) {
-			$line .= '<td class="logo"><img src="'.$analyse->logosrc.' style="max-width: 240px;" alt=""></td>';
+			$line .= '<td class="logo"><img class="borderless noshadow" src="'.$analyse->logosrc.'" style="max-width: 240px; max-height: 65px;" alt=""></td>';
 		    } else {
 			$line .= '<td class="logo"></td>';
 		    }
-		    
+		    if (isset($analyse->favicon)) {;
+			$line .= '<td class="favicon center"><img class="borderless noshadow" src="'.$analyse->favicon['href'].'" style="width: 32px; height: 32px;" alt=""></td>';
+		    } else {
+			$line .= '<td class="favicon center"></td>';
+		    }
+
 		    if ($analyse->toslinks) {
 
 			 if (($analyse->toslinks['Impressum']) && (!empty($analyse->toslinks['Impressum']['href']))) {
-			     $line .= '<td>';
-			     $line .= '<a href="'.$analyse->toslinks['Impressum']['href'].'"><span class="success">Ok</span></a>';
+			     $line .= '<td class="center">';
+			     $line .= '<a href="'.$analyse->toslinks['Impressum']['href'].'"><span class="success"></span><span class="screen-reader-text">Ok</span></a>';
 			     $line .= '</td>';
 			 } else {
-			     $line .= '<td>';
-			     $line .= '<span class="fail">-</span>';
+			     $line .= '<td class="center">';
+			     $line .= '<span class="fail"></span><span class="screen-reader-text">fehlt</span>';
 			     $line .= '</td>';
 			 }
 			if (($analyse->toslinks['Datenschutz']) && (!empty($analyse->toslinks['Datenschutz']['href']))) {
-			     $line .= '<td>';
-			     $line .= '<a href="'.$analyse->toslinks['Datenschutz']['href'].'"><span class="success">Ok</span></a>';
+			     $line .= '<td class="center">';
+			     $line .= '<a href="'.$analyse->toslinks['Datenschutz']['href'].'"><span class="success"></span><span class="screen-reader-text">Ok</span></a>';
 			     $line .= '</td>';
 			 } else {
-			      $line .= '<td>';
-			     $line .= '<span class="fail">-</span>';
+			      $line .= '<td class="center">';
+			     $line .= '<span class="fail"></span><span class="screen-reader-text">fehlt</span>';
 			     $line .= '</td>';
 			 }
 			if (($analyse->toslinks['Barrierefreiheit']) && (!empty($analyse->toslinks['Barrierefreiheit']['href']))) {
-			     $line .= '<td>';
-			     $line .= '<a href="'.$analyse->toslinks['Barrierefreiheit']['href'].'"><span class="success">Ok</span></a>';
+			     $line .= '<td class="center">';
+			     $line .= '<a href="'.$analyse->toslinks['Barrierefreiheit']['href'].'"><span class="success"></span><span class="screen-reader-text">Ok</span></a>';
 			     $line .= '</td>';
 			 } else {
-			      $line .= '<td>';
-			     $line .= '<span class="fail">-</span>';
+			      $line .= '<td class="center">';
+			     $line .= '<span class="fail"></span><span class="screen-reader-text">fehlt</span>';
 			     $line .= '</td>';
 			 }
 			
 		    } else {
-			$line .= '<td><span class="fail">-</span></td><td><span class="fail">-</span></td><td><span class="fail">-</span></td>';
+			$line .= '<td class="center"><span class="fail"></span><span class="screen-reader-text">fehlt</span></td><td class="center"><span class="fail"></span><span class="screen-reader-text">fehlt</span></td><td class="center"><span class="fail"></span><span class="screen-reader-text">fehlt</span></td>';
 		    }
 		    
 		    
 		    if (isset($analyse->generator)){
 		       $line .= '<td class="generator">';
-		       $line .= $analyse->generator['name'];
+		       $line .= '<span class="'.$analyse->generator['classname'].'">'.$analyse->generator['name'].'</span>';
 
-			if (isset($analyse->generator['version'])) {
-			     $line .= " (".$analyse->generator['version'].")";
-			}
+		//	if (isset($analyse->generator['version'])) {
+		//	     $line .= " (".$analyse->generator['version'].")";
+		//	}
 			
 			
 			if (isset($analyse->template)) {
-			    $line .= '<br><span class="template">Template: '.$analyse->template;
+			    $line .= '<br><span class="template">'.$analyse->template;
 			    if (isset($analyse->template_version)) {
 				$line .=  " (".$analyse->template_version.")";
 			    }
@@ -227,29 +233,54 @@ function create_indextable($index, $refstatus = 4, $refserver = 1) {
 	}  
 	if (!empty($line)) {
 	    $table .= $line."\n";
+	    $tablecell[] = $line;
+	    
 	}
     }
     if (!empty($table)) {
-	$head = '<table class="tablesorter">';
+	$head = '<table class="sorttable">';
 	$head .= '<thead>';
-	$head .= '<tr>';
-	$head .= '<th scope="col" rowspan="2">Favicon</th>';
+	$head .= '<tr class="center">';
+	
 	$head .= '<th scope="col" rowspan="2">Titel / URL</th>';
 	$head .= '<th scope="col" rowspan="2">Logo</th>';
+	$head .= '<th scope="col" rowspan="2">Favicon</th>';
 	$head .= '<th scope="col" colspan="3">Rechtstexte</th>';
 	$head .= '<th scope="col" rowspan="2">CMS</th>';
 	$head .= '</tr>';
-	$head .= '<tr>';
-	$head .= '<th>Impressum</th>';
-	$head .= '<th>Datenschutz</th>';
-	$head .= '<th>Barrierefreiheit</th>';
+	$head .= '<tr class="center">';
+	$head .= '<td class="small">Impressum</td>';
+	$head .= '<td class="small">Datenschutz</td>';
+	$head .= '<td class="small">Barrierefreiheit</td>';
 	$head .= '</tr>';	
 	$head .= '</thead>';
 	$output = $head;
-	 
-	$output .= '<tbody>';
-	$output .= $table;
-	$output .= '</tbody>';
+	
+	if ($wppagebreaks) {
+	   $output .= '<tbody>';
+	    foreach ($tablecell as $cell) {
+		
+		$breakcnt = $breakcnt + 1;
+		if ($breakcnt == $breakat) {
+		    $breakcnt = 0;
+		    $output .= '</tbody>';
+		    $output .= '</table>';
+		    
+		   $output .= '<!--nextpage-->'."\n";
+		   
+		   $output .= $head;
+		    $output .= '<tbody>';
+		}
+		$output .= $cell;
+
+	    }
+	    $output .= '</tbody>';
+	} else {
+	    $output .= '<tbody>';
+	    $output .= $table;
+	    $output .= '</tbody>';
+	}
+	
 	$output .= '</table>';
 	return $output;
 	
@@ -315,7 +346,6 @@ function get_index() {
 		    
 		    foreach ($ignore_domains as $ignore) {
 			if (preg_match($ignore, $url)) {
-		//	    echo "IGNORE ".$url."\n";
 			    $addthis = false;
 			}
 		    }
