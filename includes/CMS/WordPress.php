@@ -5,24 +5,33 @@
  */
 namespace CMS;
 
-class WordPress {
+class WordPress extends \CMS  {
     
     
-    public function __construct() {
+    public function __construct($url, $tags, $content) {
          $this->classname = 'wordpress';
-	 $this->url = 'https://de.wordpress.com';
-	
+	 $this->cmsurl = 'https://de.wordpress.com';
+	 $this->url = $url;
+	 $this->tags = $tags;
+	 $this->content = $content;
+	 $this->name = "WordPress";
      } 
+     public $methods = array(
+		"matchbymeta", "button_css"
+	);
+
      
-     
-    public function matchbymeta($string) {
-	if (!isset($string)) {
-	    return;
+    public function matchbymeta() {
+	$string = $this->tags['generator'];
+	 
+	if (empty($string)) {
+	    return false;
 	}
+	
 	$matches = $this->get_regexp_matches();
 	foreach ($matches as $m) {
 	    if (preg_match($m, $string, $matches)) {
-		$this->name = "WordPress";
+		
 		$this->version = $matches[1]; 
 		return $this->get_info();
 	    }
@@ -79,5 +88,24 @@ class WordPress {
 	}
 	return $res;
     }
+	/**
+	 * Check /wp-includes/css/buttons.css content
+	 * @return [boolean]
+	 */
+	public function button_css() {
+		if($data = $this->fetch($this->url."/wp-includes/css/buttons.css")) {
+			/**
+			 * 9th line always has Wordpress-style Buttons
+			 */
+			$lines = explode(PHP_EOL, $data);
+			   
+		    if(array_key_exists(8,$lines))   {
+			
+			return strpos($lines[8], "WordPress-style Buttons") !== FALSE;
+		    }
+		}
 
+		return FALSE;
+
+	}
 }

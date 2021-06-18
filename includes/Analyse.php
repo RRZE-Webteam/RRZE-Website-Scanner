@@ -94,7 +94,7 @@ class Analyse {
 	}
 	$this->meta = $tags;
 	
-	$cms = new CMS();
+	$cms = new CMS($this->url);
 	$cms->get_generator($this->meta,$data['content']);
 
 	
@@ -105,7 +105,7 @@ class Analyse {
 	    }
 	    $this->generator['classname'] = $cms->classname;
 	    $this->generator['icon'] = $cms->icon;
-	    $this->generator['url'] = $cms->url;
+	    $this->generator['url'] = $cms->cmsurl;
 	}
 	
 
@@ -113,7 +113,7 @@ class Analyse {
 
 	if (in_array( $cms->name, ["WordPress"])) {
 	    $controller = 'CMS\\'.$cms->name;
-	    $cmsdata = new $controller;
+	    $cmsdata = new $controller($this->url, $tags, $data['content']);
 	    $cmsinfo = $cmsdata->get_theme_main_style($this->linkrels,$cms->name, $cms->version);
 	    if (!empty($cmsinfo)) {
 		$this->template = $cmsinfo['theme'];
