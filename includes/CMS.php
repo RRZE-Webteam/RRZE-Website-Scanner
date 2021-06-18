@@ -13,81 +13,86 @@ class CMS {
     var $icon;
     var $url; 
     
+    
+    public $systems = [
+        "WordPress",
+	"Webbaukasten"
+
+    ];
     public function __construct() {
          $this->name = '';
          $this->version = '';
-	 $this->info = array();
-	 
-
      } 
      
      
     function get_generator($tags,$content) {
-	$res = array();
 	if (isset($tags)) {
-	    $genatorstring = $tags['generator'];
+	    $genatorstring = trim($tags['generator']);
+	    $this->name = $genatorstring;
+	    
 	    if ((isset($genatorstring)) && (!is_array($genatorstring))) {
-		$res['name'] = $genatorstring;
-		$this->name = $genatorstring;
-		preg_match('/([\w\s]+)\s+([\d\.]+)/i', $genatorstring, $output_array);
-		if (isset($output_array)) {
-		    $res['name'] = $output_array[1];
-		    $this->name = $output_array[1];
-		    if (isset($output_array[2])) {
-			$res['version'] = $output_array[2];
-			$this->version = $output_array[2];
+
+		foreach ($this->systems as $system_name) {
+		    $controller = 'CMS\\'.$system_name;
+		    
+		    $cmsdata = new $controller;
+		    if ($cmsdata->matchbymeta($genatorstring)) {
+			$this->name = $cmsdata->name;
+			$this->version = $cmsdata->version;
+			$this->classname = $cmsdata->classname;
+			$this->icon = $cmsdata->icon;
+			$this->url = $cmsdata->url;
+			return true;
 		    }
 		}
-		$res = $this->add_generator_info($res);
-		return $res;
+		
+
+		preg_match('/^([\wa-zA-Z\s\-;&]+)\(?([\s\d\.\/]*)\)?$/iu', $genatorstring, $output_array);
+		if (isset($output_array)) {
+		    $this->name = trim($output_array[1]);
+		    if (isset($output_array[2])) {
+			$this->version = trim($output_array[2]);
+		    }
+		}
+
 	    } elseif (is_array($genatorstring)) {
 		
 		foreach ($genatorstring as $i => $value) {
-		    preg_match('/^([\w\s]+)\s+([\d\.]+)$/i', $value, $output_array);
+		    
+		    foreach ($this->systems as $system_name) {
+			$controller = 'CMS\\'.$searchname;
+			$cmsdata = new $controller;
+			if ($cmsdata->matchbymeta($value)) {
+			    $this->name = $cmsdata->name;
+			    $this->version = $cmsdata->version;
+			    $this->classname = $cmsdata->classname;
+			    $this->icon = $cmsdata->icon;
+			    $this->url = $cmsdata->url;
+			    return true;
+			}
+		    }
+		
+ 
+		    preg_match('/^([\wa-z0-9A-Z\s\-;&]+)\(?([\s\d\.\/]*)\)?$/iu', $value, $output_array);
 		    if (isset($output_array)) {
-			$res['name'] = $output_array[1];
 			$this->name = $output_array[1];
 			if (isset($output_array[2])) {
-			    $res['version'] = $output_array[2];
 			    $this->version = $output_array[2];
 			}
 			break;
 		    }
 		}
-		if (!isset($res['name'])) {
-		    $res['name'] = '';
-		    foreach ($genatorstring as $i => $value) {
-			$res['name'] .= $value."\n";
-		    }
-		    $this->name = $res['name'];
-		}
-		$this->add_generator_info($res);
-		return $res;
+		
+		return;
 	    }
 	}
 	// nichts im Meta, also nochmal den Content analysieren..  
 	// TODO.
 
-	return $res;
+	return false;
 
     }
     
-   function add_generator_info($info) {
-       if (!isset($info)) {
-	   return;
-       }
-       $searchname = $info['name'];
-       $searchname = preg_replace('/[^a-z0-9A-Z]+/', "", $searchname);
-       if (in_array( $searchname, ["WordPress"])) {
-	    $controller = 'CMS\\'.$searchname;
-	    $cmsdata = new $controller;
-	    $info['classname'] = $cmsdata->classname;
-	    $info['icon'] = $cmsdata->icon;
-	    $this->classname = $cmsdata->classname;
-	    $this->icon = $cmsdata->icon;
-	    $this->url= $cmsdata->url;
-	    $info['url'] = $cmsdata->url;
-	}
-       return $info;
-   }
+   
+   
 }

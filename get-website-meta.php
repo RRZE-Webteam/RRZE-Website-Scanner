@@ -58,37 +58,39 @@ function parse_website($url) {
     echo "Total Time:         ".$data['meta']['total_time']."\n";
     echo "Size:               ".$data['meta']['size_download']." Bytes\n";
     echo "primary_ip:         ".$data['meta']['primary_ip']."\n";
-    echo "\n";
+    echo "SSL:                ";
     
     $certinfo = $cc->get_ssl_info();
     if ($certinfo) {
 //	 var_dump($certinfo);
-	  echo "SSL Infos: \n";
 	if (isset($certinfo['issuer'])) {
-
 	    if (isset($certinfo['issuer']['O'])) {
-		echo "\tO: ".$certinfo['issuer']['O']."\n";
+		echo $certinfo['issuer']['O'];
 	    }
 	    if (isset($certinfo['issuer']['OU'])) {
-		echo "\tOU: ".$certinfo['issuer']['OU']."\n";
+		echo ", ".$certinfo['issuer']['OU'];
 	    }
 	     if (isset($certinfo['issuer']['CN'])) {
-		echo "\tCN: ".$certinfo['issuer']['CN']."\n";
+		echo ", ".$certinfo['issuer']['CN'];
 	    }
+	    echo "\n";
 	}
 	if (isset($certinfo['extensions'])) {
 	     if (isset($certinfo['extensions']['authorityKeyIdentifier'])) {
-		echo "\tauthorityKeyIdentifier: ".trim($certinfo['extensions']['authorityKeyIdentifier'])."\n";
+		echo "authorityKeyIdentifier: ".trim($certinfo['extensions']['authorityKeyIdentifier'])."\n";
 	    }
 	///     if (isset($certinfo['extensions']['certificatePolicies'])) {
 	//	echo "\tcertificatePolicies: ".$certinfo['extensions']['certificatePolicies']."\n";
 	//    }
 	      if (isset($certinfo['extensions']['subjectAltName'])) {
-		echo "\tsubjectAltName: ".$certinfo['extensions']['subjectAltName']."\n";
+		echo "subjectAltName:     ".$certinfo['extensions']['subjectAltName']."\n";
 	    }
 	}
 	echo "\n";
-    }
+    } else {
+	echo "*Kein SSL Zugang verfügbar*\n";
+    }    
+    echo "\n";
     
     if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
 	
@@ -114,15 +116,7 @@ function parse_website($url) {
 		echo " (".$analyse->generator['version'].")";
 	    }
 	    echo "\n";
-	     if (isset($analyse->generator['classname'])) {
-		echo "\t\t classname: ".$analyse->generator['classname']."\n";
-	    }
-	    if (isset($analyse->generator['icon'])) {
-		echo "\t\t icon: ".$analyse->generator['icon']."\n";
-	    }
-	     if (isset($analyse->generator['url'])) {
-		echo "\t\t url: ".$analyse->generator['url']."\n";
-	    }
+	    
 	}
 	if (isset($analyse->template)) {
 	    echo "Template:           ".$analyse->template;

@@ -121,6 +121,8 @@ class Analyse {
 		    $this->template_version = $cmsinfo['version'];
 		}
 	    }
+	} else {
+	    $this->template = $cms->name;
 	}
 	
 	$this->favicon = $this->get_favicon($data['content']);
@@ -221,6 +223,8 @@ class Analyse {
 		    $canonical = $matches[1][0];
 		}
 	}
+	$canonical = preg_replace('/\/$/i', '', $canonical);
+
 	return $canonical;
     }
     function get_favicon($content) {
@@ -390,13 +394,24 @@ class Analyse {
 		    if (preg_match('/wp\-content\/themes\/FAU\-[a-z]+\/img\//i', $logo)) {
 			// Default Logo aus Theme-Verzeichnis verwendet.
 			// Dies ist nur erlaubt für die 5 Fakultätsdomains und die Startdomain
-			if (in_array($this->url, ["https://www.fau.de", "https://www.fau.eu", 
+			
+
+			if (in_array($this->canonical, ["https://www.fau.de", "https://www.fau.eu", 
 			    "https://www.phil.fau.de", "https://www.phil.fau.eu",
 			    "https://www.nat.fau.de", "https://www.nat.fau.eu",
 			    "https://www.med.fau.de", "https://www.med.fau.eu",
 			    "https://www.tf.fau.de", "https://www.tf.fau.eu",
 			    "https://www.rw.fau.de", "https://www.rw.fau.eu"])) {
 			    // Bin auf einer der Hauptdomains, die einen Default nutzen dürfen
+			    
+			 } elseif (in_array($this->url, ["https://www.fau.de", "https://www.fau.eu", 
+			    "https://www.phil.fau.de", "https://www.phil.fau.eu",
+			    "https://www.nat.fau.de", "https://www.nat.fau.eu",
+			    "https://www.med.fau.de", "https://www.med.fau.eu",
+			    "https://www.tf.fau.de", "https://www.tf.fau.eu",
+			    "https://www.rw.fau.de", "https://www.rw.fau.eu"])) {
+			    // Bin auf einer der Hauptdomains, die einen Default nutzen dürfen
+			     
 			} else {
 			    $logo = '';
 			}

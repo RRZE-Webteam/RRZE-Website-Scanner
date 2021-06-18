@@ -1,9 +1,7 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Getting Infos from a detecting WordPress CMS
  */
 namespace CMS;
 
@@ -12,11 +10,44 @@ class WordPress {
     
     public function __construct() {
          $this->classname = 'wordpress';
-      //   $this->icon = '';
 	 $this->url = 'https://de.wordpress.com';
-
+	
      } 
      
+     
+    public function matchbymeta($string) {
+	if (!isset($string)) {
+	    return;
+	}
+	$matches = $this->get_regexp_matches();
+	foreach ($matches as $m) {
+	    if (preg_match($m, $string, $matches)) {
+		$this->name = "WordPress";
+		$this->version = $matches[1]; 
+		return $this->get_info();
+	    }
+	}
+	return false;
+	
+    }
+     
+    private function get_regexp_matches() {
+	$match_reg = [
+	    '/^WordPress\s*([0-9\.]+)$/i'
+	];
+	return $match_reg;
+    }   
+    public function get_info() {
+	$info = array();
+        $info['icon']	    = $this->icon;
+	$info['classname']  = $this->classname;	   
+	$info['url']	    = $this->url;
+	$info['name']	    = $this->name; 
+	$info['version']    = $this->version; 
+	return $info;
+    }
+    
+    
     function get_theme_main_style($linkarray, $genname, $genversion) {
 	if (!is_array($linkarray)) {
 	    return;
@@ -48,4 +79,5 @@ class WordPress {
 	}
 	return $res;
     }
+
 }
