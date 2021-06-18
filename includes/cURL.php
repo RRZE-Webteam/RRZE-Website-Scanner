@@ -34,11 +34,24 @@ class cURL {
 	}
     }
     function get($url) {
+	$res = array(
+	    "content" => '',
+	    "meta" => array(
+		"http_code" => 0
+	    ),
+	);
+	
+	if (!$this->is_valid_url($url)) {
+	    $res['meta']['http_code'] = -1;
+	    return $res;
+	}
 	$process = curl_init($url);
+	$this->url = $url;
 	curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
 	curl_setopt($process, CURLOPT_HEADER, 0);
 	curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
-	
+	curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
+	curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);
 	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEFILE, $this->cookie_file);
 	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEJAR, $this->cookie_file);
 	
@@ -63,12 +76,27 @@ class cURL {
 	
 	return $res;
     }
+     
     function post($url,$data) {
+	$res = array(
+	    "content" => '',
+	    "meta" => array(
+		"http_code" => 0
+	    ),
+	);
+	
+	if (!$this->is_valid_url($url)) {
+	    $res['meta']['http_code'] = -1;
+	    return $res;
+	}
 	$process = curl_init($url);
+	$this->url = $url;
+
 	curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
 	curl_setopt($process, CURLOPT_HEADER, 1);
 	curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
-	
+	curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
+	curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);
 	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEFILE, $this->cookie_file);
 	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEJAR, $this->cookie_file);
 	
@@ -97,4 +125,17 @@ class cURL {
 	echo "cURL Error: $error";
 	die;
     }
+    function get_ssl_info() {
+	
+    }
+    function is_valid_url($urlinput) {
+	$url = filter_var($urlinput, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
+
+	if (empty($url) || (strlen($url) != strlen($urlinput))) {
+	    return false;
+	}
+	return true;
+    }
+
+
 }
