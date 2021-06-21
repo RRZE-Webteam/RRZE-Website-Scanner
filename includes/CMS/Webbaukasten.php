@@ -15,12 +15,14 @@ class Webbaukasten extends \CMS  {
 	 $this->searchurl = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
+	 $this->name = "Webbaukasten"; 
  	 $this->links = $links;
          $this->linkrels = $linkrels;
          $this->scripts = $scripts;
      } 
      public $methods = array(
-		"generator_header"
+		"generator_header",
+	 "content_string"
     );
      
      public function generator_header() {
@@ -64,4 +66,22 @@ class Webbaukasten extends \CMS  {
 	$info['version']    = $this->version; 
 	return $info;
     }   
+    
+    
+    public function content_string() {
+	
+	    if ($this->content) {
+		if ((strpos($this->content, '<!-- KOPF ***') !==FALSE)
+		    && (strpos($this->content, '<!-- CONTENT *****') !==FALSE)) {
+		    
+		    if ((!isset($this->version)) || (empty($this->version))) {
+			// Keine Angabe der Version im Generator => Uralte Version vor 2006
+			$this->version = '2007';
+		    }
+		    return true;
+		}
+	    }
+	    return FALSE;
+	}
+	
 }

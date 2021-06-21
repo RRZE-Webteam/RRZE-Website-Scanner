@@ -58,7 +58,13 @@ class CMS {
         /*
          * Common, easy way first: check for Generator metatags or Generator headers
          */
-
+	if (isset($tags['generator']) && is_array($tags['generator'])) {
+	    $g = '';
+	    foreach ($tags['generator'] as $line) {
+		$g .= $line."\n";
+	    }
+	    $tags['generator'] = $g;
+	}
         foreach ($this->systems as $system_name) {
             $system_class = 'CMS\\' . $system_name;
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
