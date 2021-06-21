@@ -8,20 +8,23 @@ namespace CMS;
 class WordPress extends \CMS  {
     
     
-    public function __construct($url, $tags, $content) {
+    public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
          $this->classname = 'wordpress';
 	 $this->cmsurl = 'https://de.wordpress.com';
 	 $this->url = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
 	 $this->name = "WordPress";
+	 $this->links = $links;
+	 $this->linkrels = $linkrels;
+	 $this->scripts = $scripts;
      } 
      public $methods = array(
-		"matchbymeta", "button_css"
+	 "generator_header", "button_css", "api", "scripts"
 	);
 
      
-    public function matchbymeta() {
+    public function generator_header() {
 	$string = $this->tags['generator'];
 	 
 	if (empty($string)) {
@@ -66,6 +69,7 @@ class WordPress extends \CMS  {
 	foreach ($linkarray as $i => $values) {
 	    if (isset($linkarray[$i]['stylesheet'])) {
 		if (isset($linkarray[$i]['stylesheet']['href'])) {
+		    
 		    $href = $linkarray[$i]['stylesheet']['href'];
 		    if (preg_match('/themes\/([a-zA-Z0-9\-_]+)\/([a-z0-9\-\/]+)\.css(\?ver=[a-z0-9\.]+)?/i', $href, $output_array)) {
 			if (isset($output_array)) {
@@ -103,6 +107,50 @@ class WordPress extends \CMS  {
 			
 			return strpos($lines[8], "WordPress-style Buttons") !== FALSE;
 		    }
+		}
+
+		return FALSE;
+
+	}
+	/**
+	 * Check for WordPress Core scripts
+	 * @return [boolean]
+	 */
+	public function scripts() {
+		if($this->scripts) {
+		    foreach($this->scripts as $num => $element) {
+			    if (strpos($element, 'wp-includes') !==FALSE)
+				    return true;
+		    }
+
+		}
+
+		return FALSE;
+
+	}
+
+	/**
+	 * Check for WordPress Core API
+	 * @return [boolean]
+	 */
+	public function api() {
+		if($this->linkrels) {
+		    foreach($this->linkrels as $num => $element) {
+			
+			  foreach($element as $type => $lc) {
+
+			    if ($type == 'alternate') {
+				if (strpos($lc['href'], 'wp-json') !==FALSE)
+				    return true;
+			    }
+			     if ($type == 'dns-prefetch') {
+				if (strpos($lc['href'], 's.w.org') !==FALSE)
+				    return true;
+			    }
+			    
+			}
+		    }
+
 		}
 
 		return FALSE;

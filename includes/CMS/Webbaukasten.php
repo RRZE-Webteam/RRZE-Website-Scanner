@@ -5,22 +5,25 @@
  */
 namespace CMS;
 
-class Webbaukasten {
+class Webbaukasten extends \CMS  {
     
     
-    public function __construct($url, $tags, $content) {
+    public function __construct($url, $tags, $content,$links, $linkrels, $scripts) {
          $this->classname = 'webbaukasten';
       //   $this->icon = '';
 	 $this->cmsurl = 'https://webbaukasten.rrze.fau.de/';
 	 $this->searchurl = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
+ 	 $this->links = $links;
+         $this->linkrels = $linkrels;
+         $this->scripts = $scripts;
      } 
      public $methods = array(
-		"matchbymeta"
+		"generator_header"
     );
      
-     public function matchbymeta() {
+     public function generator_header() {
 	
 	$string = $this->tags['generator'];
 	 

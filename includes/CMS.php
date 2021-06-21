@@ -14,13 +14,21 @@ class CMS {
     var $icon;
     var $url; 
     var $cmsurl;
+    var $links;
+    var $scripts;
+    var $linkrels;
     
     public $systems = [
         "WordPress",
-	"Webbaukasten"
+	"Webbaukasten",
+	"Drupal",
+	"Typo3",
+	"MediaWiki",
+	"DokuWiki",
+	"Joomla"
 
     ];
-    private $common_methods = ["matchbymeta"];
+    private $common_methods = ["generator_header"];
     
     
     public function __construct($url) {
@@ -29,7 +37,21 @@ class CMS {
 	 $this->url = $url;
      } 
      
-     
+     public function add_linkrel($linkrels) {
+	 if (isset($linkrels)) {
+	     $this->linkrels = $linkrels;
+	 }
+     }
+     public function add_scripts($scripts) {
+	 if (isset($scripts)) {
+	     $this->scripts = $scripts;
+	 }
+     }
+     public function add_links($links) {
+	 if (isset($links)) {
+	     $this->links = $links;
+	 }
+     }
 
     public function get_generator($tags,$content) {
 
@@ -39,7 +61,8 @@ class CMS {
 
         foreach ($this->systems as $system_name) {
             $system_class = 'CMS\\' . $system_name;
-            $system = new $system_class($this->url, $tags, $content);
+            $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
+
 
             foreach ($this->common_methods as $method) {
                 if (method_exists($system, $method)) {
@@ -64,7 +87,7 @@ class CMS {
         foreach ($this->systems as $system_name) {
 
             $system_class = 'CMS\\' . $system_name;
-            $system = new $system_class($this->url, $tags, $content);
+            $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
 
             foreach ($system->methods as $method) {
                 if (!in_array($method, $this->common_methods)) {
@@ -89,29 +112,7 @@ class CMS {
 	    $genatorstring = trim($tags['generator']);
 	    $this->name = $genatorstring;
 	    
-	    if ((isset($genatorstring)) && (!is_array($genatorstring))) {
-		preg_match('/^([\wa-zA-Z\s\-;&]+)\(?([\s\d\.\/]*)\)?$/iu', $genatorstring, $output_array);
-		if (isset($output_array)) {
-		    $this->name = trim($output_array[1]);
-		    if (isset($output_array[2])) {
-			$this->version = trim($output_array[2]);
-		    }
-		    return $this->name;
-		}
-
-	    } elseif (is_array($genatorstring)) {
-		
-		foreach ($genatorstring as $i => $value) {
-		    preg_match('/^([\wa-z0-9A-Z\s\-;&]+)\(?([\s\d\.\/]*)\)?$/iu', $value, $output_array);
-		    if (isset($output_array)) {
-			$this->name = $output_array[1];
-			if (isset($output_array[2])) {
-			    $this->version = $output_array[2];
-			}
-			break;
-		    }
-		}
-	    }
+	   
 	    return $this->name;
 	}
 

@@ -44,7 +44,6 @@ class Analyse {
 	@ $doc->loadHTML($data['content']);
 	$nodes = $doc->getElementsByTagName('title');
 	$this->title = $this->sanitize_string(trim($nodes->item(0)->nodeValue));
-
 	$this->canonical = $this->get_canonical($data['content']);
 
 	$link = array();
@@ -75,16 +74,17 @@ class Analyse {
 	$tags = array();
 	foreach($doc->getElementsByTagName('meta') as $metaTag) {
 	      if($metaTag->getAttribute('name') != "") {
+		  $attrbname = strtolower($metaTag->getAttribute('name'));
 		  
-		  if (!isset($tags[$metaTag->getAttribute('name')])) {
-		      $tags[$metaTag->getAttribute('name')] = $metaTag->getAttribute('content');
-		  } elseif (is_array($tags[$metaTag->getAttribute('name')])) {
-		      $tags[$metaTag->getAttribute('name')][] = $metaTag->getAttribute('content');
+		  if (!isset($tags[$attrbname])) {
+		      $tags[$attrbname] = $metaTag->getAttribute('content');
+		  } elseif (is_array($tags[$attrbname])) {
+		      $tags[$attrbname][] = $metaTag->getAttribute('content');
 		  } else {
-		      $oldsingle = $tags[$metaTag->getAttribute('name')];
-		      $tags[$metaTag->getAttribute('name')] = array();
-		      $tags[$metaTag->getAttribute('name')][] = $oldsingle;
-		      $tags[$metaTag->getAttribute('name')][] = $metaTag->getAttribute('content');
+		      $oldsingle = $tags[$attrbname];
+		      $tags[$attrbname] = array();
+		      $tags[$attrbname][] = $oldsingle;
+		      $tags[$attrbname][] = $metaTag->getAttribute('content');
 		  }
 		
 	      }
@@ -93,8 +93,13 @@ class Analyse {
 	      }
 	}
 	$this->meta = $tags;
+	$this->linkrels = $this->get_meta_link($data['content']); 
+	
 	
 	$cms = new CMS($this->url);
+	$cms->add_links($this->links);
+	$cms->add_linkrel($this->linkrels);
+	$cms->add_scripts($this->get_script_link($data['content']));
 	$cms->get_generator($this->meta,$data['content']);
 
 	
@@ -109,11 +114,9 @@ class Analyse {
 	}
 	
 
-	$this->linkrels = $this->get_meta_link($data['content']); 
-
-	if (in_array( $cms->name, ["WordPress"])) {
+	if ($cms->name == "WordPress") {
 	    $controller = 'CMS\\'.$cms->name;
-	    $cmsdata = new $controller($this->url, $tags, $data['content']);
+	    $cmsdata = new $controller($this->url, $tags, $data['content'], $cms->links, $cms->linkrels, $cms->scripts);
 	    $cmsinfo = $cmsdata->get_theme_main_style($this->linkrels,$cms->name, $cms->version);
 	    if (!empty($cmsinfo)) {
 		$this->template = $cmsinfo['theme'];
@@ -166,6 +169,8 @@ class Analyse {
 	if (!empty($canonical)) {
 	    $baseurl = $canonical;
 	}
+	$basehost = parse_url($baseurl)['host'];
+	
 	$escapedUrl = preg_quote($baseurl, '/');
 	$regex = '/^' . $escapedUrl . '/';
 	
@@ -177,20 +182,14 @@ class Analyse {
 		   if ($matches) {
 			   // relative url, ignore
 		    } else {
-		   
-		   
-			$url = filter_var($href, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
-			if ($url) {
-
-
-
-			    preg_match($regex, $url, $matches);
-			     if ($matches) {
+			$pu = parse_url($href);		   
+		//	$url = filter_var($href, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
+			if ($pu['host'] == $basehost) {
 				 // internal link. ignore yet
-			     } else {
-				  $res[] = $url;
-			     }
-		       }
+			 } else {
+			      $res[] = $href;
+			 }
+		     
 		   }
 	     }
 	}
@@ -199,12 +198,14 @@ class Analyse {
 	foreach ($scriptsrcs as $link) {
 	       if ($link) {
 		   preg_match('/^\//',  $link, $matches);
+
 		   if ($matches) {
 			   // relative url, ignore
 		    } else {
-			preg_match($regex, $link, $matches);
-			if ($matches) {
-			    // internal link. ignore yet
+
+			$pu = parse_url($link);
+			if ($pu['host'] == $basehost) {
+			   // Local URL
 			} else {
 			     $res[] = $link;
 			}
