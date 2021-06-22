@@ -48,10 +48,13 @@ class cURL {
 	$process = curl_init($url);
 	$this->url = $url;
 	curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
-	curl_setopt($process, CURLOPT_HEADER, 0);
 	curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
 	curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
 	curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);
+	
+	curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($process, CURLOPT_HEADER, 1);
+	
 	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEFILE, $this->cookie_file);
 	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEJAR, $this->cookie_file);
 	
@@ -63,13 +66,18 @@ class cURL {
 	curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);
 	
-	$return = curl_exec($process);
+	$response = curl_exec($process);
+	$header_size = curl_getinfo($process, CURLINFO_HEADER_SIZE);
+	$header = substr($response, 0, $header_size);
+	$body = substr($response, $header_size);
+	
+	$res['header'] = $header;
 	$res['meta'] = curl_getinfo($process);
 	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
 	curl_close($process);
 
 	if ($httpcode>=200 && $httpcode<500) {
-	    $res['content'] = $return;	   
+	    $res['content'] = $body;	   
 	} else {
 	     $res['content'] = '';
 	}

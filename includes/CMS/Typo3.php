@@ -6,7 +6,7 @@ class Typo3 extends \CMS
 {
 
     public $methods = array(
-        "generator_header",
+        "generator_meta",
         "scripts"
     );
 
@@ -24,13 +24,23 @@ class Typo3 extends \CMS
 	} 
 
      
-	public function generator_header() {
+    public function generator_meta($string = '') {
+	if (empty($string)) {
 	    $string = $this->tags['generator'];
-
-	    if (empty($string)) {
-		return false;
+	}
+	
+	if (empty($string)) {
+	    return false;
+	}
+	
+	if (is_array($string)) {
+	    foreach ($string as $line) {
+		 $ret = $this->generator_meta($line);
+		 if ($ret !== false) {
+		     return $ret;
+		 }
 	    }
-
+	} else {
 	    $matches = $this->get_regexp_matches();
 	    foreach ($matches as $m) {
 		if (preg_match($m, $string, $matches)) {
@@ -39,9 +49,10 @@ class Typo3 extends \CMS
 		    return $this->get_info();
 		}
 	    }
-	    return false;
-
 	}
+	return false;
+	
+    }
 	 private function get_regexp_matches() {
 	    $match_reg = [
 		'/^TYPO3 /i'
@@ -77,5 +88,51 @@ class Typo3 extends \CMS
 		return FALSE;
 
 	}
+	/*
+     * Get Template (TYPO3 Extention)
+     */
+    
+    function get_template() {
+	$linkarray = $this->linkrels;
+	$genversion = $this->version;
+	$found = false;
+	$res = array();
+	foreach ($linkarray as $i => $values) {
+	    if (isset($linkarray[$i]['stylesheet'])) {
+		if (isset($linkarray[$i]['stylesheet']['href'])) {
+		    
+		    $href = $linkarray[$i]['stylesheet']['href'];
+		    if (preg_match('/typo3conf\/ext\/([a-zA-Z0-9\-_]+)\/Resources/i', $href, $output_array)) {
+			if (isset($output_array)) {
+			    $res['name'] = $output_array[1];
+			    $res['url'] = $linkarray[$i]['stylesheet']['href'];
 
+			    $found = true;
+			    break;
+			}
+		    }
+		}
+	    }
+	    if (isset($linkarray[$i]['manifest'])) {
+		if (isset($linkarray[$i]['manifest']['href'])) {
+		    
+		    $href = $linkarray[$i]['manifest']['href'];
+		    if (preg_match('/typo3conf\/ext\/([a-zA-Z0-9\-_]+)\/Resources/i', $href, $output_array)) {
+			if (isset($output_array)) {
+			    $res['name'] = $output_array[1];
+			    $res['url'] = $linkarray[$i]['manifest']['href'];
+
+			    $found = true;
+			    break;
+			}
+		    }
+		}
+	    }
+	}
+	if ($found) {
+	    return $res;
+	} else {
+	    return false;
+	}
+    }
 }

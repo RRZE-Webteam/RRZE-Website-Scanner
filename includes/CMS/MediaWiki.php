@@ -6,13 +6,13 @@ class MediaWiki extends \CMS
 {
 
     public $methods = array(
-        "generator_header",
-        "content_string"
+        "generator_meta",
+	"content_string"
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	    $this->classname = 'mediawiki';
+	     $this->classname = 'mediawiki';
 	    $this->cmsurl = 'https://www.mediawiki.org/';
 	    $this->url = $url;
 	    $this->tags = $tags;
@@ -24,13 +24,23 @@ class MediaWiki extends \CMS
 	} 
 
      
-	public function generator_header() {
+    public function generator_meta($string = '') {
+	if (empty($string)) {
 	    $string = $this->tags['generator'];
-
-	    if (empty($string)) {
-		return false;
+	}
+	
+	if (empty($string)) {
+	    return false;
+	}
+	
+	if (is_array($string)) {
+	    foreach ($string as $line) {
+		 $ret = $this->generator_meta($line);
+		 if ($ret !== false) {
+		     return $ret;
+		 }
 	    }
-
+	} else {
 	    $matches = $this->get_regexp_matches();
 	    foreach ($matches as $m) {
 		if (preg_match($m, $string, $matches)) {
@@ -39,9 +49,10 @@ class MediaWiki extends \CMS
 		    return $this->get_info();
 		}
 	    }
-	    return false;
-
 	}
+	return false;
+	
+    }
 	 private function get_regexp_matches() {
 	    $match_reg = [
 		'/^MediaWiki ([0-9\.\-a-z]+)$/i'
@@ -60,7 +71,7 @@ class MediaWiki extends \CMS
         
   
 
-   
+      
 	
 	public function content_string() {
 	    if ($this->content) {
@@ -70,5 +81,7 @@ class MediaWiki extends \CMS
 	    }
 	    return FALSE;
 	}
+	
+
 
 }

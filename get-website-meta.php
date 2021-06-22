@@ -59,6 +59,7 @@ function parse_website($url) {
     echo "Size:               ".$data['meta']['size_download']." Bytes\n";
     echo "primary_ip:         ".$data['meta']['primary_ip']."\n";
     echo "SSL:                ";
+   
     
     $certinfo = $cc->get_ssl_info();
     if ($certinfo) {
@@ -91,7 +92,9 @@ function parse_website($url) {
 	echo "*Kein SSL Zugang verfügbar*\n";
     }    
     echo "\n";
-    
+    // echo "Header:             ".$data['header']."\n";
+     
+     
     if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
 	
 	$analyse = new Analyse($url);

@@ -20,23 +20,34 @@ class WordPress extends \CMS  {
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_header", "button_css", "api", "scripts"
+	 "generator_meta", "button_css", "api", "scripts"
 	);
 
      
-    public function generator_header() {
-	$string = $this->tags['generator'];
-	 
+    public function generator_meta($string = '') {
+	if (empty($string)) {
+	    $string = $this->tags['generator'];
+	}
+	
 	if (empty($string)) {
 	    return false;
 	}
 	
-	$matches = $this->get_regexp_matches();
-	foreach ($matches as $m) {
-	    if (preg_match($m, $string, $matches)) {
-		
-		$this->version = $matches[1]; 
-		return $this->get_info();
+	if (is_array($string)) {
+	    foreach ($string as $line) {
+		 $ret = $this->generator_meta($line);
+		 if ($ret !== false) {
+		     return $ret;
+		 }
+	    }
+	} else {
+	    $matches = $this->get_regexp_matches();
+	    foreach ($matches as $m) {
+		if (preg_match($m, $string, $matches)) {
+
+		    $this->version = $matches[1]; 
+		    return $this->get_info();
+		}
 	    }
 	}
 	return false;
@@ -59,12 +70,14 @@ class WordPress extends \CMS  {
 	return $info;
     }
     
+    /*
+     * Get Template (WordPress Theme)
+     */
     
-    function get_theme_main_style($linkarray, $genname, $genversion) {
-	if (!is_array($linkarray)) {
-	    return;
-	}
-
+    function get_template() {
+	$linkarray = $this->linkrels;
+	$genversion = $this->version;
+	$found = false;
 	$res = array();
 	foreach ($linkarray as $i => $values) {
 	    if (isset($linkarray[$i]['stylesheet'])) {
@@ -73,7 +86,7 @@ class WordPress extends \CMS  {
 		    $href = $linkarray[$i]['stylesheet']['href'];
 		    if (preg_match('/themes\/([a-zA-Z0-9\-_]+)\/([a-z0-9\-\/]+)\.css(\?ver=[a-z0-9\.]+)?/i', $href, $output_array)) {
 			if (isset($output_array)) {
-			    $res['theme'] = $output_array[1];
+			    $res['name'] = $output_array[1];
 			    $res['url'] = $linkarray[$i]['stylesheet']['href'];
 			    if (isset($output_array[3])) {
 				$res['version'] = $output_array[3];
@@ -83,14 +96,18 @@ class WordPress extends \CMS  {
 				// Bei einigen Themes wird die WP-Version an die Theme-URI angehängt. Das ist dann aber nicht die Theme-Version
 				$res['version'] = '';
 			    }
-			    
+			    $found = true;
 			    break;
 			}
 		    }
 		}
 	    }
 	}
-	return $res;
+	if ($found) {
+	    return $res;
+	} else {
+	    return false;
+	}
     }
 	/**
 	 * Check /wp-includes/css/buttons.css content

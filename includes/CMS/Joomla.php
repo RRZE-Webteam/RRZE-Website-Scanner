@@ -5,7 +5,7 @@ class Joomla extends \CMS {
 
 	public $methods = array(
 		"readme",
-		"generator_header",
+		"generator_meta",
 		"core_js"
 	);
 
@@ -23,13 +23,23 @@ class Joomla extends \CMS {
 	} 
 
      
-	public function generator_header() {
+    public function generator_meta($string = '') {
+	if (empty($string)) {
 	    $string = $this->tags['generator'];
-
-	    if (empty($string)) {
-		return false;
+	}
+	
+	if (empty($string)) {
+	    return false;
+	}
+	
+	if (is_array($string)) {
+	    foreach ($string as $line) {
+		 $ret = $this->generator_meta($line);
+		 if ($ret !== false) {
+		     return $ret;
+		 }
 	    }
-
+	} else {
 	    $matches = $this->get_regexp_matches();
 	    foreach ($matches as $m) {
 		if (preg_match($m, $string, $matches)) {
@@ -38,9 +48,10 @@ class Joomla extends \CMS {
 		    return $this->get_info();
 		}
 	    }
-	    return false;
-
 	}
+	return false;
+	
+    }
 	 private function get_regexp_matches() {
 	    $match_reg = [
 		'/^Joomla! ([0-9\.]+) /i'
@@ -104,5 +115,37 @@ class Joomla extends \CMS {
 
 	}
 
-	
+	  /*
+     * Get Template  
+     */
+    
+    function get_template() {
+	$linkarray = $this->linkrels;
+	$genversion = $this->version;
+	$found = false;
+	$res = array();
+	foreach ($linkarray as $i => $values) {
+	    if (isset($linkarray[$i]['stylesheet'])) {
+		if (isset($linkarray[$i]['stylesheet']['href'])) {
+		    
+		    $href = $linkarray[$i]['stylesheet']['href'];
+		    if (preg_match('/templates\/([a-zA-Z0-9\-_]+)\/css\/template\.css/i', $href, $output_array)) {
+			if (isset($output_array)) {
+			    $res['name'] = $output_array[1];
+			    $res['url'] = $linkarray[$i]['stylesheet']['href'];
+			    
+			   
+			    $found = true;
+			    break;
+			}
+		    }
+		}
+	    }
+	}
+	if ($found) {
+	    return $res;
+	} else {
+	    return false;
+	}
+    }
 }

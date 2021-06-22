@@ -21,25 +21,34 @@ class Webbaukasten extends \CMS  {
          $this->scripts = $scripts;
      } 
      public $methods = array(
-		"generator_header",
+		"generator_meta",
 	 "content_string"
     );
      
-     public function generator_header() {
+    public function generator_meta($string = '') {
+	if (empty($string)) {
+	    $string = $this->tags['generator'];
+	}
 	
-	$string = $this->tags['generator'];
-	 
 	if (empty($string)) {
 	    return false;
 	}
 	
-	
-	$matches = $this->get_regexp_matches();
-	foreach ($matches as $m) {
-	    if (preg_match($m, $string, $matches)) {
-		$this->name = "Webbaukasten";
-		$this->version = $matches[1]; 
-		return $this->get_info();
+	if (is_array($string)) {
+	    foreach ($string as $line) {
+		 $ret = $this->generator_meta($line);
+		 if ($ret !== false) {
+		     return $ret;
+		 }
+	    }
+	} else {
+	    $matches = $this->get_regexp_matches();
+	    foreach ($matches as $m) {
+		if (preg_match($m, $string, $matches)) {
+
+		    $this->version = $matches[1]; 
+		    return $this->get_info();
+		}
 	    }
 	}
 	return false;

@@ -113,20 +113,15 @@ class Analyse {
 	    $this->generator['url'] = $cms->cmsurl;
 	}
 	
-
-	if ($cms->name == "WordPress") {
-	    $controller = 'CMS\\'.$cms->name;
-	    $cmsdata = new $controller($this->url, $tags, $data['content'], $cms->links, $cms->linkrels, $cms->scripts);
-	    $cmsinfo = $cmsdata->get_theme_main_style($this->linkrels,$cms->name, $cms->version);
-	    if (!empty($cmsinfo)) {
-		$this->template = $cmsinfo['theme'];
-		if ($cmsinfo['version']) {
-		    $this->template_version = $cmsinfo['version'];
-		}
-	    }
+	
+	$template = $cms->get_cms_template();
+	if ($template !== false) {
+	     $this->template = $template['name'];
+	     $this->template_version = $template['version'];
 	} else {
 	    $this->template = $cms->name;
 	}
+
 	
 	$this->favicon = $this->get_favicon($data['content']);
 	$this->canonical = $this->get_canonical($data['content']);
@@ -434,7 +429,7 @@ class Analyse {
     function find_tos_links() {
 	$tospages = array(
 	  "Impressum" => [
-	      'uri' => '/impressum[\b\.\/]+/, /imprint[\b\.\/]+/',
+	      'uri' => '/impressum[\b\.\/]+/i, /imprint[\b\.\/]+/i',
 	      'text' => '/Impressum\b/Ui, /Imprint\b/Ui, /Legal notice\b/Ui'	
 	  ],
 	    "Datenschutz" => [

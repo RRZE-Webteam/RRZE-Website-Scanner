@@ -7,7 +7,7 @@ class Drupal extends \CMS {
 		"readme_d6",
 		"changelog",
 		"changelog_d8",
-		"generator_header",
+		"generator_meta",
 		"node_css"
 	);
 
@@ -25,13 +25,23 @@ class Drupal extends \CMS {
 	} 
 
      
-	public function generator_header() {
+    public function generator_meta($string = '') {
+	if (empty($string)) {
 	    $string = $this->tags['generator'];
-
-	    if (empty($string)) {
-		return false;
+	}
+	
+	if (empty($string)) {
+	    return false;
+	}
+	
+	if (is_array($string)) {
+	    foreach ($string as $line) {
+		 $ret = $this->generator_meta($line);
+		 if ($ret !== false) {
+		     return $ret;
+		 }
 	    }
-
+	} else {
 	    $matches = $this->get_regexp_matches();
 	    foreach ($matches as $m) {
 		if (preg_match($m, $string, $matches)) {
@@ -40,9 +50,10 @@ class Drupal extends \CMS {
 		    return $this->get_info();
 		}
 	    }
-	    return false;
-
 	}
+	return false;
+	
+    }
 	 private function get_regexp_matches() {
 	    $match_reg = [
 		'/^Drupal ([0-9\.]+) /i'

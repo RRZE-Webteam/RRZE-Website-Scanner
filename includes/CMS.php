@@ -25,10 +25,12 @@ class CMS {
 	"Typo3",
 	"MediaWiki",
 	"DokuWiki",
-	"Joomla"
+	"Joomla",
+	"Imperia",
+	"ActiveWeb"
 
     ];
-    private $common_methods = ["generator_header"];
+    private $common_methods = ["generator_meta"];
     
     
     public function __construct($url) {
@@ -58,13 +60,7 @@ class CMS {
         /*
          * Common, easy way first: check for Generator metatags or Generator headers
          */
-	if (isset($tags['generator']) && is_array($tags['generator'])) {
-	    $g = '';
-	    foreach ($tags['generator'] as $line) {
-		$g .= $line."\n";
-	    }
-	    $tags['generator'] = $g;
-	}
+	
         foreach ($this->systems as $system_name) {
             $system_class = 'CMS\\' . $system_name;
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
@@ -123,6 +119,23 @@ class CMS {
 	}
 
 
+        return false;
+
+    }
+    
+    public function get_cms_template() {
+        foreach ($this->systems as $system_name) {
+
+            $system_class = 'CMS\\' . $system_name;
+            $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
+
+            if (method_exists($system, "get_template")) {
+		$res = $system->get_template();
+		if ($res !== false) {
+		    return  $res;
+		}
+	    }
+        }
         return false;
 
     }

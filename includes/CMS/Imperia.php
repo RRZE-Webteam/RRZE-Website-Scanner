@@ -2,22 +2,21 @@
 
 namespace CMS;
 
-class DokuWiki extends \CMS
+class Imperia extends \CMS
 {
 
     public $methods = array(
         "generator_meta",
-        "css"
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	    $this->classname = 'dokuwiki';
-	    $this->cmsurl = 'https://www.dokuwiki.org/';
+	    $this->classname = 'imperia';
+	    $this->cmsurl = 'https://www.pirobase-imperia.com/de/solutions/imperia';
 	    $this->url = $url;
 	    $this->tags = $tags;
 	    $this->content = $content;
-	    $this->name = "DokuWiki";
+	    $this->name = "Imperia";
 	    $this->links = $links;
 	    $this->linkrels = $linkrels;
 	    $this->scripts = $scripts;
@@ -55,7 +54,7 @@ class DokuWiki extends \CMS
     }
 	 private function get_regexp_matches() {
 	    $match_reg = [
-		'/^DokuWiki\s*([0-9\.\-a-z\s&;]*)/iu'
+		'/^Imperia ([0-9\.\-a-z]+)$/i'
 	    ];
 	    return $match_reg;
 	}   
@@ -71,30 +70,6 @@ class DokuWiki extends \CMS
         
   
 
-   
-	
-	 /* Check for CSS
-	 * @return [boolean]
-	 */
-	public function css() {
-		if($this->linkrels) {
-		    foreach($this->linkrels as $num => $element) {
-			
-			  foreach($element as $type => $lc) {
 
-			    if ($type == 'stylesheet') {
-				if (strpos($lc['href'], '/lib/exe/css.php') !==FALSE)
-				    return true;
-			    }
-			   
-			    
-			}
-		    }
-
-		}
-
-		return FALSE;
-
-	}
 
 }
