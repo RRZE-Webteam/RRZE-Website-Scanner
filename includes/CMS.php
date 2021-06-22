@@ -27,7 +27,12 @@ class CMS {
 	"DokuWiki",
 	"Joomla",
 	"Imperia",
-	"ActiveWeb"
+	"ActiveWeb",
+	"InfoparkFiona",
+	"Roxen",
+	"Zope",
+	"Express",
+	"SixCMS"
 
     ];
     private $common_methods = ["generator_meta"];
@@ -54,6 +59,12 @@ class CMS {
 	     $this->links = $links;
 	 }
      }
+      public function add_header($header) {
+	 if (isset($header)) {
+	     $this->header = $header;
+	 }
+     }
+      
 
     public function get_generator($tags,$content) {
 
@@ -64,7 +75,6 @@ class CMS {
         foreach ($this->systems as $system_name) {
             $system_class = 'CMS\\' . $system_name;
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
-
 
             foreach ($this->common_methods as $method) {
                 if (method_exists($system, $method)) {
@@ -87,10 +97,9 @@ class CMS {
          */
 
         foreach ($this->systems as $system_name) {
-
             $system_class = 'CMS\\' . $system_name;
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
-
+	    $system->header = $this->header;
             foreach ($system->methods as $method) {
                 if (!in_array($method, $this->common_methods)) {
                     if ($system->$method()) {
@@ -107,7 +116,6 @@ class CMS {
             }
 
         }
-	
 	// Didnt find anything till yet. If meta tag filled with a string, return this.
 	
 	if (isset($tags)) {

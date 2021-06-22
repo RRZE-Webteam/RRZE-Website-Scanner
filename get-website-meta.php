@@ -92,12 +92,13 @@ function parse_website($url) {
 	echo "*Kein SSL Zugang verfügbar*\n";
     }    
     echo "\n";
-    // echo "Header:             ".$data['header']."\n";
+   //  echo "Header:             ".$data['header']."\n";
      
      
     if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
 	
 	$analyse = new Analyse($url);
+	$analyse->add_header($data['header']);
 	$analyse->init($data);
 
 	echo "Analyse:\n";

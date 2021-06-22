@@ -29,6 +29,23 @@ class Analyse {
 	 $this->canonical = $url;
 	 $this->get_content_filter();
      } 
+     public function add_header($header) {
+	 if (isset($header)) {
+	    $haderlines = preg_split('/[\n\r]+/',$header);
+	    if (!empty($haderlines)) {
+		foreach ($haderlines as $line) {
+		    $cur = trim($line);
+		    if (!empty($cur)) {
+			list($name, $value) = explode(": ", $cur);
+			if ((!empty($name)) && (!empty($value))) {
+			    $this->header[$name] = $value;
+			}
+		    }
+		}
+	    }
+		
+	 }
+     }
      
     function set_url($url) {
 	  $url = filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
@@ -100,8 +117,8 @@ class Analyse {
 	$cms->add_links($this->links);
 	$cms->add_linkrel($this->linkrels);
 	$cms->add_scripts($this->get_script_link($data['content']));
+	$cms->add_header($this->header);
 	$cms->get_generator($this->meta,$data['content']);
-
 	
 	if ($cms->name) {
 	   $this->generator['name'] = $this->sanitize_string($cms->name);
@@ -173,7 +190,7 @@ class Analyse {
 	foreach ($this->linkrels as $i => $link) {
 	     if (isset($link['stylesheet'])) {
 		   $href = $link['stylesheet']['href'];
-		   preg_match('/^\//',  $href, $matches);
+		   preg_match('/^[\/\.]+/',  $href, $matches);
 		   if ($matches) {
 			   // relative url, ignore
 		    } else {
@@ -192,7 +209,7 @@ class Analyse {
 	$scriptsrcs = $this->get_script_link($content);
 	foreach ($scriptsrcs as $link) {
 	       if ($link) {
-		   preg_match('/^\//',  $link, $matches);
+		   preg_match('/^[\/\.]+/',  $link, $matches);
 
 		   if ($matches) {
 			   // relative url, ignore
@@ -278,7 +295,7 @@ class Analyse {
     }
     function get_language($content) {
 	$lang = '';
-	if (preg_match_all('/<html\s*[^<>]*lang="([a-z\-]+)"[^<>]*>/Umi', $content, $matches)) {
+	if (preg_match_all('/<html\s*[^<>]*lang="([a-z\-]+)"[^<>]*>/Ui', $content, $matches)) {
 		if ((isset($matches)) && (isset($matches[1]))) {
 		    $lang = $matches[1][0];
 		}
@@ -433,8 +450,8 @@ class Analyse {
 	      'text' => '/Impressum\b/Ui, /Imprint\b/Ui, /Legal notice\b/Ui'	
 	  ],
 	    "Datenschutz" => [
-	      'uri' => '/datenschutz[\b\.\/]+/, /privacy[\b\.\/]+/',
-	      'text' => '/Datenschutz\b/Ui, /Privacy\b/Ui, /Data protection\b/Ui'	
+	      'uri' => '/datenschutz[\b\.\/]+/i, /datenschutzhinweise/i, /privacy[\b\.\/]+/i',
+	      'text' => '/Datenschutzerklärung\b/ui, /Datenschutzhinweis/ui, /Datenschutz\b/Ui, /Datenschutzinformation\b/Ui, /Privacy\b/Ui, /Data protection\b/Ui'	
 	  ],
 	     "Barrierefreiheit" => [
 	      'uri' => '/barrierefreiheit[\b\.\/]+/, /accessibility[\b\.\/]+/, /a11y[\b\.\/]+/',

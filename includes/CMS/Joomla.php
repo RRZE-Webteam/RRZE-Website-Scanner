@@ -6,7 +6,8 @@ class Joomla extends \CMS {
 	public $methods = array(
 		"readme",
 		"generator_meta",
-		"core_js"
+		"core_js",
+	    "core_site_js"
 	);
 
 	
@@ -105,10 +106,28 @@ class Joomla extends \CMS {
 			 * 4th line always has Joomla declaration
 			 */
 			$lines = explode(PHP_EOL, $data);
-            if(array_key_exists(3,$lines))
-            {
-                return strpos($lines[3], "var Joomla={};") !== FALSE;
-            }
+		    if(array_key_exists(3,$lines))    {
+			return strpos($lines[3], "var Joomla={};") !== FALSE;
+		    }
+		}
+
+		return FALSE;
+
+	}
+ /**
+	 * Check /media/system/js/core.js content
+	 * @return [boolean]
+	 */
+	public function core_site_js() {
+
+		if($data = $this->fetch($this->url."/site/media/system/js/core.js")) {
+
+			/**
+			 * Look if the Joomla Definiton starts
+			 */
+		      if (preg_match('/^Joomla=window\.Joomla/i', $data, $matches)) {
+		       return true;
+		    }
 		}
 
 		return FALSE;

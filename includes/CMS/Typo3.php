@@ -7,7 +7,8 @@ class Typo3 extends \CMS
 
     public $methods = array(
         "generator_meta",
-        "scripts"
+        "scripts",
+	"content_string"
     );
 
     
@@ -69,7 +70,15 @@ class Typo3 extends \CMS
 	    return $info;
 	}
         
-  
+  	public function content_string() {
+	    if ($this->content) {
+		if (preg_match('/This website is powered by TYPO3 /i', $this->content, $matches)) {
+		       return true;
+		}
+	    }
+	    return FALSE;
+	}
+	
 
     /**
      * Check for Typo3 scripts

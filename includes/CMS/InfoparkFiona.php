@@ -2,21 +2,21 @@
 
 namespace CMS;
 
-class Imperia extends \CMS
+class InfoparkFiona extends \CMS
 {
 
     public $methods = array(
-        "generator_meta",
+        "generator_meta"
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	    $this->classname = 'imperia';
-	    $this->cmsurl = 'https://www.pirobase-imperia.com/de/solutions/imperia';
+	     $this->classname = 'fiona';
+	    $this->cmsurl = 'https://fiona.infopark.com/de';
 	    $this->url = $url;
 	    $this->tags = $tags;
 	    $this->content = $content;
-	    $this->name = "Imperia";
+	    $this->name = "Infopark CMS Fiona";
 	    $this->links = $links;
 	    $this->linkrels = $linkrels;
 	    $this->scripts = $scripts;
@@ -54,7 +54,7 @@ class Imperia extends \CMS
     }
 	 private function get_regexp_matches() {
 	    $match_reg = [
-		'/^Imperia ([0-9\.\-a-z_]+)$/i'
+		'/^Infopark CMS Fiona; ([0-9\.\-a-z]+);/i'
 	    ];
 	    return $match_reg;
 	}   
@@ -70,6 +70,10 @@ class Imperia extends \CMS
         
   
 
+      
+	
+	
+	
 
 
 }
