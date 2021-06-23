@@ -92,7 +92,7 @@ function parse_website($url) {
 	echo "*Kein SSL Zugang verfügbar*\n";
     }    
     echo "\n";
-   //  echo "Header:             ".$data['header']."\n";
+ //   echo "Header:             ".$data['header']."\n";
      
      
     if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
@@ -104,8 +104,12 @@ function parse_website($url) {
 	echo "Analyse:\n";
 	
 	echo "Title:              ".$analyse->title."\n";
-	echo "Original-URL:       ",$analyse->url."\n";
+	echo "Original-URL:       ".$analyse->url."\n";
 
+	if (isset($analyse->header['location'])) {
+	    echo "Location:           ".$analyse->header['location']."\n";
+	}
+	
 	if (isset($analyse->canonical)){
 	    echo "Canonical URL:      ".$analyse->canonical;
 	    echo "\n";

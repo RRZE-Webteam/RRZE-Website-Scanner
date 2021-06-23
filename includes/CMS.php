@@ -32,7 +32,12 @@ class CMS {
 	"Roxen",
 	"Zope",
 	"Express",
-	"SixCMS"
+	"SixCMS",
+	"GovernmentSiteBuilder",
+	"Plone",
+	"Moodle",
+	"Ilias",
+	"OpenCms"
 
     ];
     private $common_methods = ["generator_meta"];

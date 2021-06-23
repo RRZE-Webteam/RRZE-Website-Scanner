@@ -24,41 +24,46 @@ class Joomla extends \CMS {
 	} 
 
      
-    public function generator_meta($string = '') {
-	if (empty($string)) {
-	    $string = $this->tags['generator'];
-	}
-	
-	if (empty($string)) {
-	    return false;
-	}
-	
-	if (is_array($string)) {
-	    foreach ($string as $line) {
-		 $ret = $this->generator_meta($line);
-		 if ($ret !== false) {
-		     return $ret;
-		 }
+	public function generator_meta($string = '') {
+	    if (empty($string)) {
+		$string = $this->tags['generator'];
 	    }
-	} else {
-	    $matches = $this->get_regexp_matches();
-	    foreach ($matches as $m) {
-		if (preg_match($m, $string, $matches)) {
 
-		    $this->version = $matches[1]; 
-		    return $this->get_info();
+	    if (empty($string)) {
+		return false;
+	    }
+
+	    if (is_array($string)) {
+		foreach ($string as $line) {
+		     $ret = $this->generator_meta($line);
+		     if ($ret !== false) {
+			 return $ret;
+		     }
+		}
+	    } else {
+		$matches = $this->get_regexp_matches();
+		foreach ($matches as $m) {
+		    if (preg_match($m, $string, $matches)) {
+
+			$this->version = $matches[1]; 
+			return $this->get_info();
+		    }
 		}
 	    }
+	    return false;
+
 	}
-	return false;
+     
+    private function get_regexp_matches() {
+	$match_reg = [
+	    '/^Joomla! ([0-9\.]+) /i',
+	    '/^Joomla! \- Open Source Content Management \- Version ([0-9\/\-\.]+)$/ui'
+	];
+	return $match_reg;
+
 	
-    }
-	 private function get_regexp_matches() {
-	    $match_reg = [
-		'/^Joomla! ([0-9\.]+) /i'
-	    ];
-	    return $match_reg;
-	}   
+    }  
+ 
 	public function get_info() {
 	    $info = array();
 	    $info['icon']	    = $this->icon;

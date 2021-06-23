@@ -156,18 +156,20 @@ class Analyse {
 	}
 	
 	$url = $uri;
-	preg_match('/^\//',  $uri, $matches);
-	if ($matches) {
-		$baseurl = $this->url;
-		$canonical = $this->get_canonical($content);
-		if (!empty($canonical)) {
-		    $baseurl = $canonical;
-		}
-		$baseurl =preg_replace('/\/$/i', '', $baseurl);
-		
-		$url = $baseurl.$uri;
+	
+	$p = parse_url($uri);
+	if (empty($p['host'])) {
+	    $baseurl = $this->url;
+	    $canonical = $this->get_canonical($content);
+	    if (!empty($canonical)) {
+		$baseurl = $canonical;
+	    }
+	    $baseurl =preg_replace('/\/$/i', '', $baseurl);
+	    $p['path'] = preg_replace('/^\//i', '', $p['path']);
+	    $url = $baseurl.'/'.$p['path'];
 	}
 	return $url;
+
     }
     
     function find_external_ressources($content) {
@@ -182,24 +184,21 @@ class Analyse {
 	    $baseurl = $canonical;
 	}
 	$basehost = parse_url($baseurl)['host'];
-	
-	$escapedUrl = preg_quote($baseurl, '/');
-	$regex = '/^' . $escapedUrl . '/';
+	$baseurl =preg_replace('/\/$/i', '', $baseurl);
 	
 	
 	foreach ($this->linkrels as $i => $link) {
 	     if (isset($link['stylesheet'])) {
-		   $href = $link['stylesheet']['href'];
-		   preg_match('/^[\/\.]+/',  $href, $matches);
-		   if ($matches) {
+		   $p = parse_url($link['stylesheet']['href']);
+		   if (empty($p['host'])) {
 			   // relative url, ignore
+		       
 		    } else {
-			$pu = parse_url($href);		   
-		//	$url = filter_var($href, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
-			if ($pu['host'] == $basehost) {
+			if ($p['host'] == $basehost) {
 				 // internal link. ignore yet
 			 } else {
-			      $res[] = $href;
+			     
+			      $res[] = $link['stylesheet']['href'];
 			 }
 		     
 		   }
@@ -209,14 +208,12 @@ class Analyse {
 	$scriptsrcs = $this->get_script_link($content);
 	foreach ($scriptsrcs as $link) {
 	       if ($link) {
-		   preg_match('/^[\/\.]+/',  $link, $matches);
+		   $p = parse_url($link);
 
-		   if ($matches) {
+		   if (empty($p['host'])) {
 			   // relative url, ignore
 		    } else {
-
-			$pu = parse_url($link);
-			if ($pu['host'] == $basehost) {
+			if ($p['host'] == $basehost) {
 			   // Local URL
 			} else {
 			     $res[] = $link;
@@ -230,14 +227,19 @@ class Analyse {
     } 
     
     function get_canonical($content) {
-	$canonical = $this->url;
+	$canonical = '';
 	if (preg_match_all('/<link rel="canonical" href="([^<>"]+)"[^<>]*>/iU', $content, $matches)) {
 		if ((isset($matches)) && (isset($matches[1]))) {
 		    $canonical = $matches[1][0];
 		}
 	}
+	
+	if (empty($canonical)) {
+	    $canonical = $this->url;
+	}
+	
 	$canonical = preg_replace('/\/$/i', '', $canonical);
-
+	
 	return $canonical;
     }
     function get_favicon($content) {
@@ -263,7 +265,7 @@ class Analyse {
 		$width = $height = 0;
 		$href = $sizes = '';
 		 if (isset($link[$icontype]['href'])) {
-		     $href = $link[$icontype]['href'];
+		     $href = $this->make_absolute_link($link[$icontype]['href']);
 		 }
 		  if (isset($link[$icontype]['sizes'])) {
 		     $sizes = $link[$icontype]['sizes'];
