@@ -37,10 +37,12 @@ class CMS {
 	"Plone",
 	"Moodle",
 	"Ilias",
-	"OpenCms"
+	"OpenCms",
+	"ProcessWire",
+	"Pimcore"
 
     ];
-    private $common_methods = ["generator_meta"];
+    private $common_methods = ["generator_meta", "generator_header"];
     
     
     public function __construct($url) {
