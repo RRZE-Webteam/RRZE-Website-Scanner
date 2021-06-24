@@ -30,12 +30,18 @@ $ignore_domains = [
     '/zuv[0-9\-]+\.fau\.info/',
     '/[a-z0-9\-]+\.test\.rrze\.uni\-erlangen\.de/',
     '/[a-z0-9\-]+\.webhummel\.rrze\uni\-erlangen\.de/',
+    '/[a-z0-9\-]+\.tindu\.rrze\uni\-erlangen\.de/',
     '/berta\.wmp\.rrze\uni\-erlangen\.de/',
 ];
 
 		
 
-
+$outputfile = "";
+$prefix_outhtmlfile = "domain-analyse";
+$prefix_outjsonfile = "domain-analyse";
+$outjson = true;
+$servertyp = 18;
+$json_data = array();
 
 
 // Automatische Laden von Klassen.
@@ -58,7 +64,7 @@ spl_autoload_register(function ($class) {
     
 
 
-$outputfile = "domain-analyse.html";
+
 
 if ($argc !== 2) {
     echo "Usage: php create-domain-analyse.php Servertyp [output-file.html]\n";
@@ -77,7 +83,7 @@ if ($argc !== 2) {
 	$outputfile = sanitize_filename($argv[2]);
     }
     if (empty($outputfile)) {
-	$outputfile = "domain-analyse.html";
+	$outputfile = $prefix_outhtmlfile.'-'.$servertyp.'.html';
     }
 
     echo "Output to: ".$outputfile."\n";
@@ -92,6 +98,15 @@ usort($index, function($a, $b) {
 $table = create_indextable($index,4,$servertyp);
 // Schreibt den Inhalt in die Datei zurück
 file_put_contents($outputfile, $table);
+
+if ($outjson) {
+    $jsonfile = $prefix_outjsonfile.'-'.$servertyp.'.json';
+    $json = json_encode(array('data' => $json_data));
+    if (file_put_contents($jsonfile, $json))
+        echo "JSON file $jsonfile created successfully...\n";
+    else 
+	echo "Oops! Error creating json file $jsonfile...\n";
+}
 
 exit;
 
@@ -108,6 +123,8 @@ function sanitize_filename($name) {
 }
 
 function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks = true) {
+    global $json_data;
+    
     if (!isset($index)){
 	return;
     }
@@ -115,7 +132,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
     $line = '';
     $table = '';
     $cnt = 0;
-    $maxcnt = 1500;
+    $maxcnt = 2000;
     $breakat = 100;
     $breakcnt = 0;
      
@@ -123,11 +140,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 	$line = '';
 	
 	if (($refstatus==-1) || (($refstatus > -1) && ($entry['wmp_refstatus'] == $refstatus))) {
-	    // Status ok
-	    
-	    
 	    if (($refserver==-1) || ($entry['wmp_refservertyp'] == $refserver)) {
-	    // Servertyp ok
 		
 		if ($cnt > $maxcnt) {
 		    break;
@@ -136,11 +149,13 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 		
 	        $cc = new cURL();
 		$data = $cc->get($entry['url']);
-		echo $entry['url']."\n";
+		echo $entry['url'];
 		
 		if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 400) {
+		    echo " \t Ok\n";
 		    $line .= '<tr>';
 		    $analyse = new Analyse($entry['url']);
+		    $analyse->add_header($data['header']);
 		    $analyse->init($data);
 
 		   
@@ -155,7 +170,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 		    }
 		    $line .=  '<br><span class="url"><a href="'.$analyse->canonical.'">'.$analyse->canonical.'</a></span></td>';
 
-		    if (isset($analyse->logosrc)) {
+		    if (isset($analyse->logosrc) && !empty($analyse->logosrc)) {
 			$line .= '<td class="logo"><img class="borderless noshadow" src="'.$analyse->logosrc.'" style="max-width: 240px; max-height: 65px;" alt=""></td>';
 		    } else {
 			$line .= '<td class="logo"></td>';
@@ -227,6 +242,12 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 	
 		    
 		     $line .= '</tr>'."\n";
+		     
+		     
+		     $json_data[] = $analyse->get_analyse_data(); 
+	     
+		} else {
+		    echo " \t Status Error (".$data['meta']['http_code'].")\n";
 		}
 		sleep(1);
 	    }
@@ -249,9 +270,9 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 	$head .= '<th scope="col" rowspan="2">CMS</th>';
 	$head .= '</tr>';
 	$head .= '<tr class="center">';
-	$head .= '<td class="small">Impressum</td>';
-	$head .= '<td class="small">Datenschutz</td>';
-	$head .= '<td class="small">Barrierefreiheit</td>';
+	$head .= '<td class="small vertical">Impressum</td>';
+	$head .= '<td class="small vertical">Datenschutz</td>';
+	$head .= '<td class="small vertical">Barrierefreiheit</td>';
 	$head .= '</tr>';	
 	$head .= '</thead>';
 	$output = $head;
@@ -350,7 +371,11 @@ function get_index() {
 			}
 		    }
 		}
-		if ($addthis) {
+		if ($addthis) {	    
+		    if (strpos($url, "http") == FALSE) {
+			$url = 'https://'.$url;
+		    }
+		    
 		    $res[$num]['url'] = $url;
 		    $res[$num]['fachbereich'] = $fachbereich;
 		    $res[$num]['wmp_id'] = intval($wmpid);

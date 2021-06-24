@@ -150,6 +150,30 @@ class Analyse {
 	
     } 
     
+    
+    function get_analyse_data() {
+	$res = array();
+	$res['url'] = $this->url;
+	$res['canonical'] = $this->canonical;
+	$res['title'] = $this->title;
+	$res['logo_src'] = $this->logosrc; 
+	$res['favicon_src'] =$this->favicon;
+	$res['meta'] =  $this->meta;
+//	$res['content']['links'] = $this->links;
+	$res['content']['lang'] =  $this->lang;
+	$res['content']['tos'] =  $this->toslinks;
+	$res['content']['external'] = $this->external;
+	
+	$res['generator']['name'] =  $this->generator['name']; 
+	$res['generator']['version'] =  $this->generator['version'];
+	$res['generator']['icon'] =  $this->generator['icon'];
+	$res['generator']['url'] =  $this->generator['url'];
+	$res['generator']['classname'] =  $this->generator['classname']; 
+	$res['template']['name'] =  $this->template; 
+	$res['template']['version'] =  $this->template_version;  
+	return $res;
+    }
+    
     function make_absolute_link($uri) {
 	if (empty($uri)) {
 	    return;
