@@ -191,6 +191,7 @@ class cURL {
 	    }
 	    return true;
 	 }
+	 $this->header = array();
 	 return false;
      }
      
