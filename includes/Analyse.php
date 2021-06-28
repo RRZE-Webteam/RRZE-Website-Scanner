@@ -148,13 +148,31 @@ class Analyse {
 	$res['content']['tos'] =  $this->toslinks;
 	$res['content']['external'] = $this->external;
 	
-	$res['generator']['name'] =  $this->generator['name']; 
-	$res['generator']['version'] =  $this->generator['version'];
-	$res['generator']['icon'] =  $this->generator['icon'];
-	$res['generator']['url'] =  $this->generator['url'];
-	$res['generator']['classname'] =  $this->generator['classname']; 
-	$res['template']['name'] =  $this->template; 
-	$res['template']['version'] =  $this->template_version;  
+	if (isset($this->generator['name'])) {
+	    $res['generator']['name'] =  $this->generator['name']; 
+	}
+	if (isset($this->generator['version'])) {
+	    $res['generator']['version'] =  $this->generator['version'];
+	}
+	if (isset($this->generator['icon'])) {
+	    $res['generator']['icon'] =  $this->generator['icon'];
+	}
+	if (isset($this->generator['url'])) {
+	    $res['generator']['url'] =  $this->generator['url'];
+	}
+	if (isset($this->generator['classname'])) {
+	    $res['generator']['classname'] =  $this->generator['classname']; 
+	}
+	if (isset($this->template)) {
+	    $res['template']['name'] =  $this->template; 
+	}
+	if (isset($this->template_version)) {
+	    $res['template']['version'] =  $this->template_version;  
+	}
+	
+	
+	
+	
 	return $res;
     }
     

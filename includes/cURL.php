@@ -179,10 +179,12 @@ class cURL {
 		foreach ($haderlines as $line) {
 		    $cur = trim($line);
 		    if (!empty($cur)) {
-			list($name, $value) = explode(": ", $cur);
-			if ((!empty($name)) && (!empty($value))) {
-			    $name = strtolower($name);
-			    $this->header[$name] = $value;
+			if (strpos($cur, ': ')) { 
+			    list($name, $value) = explode(": ", $cur);
+			    if ((!empty($name)) && (!empty($value))) {
+				$name = strtolower($name);
+				$this->header[$name] = $value;
+			    }
 			}
 		    }
 		}
