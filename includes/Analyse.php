@@ -502,13 +502,13 @@ class Analyse {
 		}
 		if (isset($link['linktext'])) {
 		    $link['linktext'] = trim($link['linktext']);
-		}
-		foreach (explode(",",$textstrings)  as $search) {
-		   if (preg_match($search, $link['linktext'], $matches)) {
-		       $link['href'] = $this->make_absolute_link($link['href']);
-		       $found = $link;
-		       break;
-		   }
+		    foreach (explode(",",$textstrings)  as $search) {
+		       if (preg_match($search, $link['linktext'], $matches)) {
+			   $link['href'] = $this->make_absolute_link($link['href']);
+			   $found = $link;
+			   break;
+		       }
+		    }
 		}
 		if ($found) {
 		    break;
