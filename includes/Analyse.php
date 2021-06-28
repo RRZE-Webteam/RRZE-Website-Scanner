@@ -29,23 +29,7 @@ class Analyse {
 	 $this->canonical = $url;
 	 $this->get_content_filter();
      } 
-     public function add_header($header) {
-	 if (isset($header)) {
-	    $haderlines = preg_split('/[\n\r]+/',$header);
-	    if (!empty($haderlines)) {
-		foreach ($haderlines as $line) {
-		    $cur = trim($line);
-		    if (!empty($cur)) {
-			list($name, $value) = explode(": ", $cur);
-			if ((!empty($name)) && (!empty($value))) {
-			    $this->header[$name] = $value;
-			}
-		    }
-		}
-	    }
-		
-	 }
-     }
+     
      
     function set_url($url) {
 	  $url = filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);

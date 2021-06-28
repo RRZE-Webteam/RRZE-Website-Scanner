@@ -45,7 +45,8 @@ function parse_website($url) {
 
     $cc = new cURL();
     $data = $cc->get($url);
-    
+    $locationchange = $cc->is_url_location_host(true);
+
     
     if ($data['meta']['http_code'] < 0 ) {
 	echo "Invalid URL to analyse: \"".$url."\"\n";
@@ -92,13 +93,16 @@ function parse_website($url) {
 	echo "*Kein SSL Zugang verfügbar*\n";
     }    
     echo "\n";
- //   echo "Header:             ".$data['header']."\n";
-     
-     
-    if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
+    echo "Header: \n";
+    foreach ($cc->header as $name => $value) {
+	echo "\t$name: $value\n";
+    }
+    echo "\n"; 
+    
+    if (($locationchange) && ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500)) {
 	
-	$analyse = new Analyse($url);
-	$analyse->add_header($data['header']);
+	$analyse = new Analyse($cc->url);
+	$analyse->header = $cc->header;
 	$analyse->init($data);
 
 	echo "Analyse:\n";
@@ -126,7 +130,7 @@ function parse_website($url) {
 	    echo "\n";
 	    
 	}
-	if (isset($analyse->template)) {
+	if ((isset($analyse->template)) && ($analyse->template !== $analyse->generator)) {
 	    echo "Template:           ".$analyse->template;
 	    if (isset($analyse->template_version)) {
 		echo " (".$analyse->template_version.")";
@@ -158,6 +162,9 @@ function parse_website($url) {
 		echo "\t".$link."\n";
 	    }
 	}
+    } elseif (!$locationchange) {
+	echo "Domain ".$cc->url." wird umgelenkt auf: ".$cc->header['location']."\n";
+	echo "Bitte diese Domain gesondert analysieren.\n";
     } else {
 	echo "Fehler beim Zugriff: ".$data['meta']['http_code']."\n";
     }

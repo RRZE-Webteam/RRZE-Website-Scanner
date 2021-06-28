@@ -71,7 +71,9 @@ class cURL {
 	$header = substr($response, 0, $header_size);
 	$body = substr($response, $header_size);
 	
-	$res['header'] = $header;
+	$this->parse_header($header);
+	
+	$res['header'] = $this->header;
 	$res['meta'] = curl_getinfo($process);
 	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
 	curl_close($process);
@@ -170,5 +172,56 @@ class cURL {
 	return true;
     }
 
+    public function parse_header($header) {
+	 if (isset($header)) {
+	    $haderlines = preg_split('/[\n\r]+/',$header);
+	    if (!empty($haderlines)) {
+		foreach ($haderlines as $line) {
+		    $cur = trim($line);
+		    if (!empty($cur)) {
+			list($name, $value) = explode(": ", $cur);
+			if ((!empty($name)) && (!empty($value))) {
+			    $name = strtolower($name);
+			    $this->header[$name] = $value;
+			}
+		    }
+		}
+	    }
+	    return true;
+	 }
+	 return false;
+     }
+     
+     public function is_url_location_host($setnew = false) {
+	 if (isset($this->header['location'])) {
+	     $lu = parse_url($this->header['location']);     
+	     $lo = parse_url($this->url);
+	     
+	     $wwwlu = 'www.'.$lu['host'];
+	     $wwwlo = 'www.'.$lo['host'];
+	     if ($lu['host'] == $lo['host']) {
+		 return true;
 
+	     } else {
+		 
+		 if ($lu['host'] == $wwwlo )  {
+		     // Ist Umlenkung auf Domainhost ohne www, es bleibt also dieselbe Domain
+		   if ($setnew) {
+		       $this->url = $this->header['location']; 
+		   }
+		     return true;
+		 }
+		 if ($wwwlu == $lo['host'] )  {
+		     // Ist Umlenkung auf Domainhost mit www, es bleibt also dieselbe Domain
+		    if ($setnew) {
+		       $this->url = $this->header['location']; 
+		    }
+		     return true;
+		 }
+		 
+		 return false;
+	     }
+	 }
+	 return true;
+     }
 }
