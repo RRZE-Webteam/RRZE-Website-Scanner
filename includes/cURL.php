@@ -21,6 +21,7 @@ class cURL {
 	$this->compression=$compression;
 	$this->proxy=$proxy;
 	$this->cookies=$cookies;
+	$this->header = array();
 	if ($this->cookies == TRUE) $this->cookie($cookie);
     }
     
