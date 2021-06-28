@@ -138,7 +138,7 @@ class CMS {
 
     }
     
-    public function get_cms_template() {
+    public function get_cms_template($tags,$content) {
         foreach ($this->systems as $system_name) {
 
             $system_class = 'CMS\\' . $system_name;

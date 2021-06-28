@@ -115,7 +115,7 @@ class Analyse {
 	}
 	
 	
-	$template = $cms->get_cms_template();
+	$template = $cms->get_cms_template($this->meta,$data['content']);
 	if ($template !== false) {
 	     $this->template = $template['name'];
 	     $this->template_version = $template['version'];
@@ -257,6 +257,8 @@ class Analyse {
 	$res = array();
 	$maxw = $maxh = 0;
 	$maxhref = '';
+	$icontype = '';
+	
 	foreach ($this->linkrels as $i => $link) {
 
 	    if ((isset($link['icon'])) || (isset($link['shortcut icon']))|| (isset($link['apple-touch-icon']))) {
@@ -498,8 +500,10 @@ class Analyse {
 		if ($found) {
 		    break;
 		}
+		if (isset($link['linktext'])) {
+		    $link['linktext'] = trim($link['linktext']);
+		}
 		foreach (explode(",",$textstrings)  as $search) {
-		   $link['linktext'] = trim($link['linktext']);
 		   if (preg_match($search, $link['linktext'], $matches)) {
 		       $link['href'] = $this->make_absolute_link($link['href']);
 		       $found = $link;
