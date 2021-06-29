@@ -103,6 +103,7 @@ function parse_website($url) {
 	
 	$analyse = new Analyse($cc->url);
 	$analyse->header = $cc->header;
+	$analyse->httpstatus = $data['meta']['http_code'];
 	$analyse->init($data);
 
 	echo "Analyse:\n";

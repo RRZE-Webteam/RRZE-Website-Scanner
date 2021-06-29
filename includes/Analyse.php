@@ -28,6 +28,7 @@ class Analyse {
          $this->url = $url;
 	 $this->canonical = $url;
 	 $this->get_content_filter();
+	 $this->httpstatus = 200;
      } 
      
      
@@ -138,10 +139,15 @@ class Analyse {
     function get_analyse_data() {
 	$res = array();
 	$res['url'] = $this->url;
+	$res['httpstatus'] = $this->httpstatus;
 	$res['canonical'] = $this->canonical;
 	$res['title'] = $this->title;
-	$res['logo_src'] = $this->logosrc; 
-	$res['favicon_src'] =$this->favicon;
+	if (isset($this->logosrc)) {
+	    $res['logo_src'] = $this->logosrc;
+	}
+	if (isset($this->favicon['href'])) {
+	    $res['favicon_src'] =$this->favicon['href'];
+	}
 	$res['meta'] =  $this->meta;
 //	$res['content']['links'] = $this->links;
 	$res['content']['lang'] =  $this->lang;
