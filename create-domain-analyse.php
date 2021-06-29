@@ -187,7 +187,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 
 			 if (($analyse->toslinks['Impressum']) && (!empty($analyse->toslinks['Impressum']['href']))) {
 			     $line .= '<td class="center">';
-			     $line .= '<a href="'.$analyse->toslinks['Impressum']['href'].'">[ok]</a>';
+			     $line .= '<a title="Impressum von '.$analyse->url.'" href="'.$analyse->toslinks['Impressum']['href'].'">[ok]</a>';
 			     $line .= '</td>';
 			 } else {
 			     $line .= '<td class="center">';
@@ -196,7 +196,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 			 }
 			if (($analyse->toslinks['Datenschutz']) && (!empty($analyse->toslinks['Datenschutz']['href']))) {
 			     $line .= '<td class="center">';
-			     $line .= '<a href="'.$analyse->toslinks['Datenschutz']['href'].'">[ok]</a>';
+			     $line .= '<a title="Datenschutzerklärung von '.$analyse->url.'"  href="'.$analyse->toslinks['Datenschutz']['href'].'">[ok]</a>';
 			     $line .= '</td>';
 			 } else {
 			      $line .= '<td class="center">';
@@ -205,7 +205,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 			 }
 			if (($analyse->toslinks['Barrierefreiheit']) && (!empty($analyse->toslinks['Barrierefreiheit']['href']))) {
 			     $line .= '<td class="center">';
-			     $line .= '<a href="'.$analyse->toslinks['Barrierefreiheit']['href'].'">[ok]</a>';
+			     $line .= '<a title="Barrierefreiheitserklärung von '.$analyse->url.'"  href="'.$analyse->toslinks['Barrierefreiheit']['href'].'">[ok]</a>';
 			     $line .= '</td>';
 			 } else {
 			      $line .= '<td class="center">';
