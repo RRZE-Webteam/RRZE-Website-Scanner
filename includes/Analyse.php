@@ -466,7 +466,7 @@ class Analyse {
 			}
 		    }
 		}
-		
+		$logo = $this->make_absolute_link($logo);
 		return $logo;
 		
 	    } else {
