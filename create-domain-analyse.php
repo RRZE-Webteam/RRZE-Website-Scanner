@@ -140,6 +140,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
     
     foreach ($index as $num => $entry) {
 	$line = '';
+	$json_grunddata = array();
 	
 	if (($refstatus==-1) || (($refstatus > -1) && ($entry['wmp_refstatus'] == $refstatus))) {
 	    if (($refserver==-1) || ($entry['wmp_refservertyp'] == $refserver)) {
