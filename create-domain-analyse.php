@@ -151,6 +151,7 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 		$json_grunddata['wmp']['refstatus'] = $entry['wmp_refstatus'];
 		$json_grunddata['wmp']['refid'] = $entry['wmp_id'];
 		$json_grunddata['wmp']['internal_domain'] = $entry['internal_domain'];
+		$json_grunddata['redirect'] = '';
 		
 		if ($cnt > $maxcnt) {
 		    break;
