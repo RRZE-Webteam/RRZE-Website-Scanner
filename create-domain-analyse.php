@@ -136,11 +136,20 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
     $breakat = 100;
     $breakcnt = 0;
      
+
+    
     foreach ($index as $num => $entry) {
 	$line = '';
 	
 	if (($refstatus==-1) || (($refstatus > -1) && ($entry['wmp_refstatus'] == $refstatus))) {
 	    if (($refserver==-1) || ($entry['wmp_refservertyp'] == $refserver)) {
+		
+		
+		$json_grunddata['url'] = $entry['url'];
+		$json_grunddata['wmp']['refservertyp'] = $entry['wmp_refservertyp'];
+		$json_grunddata['wmp']['refstatus'] = $entry['wmp_refstatus'];
+		$json_grunddata['wmp']['refid'] = $entry['wmp_id'];
+		$json_grunddata['wmp']['internal_domain'] = $entry['internal_domain'];
 		
 		if ($cnt > $maxcnt) {
 		    break;
@@ -151,6 +160,9 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 		$data = $cc->get($entry['url']);
 		$locationchange = $cc->is_url_location_host(true);
 		echo $cc->url;
+		
+		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
+		
 		
 		if ($locationchange &&  $data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
 		   
@@ -245,13 +257,19 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 		    
 		     $line .= '</tr>'."\n";
 		     
+		     $analysedata = $analyse->get_analyse_data();  
 		     
-		     $json_data[] = $analyse->get_analyse_data(); 
+		     $jsonadd =  array_merge($json_grunddata, $analysedata);
+		     $json_data[] = $jsonadd;
 	     
 	        } elseif (!$locationchange) {
 		    echo "\t wird umgelenkt auf: ".$cc->header['location']."\n";
+		    $json_grunddata['redirect'] = $cc->header['location'];
+		    $json_data[] = $json_grunddata;
+		    
 		} else {
 		    echo " \t Status Error (".$data['meta']['http_code'].")\n";
+		    $json_data[] = $json_grunddata;
 		}
 		sleep(1);
 	    }
@@ -365,27 +383,32 @@ function get_index() {
 	$lines = explode("\n",$data['content']);
 	foreach ($lines as $line) {
 	    if ((!empty($line)) && (!empty(trim($line)))) {
+		$testdomain = false;
 		list($num, $url, $fachbereich, $docroot, $wmpid, $wmprefstatus, $wmprefservertyp) = explode("\t",$line);
-		$addthis = true;
 		if ($ignore_domains) {
 		    
 		    foreach ($ignore_domains as $ignore) {
 			if (preg_match($ignore, $url)) {
-			    $addthis = false;
+			    $testdomain = true;
 			}
 		    }
 		}
-		if ($addthis) {	    
-		    if (strpos($url, "http") == FALSE) {
-			$url = 'http://'.$url;
-		    }
-		    
-		    $res[$num]['url'] = $url;
-		    $res[$num]['fachbereich'] = $fachbereich;
-		    $res[$num]['wmp_id'] = intval($wmpid);
-		    $res[$num]['wmp_refstatus'] = intval($wmprefstatus);
-		    $res[$num]['wmp_refservertyp'] = intval($wmprefservertyp);
+		
+		if (strpos($url, "http") == FALSE) {
+		    $url = 'http://'.$url;
 		}
+
+		$res[$num]['url'] = $url;
+		$res[$num]['fachbereich'] = $fachbereich;
+		$res[$num]['wmp_id'] = intval($wmpid);
+		$res[$num]['wmp_refstatus'] = intval($wmprefstatus);
+		$res[$num]['wmp_refservertyp'] = intval($wmprefservertyp);
+		if ($testdomain) {
+		   $res[$num]['internal_domain'] = 1;
+		} else {
+		   $res[$num]['internal_domain'] = 0;
+		}
+		
 	    }
 	}
     }

@@ -47,7 +47,8 @@ class Analyse {
 	$nodes = $doc->getElementsByTagName('title');
 	$this->title = $this->sanitize_string(trim($nodes->item(0)->nodeValue));
 	$this->canonical = $this->get_canonical($data['content']);
-
+	$this->httpstatus = $data['meta']['http_code'];
+	
 	$link = array();
 	foreach($doc->getElementsByTagName('a') as $linkTag) {
 	    $thislink = array();
