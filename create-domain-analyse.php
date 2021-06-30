@@ -22,6 +22,7 @@ $ignore_domains = [
     '/\.webspace.rrze\.fau\.de$/',
     '/webserver\-default\.uni\-erlangen\.de/',
     '/infoload\.rrze\.uni\-erlangen\.de/',
+    '/name\-harbour\.rrze\.uni\-erlangen\.de/',
     '/real\-name\-harbour\.rrze\.uni\-erlangen\.de/',
     '/cmslb\.rrze\.uni\-erlangen\.de/',
     '/dev[0-9\-]+\.fau\.tv/',
@@ -161,6 +162,8 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 	        $cc = new cURL();
 		$data = $cc->get($entry['url']);
 		$locationchange = $cc->is_url_location_host(true);
+		$certinfo = $cc->get_ssl_info();
+		
 		echo $cc->url;
 		
 		$json_grunddata['httpstatus'] = $data['meta']['http_code'];

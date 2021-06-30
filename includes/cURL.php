@@ -159,6 +159,12 @@ class cURL {
 	if ($read) {
 	    $cert = stream_context_get_params($read);
 	    $certinfo = openssl_x509_parse($cert['options']['ssl']['peer_certificate']);
+	    
+	    $p = parse_url($this->url);
+	    if ($p['scheme'] == 'http' ) {
+		$this->url = preg_replace('/^http:/i', 'https:', $this->url);
+	    }
+	    
 	    return $certinfo;
 	}
 	return false;
