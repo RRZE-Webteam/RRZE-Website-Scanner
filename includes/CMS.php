@@ -39,7 +39,8 @@ class CMS {
 	"Ilias",
 	"OpenCms",
 	"ProcessWire",
-	"Pimcore"
+	"Pimcore",
+	"Mattermost"
 
     ];
     private $common_methods = ["generator_meta", "generator_header"];

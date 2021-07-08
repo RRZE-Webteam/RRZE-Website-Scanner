@@ -488,7 +488,7 @@ class Analyse {
 	  ],
 	    "Datenschutz" => [
 	      'uri' => '/datenschutz[\b\.\/]+/i, /datenschutzhinweise/i, /privacy[\b\.\/]+/i',
-	      'text' => '/Datenschutzerklärung\b/ui, /Datenschutzhinweis/ui, /Datenschutz\b/Ui, /Datenschutzinformation\b/Ui, /Privacy\b/Ui, /Data protection\b/Ui'	
+	      'text' => '/Datenschutzerklärung\b/ui, /Datenschutzhinweis/ui, /Datenschutz\b/Ui, /Datenschutzinformation\b/Ui, /Privacy\b/Ui, /Data protection\b/Ui, /Privatsp/Ui'	
 	  ],
 	     "Barrierefreiheit" => [
 	      'uri' => '/barrierefreiheit[\b\.\/]+/, /accessibility[\b\.\/]+/, /a11y[\b\.\/]+/',
