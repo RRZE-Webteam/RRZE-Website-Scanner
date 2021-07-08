@@ -206,7 +206,12 @@ class cURL {
 	 if (isset($this->header['location'])) {
 	     $lu = parse_url($this->header['location']);     
 	     $lo = parse_url($this->url);
+ 
 	     
+	     if (!isset($lu['host'])) {
+		 // Kein Host angegeben => relativer Link, Umleitung bleibt beim selben Host
+		 return true;
+	     }
 	     $wwwlu = 'www.'.$lu['host'];
 	     $wwwlo = 'www.'.$lo['host'];
 	     if ($lu['host'] == $lo['host']) {

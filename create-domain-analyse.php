@@ -29,6 +29,7 @@ $ignore_domains = [
     '/dev[a-z0-9\-\.]*\.rrze\.uni\-erlangen\.de/',
     '/info[0-9\-]+\.rrze\.uni\-erlangen\.de/',
     '/zuv[0-9\-]+\.fau\.info/',
+    '/[a-z0-9\-]+\.test\.rrze\.fau\.de/',
     '/[a-z0-9\-]+\.test\.rrze\.uni\-erlangen\.de/',
     '/[a-z0-9\-]+\.webhummel\.rrze\uni\-erlangen\.de/',
     '/[a-z0-9\-]+\.tindu\.rrze\uni\-erlangen\.de/',
@@ -41,7 +42,7 @@ $outputfile = "";
 $prefix_outhtmlfile = "domain-analyse";
 $prefix_outjsonfile = "domain-analyse";
 $outjson = true;
-$servertyp = 18;
+$defaultservertyp = 18;
 $json_data = array();
 
 
@@ -63,32 +64,79 @@ spl_autoload_register(function ($class) {
     }
 });
     
+$shortopts = "s:o:j:";
+$longopts  = array(
+    "server:",
+    "output:",
+    "json:"    // Optional value
+);
+$displayhelp = false;
 
+// Script example.php
+$options = getopt($shortopts,$longopts);
 
-
-
-if ($argc !== 2) {
-    echo "Usage: php create-domain-analyse.php Servertyp [output-file.html]\n";
-    
-    echo "Servertypen: ";
-    foreach ($servertypen as $num => $val) {
-	echo "\t".$num."\t".$val."\n";
-    }
-    exit;
+if (isset($options['s'])) {
+   $servertyp = $options['s'];
+} elseif (isset($options['server'])) {
+   $servertyp = $options['server'];
 } else {
-    
-    if (isset($argv) && isset($argv[1])) {
-	$servertyp = intval($argv[1]);
-    }
-    if (isset($argv) && isset($argv[2])) {
-	$outputfile = sanitize_filename($argv[2]);
-    }
-    if (empty($outputfile)) {
-	$outputfile = $prefix_outhtmlfile.'-'.$servertyp.'.html';
-    }
-
-    echo "Output to: ".$outputfile."\n";
+    $servertyp = $defaultservertyp;
+    $displayhelp = true;
 }
+$servertyp = trim($servertyp);
+if (empty($servertyp)) {
+     $displayhelp = true;
+}
+
+$list_servertypes = preg_split('/[\s,]+/', $servertyp, -1, PREG_SPLIT_NO_EMPTY);
+if (preg_match('/[\s,]+/',$servertyp)) {
+    // mehr als ein Eintrag, durch Komma oder Leerzeichen getrennt
+
+    $list_servertypes = preg_split('/[\s,]+/', $servertyp, -1, PREG_SPLIT_NO_EMPTY);
+    $filenamepart = preg_replace('/[\s,]+/', '-', $servertyp);
+} else {
+    $filenamepart = $servertyp;
+}
+
+if (isset($options['o'])) {
+   $outputfile = $options['o'];
+} elseif (isset($options['output'])) {
+   $outputfile = $options['output'];
+} else {
+    $outputfile = $prefix_outhtmlfile.'-'.$filenamepart.'.html';
+}
+
+if (isset($options['j'])) {
+   $jsonfile = $options['j'];
+} elseif (isset($options['json'])) {
+   $jsonfile = $options['json'];
+} else {
+    $jsonfile = $prefix_outjsonfile.'-'.$filenamepart.'.json';
+}
+    
+if ($displayhelp) {
+    echo "Usage: php create-domain-analyse.php -s \"1, 2, 3\" -o output-file.html\n";
+    
+    echo "\tmit:\n";
+    echo "\t-s|--server: \n";
+    foreach ($servertypen as $num => $val) {
+	echo "\t\t".$num."\t".$val."\n";
+    }
+    echo "\t\t(Servertypen können auch mit \"n1,n2\" kombiniert werden).\n";
+    echo "\t-o|--output\n";
+    echo "\t\tHTML Ausgabedatei\n";
+    echo "\t\tDefault: $prefix_outhtmlfile-$defaultservertyp.html\n";
+    exit;
+   
+} 
+
+
+echo "Servertypen: \"$servertyp\"\n";
+// echo "Filenamepart: \"$filenamepart\"\n";
+echo "JSONFIle: \"$jsonfile\"\n";
+echo "HTMLFIle: \"$outputfile\"\n";
+
+
 
 $index = get_index();
 usort($index, function($a, $b) {
@@ -96,12 +144,11 @@ usort($index, function($a, $b) {
 });
 
 
-$table = create_indextable($index,4,$servertyp);
+$table = create_indextable($index,4,$list_servertypes);
 // Schreibt den Inhalt in die Datei zurück
 file_put_contents($outputfile, $table);
 
 if ($outjson) {
-    $jsonfile = $prefix_outjsonfile.'-'.$servertyp.'.json';
     $json = json_encode(array('data' => $json_data));
     if (file_put_contents($jsonfile, $json))
         echo "JSON file $jsonfile created successfully...\n";
@@ -123,7 +170,7 @@ function sanitize_filename($name) {
     }
 }
 
-function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks = true) {
+function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wppagebreaks = true) {
     global $json_data;
     
     if (!isset($index)){
@@ -137,15 +184,14 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
     $breakat = 100;
     $breakcnt = 0;
      
-
     
     foreach ($index as $num => $entry) {
 	$line = '';
 	$json_grunddata = array();
+
 	
-	if (($refstatus==-1) || (($refstatus > -1) && ($entry['wmp_refstatus'] == $refstatus))) {
-	    if (($refserver==-1) || ($entry['wmp_refservertyp'] == $refserver)) {
-		
+	if (($refstatus==-1) || (($refstatus > -1) && (in_array($entry['wmp_refservertyp'], $refserver)) )) {
+	   
 		
 		$json_grunddata['url'] = $entry['url'];
 		$json_grunddata['wmp']['refservertyp'] = $entry['wmp_refservertyp'];
@@ -277,8 +323,9 @@ function create_indextable($index, $refstatus = 4, $refserver = 1, $wppagebreaks
 		    $json_data[] = $json_grunddata;
 		}
 		sleep(1);
-	    }
-	}  
+	   
+
+	}
 	if (!empty($line)) {
 	    $table .= $line."\n";
 	    $tablecell[] = $line;
