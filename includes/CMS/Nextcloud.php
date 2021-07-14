@@ -74,9 +74,6 @@ class Nextcloud extends \CMS
 	public function readstatus() {
 		   if($data = $this->fetch($this->url."/status.php")) {
 
-			/*
-			 * Search "Moodle" text
-			 */
 			$lines = explode(PHP_EOL, $data);
 
 			for($i=0;$i<count($lines);$i++) {

@@ -69,6 +69,8 @@ class Analyse {
 	    }
 	    if (!empty($thislink)) {
 		$link[] = $thislink;
+		
+	//	echo "FOUND LINK: ".$thislink['href']." - ".$thislink['linktext']."\n";
 	    }
 	}
 	$this->links = $link;
@@ -484,7 +486,7 @@ class Analyse {
 	$tospages = array(
 	  "Impressum" => [
 	      'uri' => '/impressum[\b\.\/]+/i, /imprint[\b\.\/]+/i',
-	      'text' => '/Impressum\b/Ui, /Imprint\b/Ui, /Legal notice\b/Ui'	
+	      'text' => '/Impressum/Ui, /Imprint/Ui, /Legal notice/Ui'	
 	  ],
 	    "Datenschutz" => [
 	      'uri' => '/datenschutz[\b\.\/]+/i, /datenschutzhinweise/i, /privacy[\b\.\/]+/i',
@@ -540,6 +542,7 @@ class Analyse {
 		}
 	   }
 	}
+
 	return $found;
     }
     

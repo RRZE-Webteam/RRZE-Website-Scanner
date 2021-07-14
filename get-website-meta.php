@@ -53,6 +53,9 @@ function parse_website($url) {
 	exit;
     }
     echo "Status Code:        ".$data['meta']['http_code']."\n";
+    if (($data['meta']['http_code'] >= 300) && ($data['meta']['http_code']<=303)) {
+	echo "Redirect Location:  ".$data['meta']['location']."\n";
+    }
     echo "connect_time:       ".$data['meta']['connect_time']."\n";
     echo "pretransfer_time:   ".$data['meta']['pretransfer_time']."\n";
     echo "starttransfer_time: ".$data['meta']['starttransfer_time']."\n";
@@ -62,6 +65,7 @@ function parse_website($url) {
     echo "SSL:                ";
    
     
+
     $certinfo = $cc->get_ssl_info();
     if ($certinfo) {
 //	 var_dump($certinfo);
@@ -99,6 +103,9 @@ function parse_website($url) {
     }
     echo "\n"; 
     
+    if (empty($data['content'])) {
+	echo "*ACHTUNG: Kein Inhalt erhalten*\n";
+    }
     if (($locationchange) && ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500)) {
 	
 	$analyse = new Analyse($cc->url);

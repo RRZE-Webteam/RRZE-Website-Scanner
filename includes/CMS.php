@@ -41,7 +41,9 @@ class CMS {
 	"ProcessWire",
 	"Pimcore",
 	"Mattermost",
-	"Nextcloud"
+	"Nextcloud",
+	"HisInOne",
+	"IdM"
 
     ];
     private $common_methods = ["generator_meta", "generator_header"];

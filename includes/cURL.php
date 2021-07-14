@@ -63,19 +63,31 @@ class cURL {
 	curl_setopt($process, CURLOPT_TIMEOUT, 30);
 	
 	if ($this->proxy) curl_setopt($process, CURLOPT_PROXY, $this->proxy);
-	
+	curl_setopt($process, CURLOPT_POSTREDIR, 7);
 	curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);
 	
+	
+	
 	$response = curl_exec($process);
 	$header_size = curl_getinfo($process, CURLINFO_HEADER_SIZE);
+	
+
+	
 	$header = substr($response, 0, $header_size);
 	$body = substr($response, $header_size);
 	
 	$this->parse_header($header);
-	
 	$res['header'] = $this->header;
 	$res['meta'] = curl_getinfo($process);
+	
+	
+	$location = curl_getinfo($process, CURLINFO_EFFECTIVE_URL);
+	if (($location !== $url) && ($location !== $res['header']['location'])) {
+	    $res['meta']['location'] = $location;
+	}
+	
+	
 	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
 	curl_close($process);
 
@@ -85,6 +97,10 @@ class cURL {
 	     $res['content'] = '';
 	}
 	
+	
+	// if ((empty($res['content'])) && ($httpcode == 303) && ($res['meta']['redirect_url']) && ($res['meta']['redirect_url'] !== $url)) {
+	//     return $this->get($res['meta']['redirect_url']);
+	// }
 	return $res;
     }
      
@@ -124,7 +140,7 @@ class cURL {
 	$res['meta'] = curl_getinfo($process);
 	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
 	curl_close($process);
-	if ($httpcode>=200 && $httpcode<300) {
+	if ($httpcode>=200 && $httpcode<500) {
 	    $res['content'] = $return;	   
 	} else {
 	    $res['content'] = '';
