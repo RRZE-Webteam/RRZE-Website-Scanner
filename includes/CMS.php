@@ -40,7 +40,8 @@ class CMS {
 	"OpenCms",
 	"ProcessWire",
 	"Pimcore",
-	"Mattermost"
+	"Mattermost",
+	"Nextcloud"
 
     ];
     private $common_methods = ["generator_meta", "generator_header"];
