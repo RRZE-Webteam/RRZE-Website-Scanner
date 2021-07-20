@@ -32,6 +32,11 @@ spl_autoload_register(function ($class) {
 
 
 $list = get_hochschullist_from_wikipedia();
+$leitungstitel = array('geschftsfhrer', 'grndungsprsident', 'rektorkanzler', 
+    'rektorprorektor', 'direktor', 'direktorin',
+    'rektor','rektorin', 'kanzlerin', 'prsident', 'prsidentin', 
+    'hochschulleitung', 'leitung', 'interimsprsident', 'prsidentinai');
+
 if ($list) {
     $n = 0;
     foreach ($list as $i => $entry) {
@@ -40,45 +45,18 @@ if ($list) {
 	    if ($info) {
 		foreach ($info as $key => $resdata) {
 		    if ($key == 'website') {
-			 $list[$i]['url'] = $resdata['content'];
+			if ($resdata['href']) {
+			    $list[$i]['url'] = $resdata['href'];
+			} else {
+			     $list[$i]['url'] = $resdata['content'];
+			}
 		    } elseif ($key == 'trgerschaft') {
 			$list[$i]['typ']['traeger'] = $resdata['content'];
 		    } elseif ($key == 'name') {
 			$list[$i]['name'] = $resdata['title'];	
-		     } elseif ($key == 'geschftsfhrer') {
-			$list[$i]['leitung'] = $resdata['content'];
-			$list[$i]['leitung-title'] =  $resdata['title'];	
-		    } elseif ($key == 'grndungsprsident') {
-			$list[$i]['leitung'] = $resdata['content'];
-			$list[$i]['leitung-title'] =  $resdata['title'];	
-		    } elseif ($key == 'rektorkanzler') {
-			$list[$i]['leitung'] = $resdata['content'];
-			$list[$i]['leitung-title'] =  $resdata['title'];	
-		    } elseif ($key == 'rektorprorektor') {
-			$list[$i]['leitung'] = $resdata['content'];
-		    } elseif ($key == 'direktor') {
-			$list[$i]['leitung'] = $resdata['content'];
-			$list[$i]['leitung-title'] = "Direktor";	
-		    } elseif ($key == 'rektor') {
-			$list[$i]['leitung'] = $resdata['content'];
-			$list[$i]['leitung-title'] = "Rektor";
-		    } elseif ($key == 'rektorin') {
-			$list[$i]['leitung'] = $resdata['content'];	
-			$list[$i]['leitung-title'] = "Rektorin";	
-		    } elseif ($key == 'kanzlerin') {
-			$list[$i]['leitung'] = $resdata['content'];	
-			$list[$i]['leitung-title'] = "Kanzlerin";			
-		    } elseif ($key == 'prsident') {
-			$list[$i]['leitung'] = $resdata['content'];	
-			$list[$i]['leitung-title'] = "Präsident";
-		     } elseif ($key == 'prsidentin') {
-			$list[$i]['leitung'] = $resdata['content'];	
-			$list[$i]['leitung-title'] = "Präsidentin";
-		    } elseif ($key == 'hochschulleitung') {	
-			$list[$i]['leitung'] = $resdata['content'];	
-			$list[$i]['leitung-title'] =  $resdata['title'];	
-		    } elseif ($key == 'leitung') {	
-			$list[$i]['leitung'] = $resdata['content'];	
+		    } elseif (in_array($key, $leitungstitel)) {
+			$list[$i]['leitung']['name'] = $resdata['content'];
+			$list[$i]['leitung']['title'] =  $resdata['title'];	
 		    } elseif ($key == 'logo') {
 			$list[$i]['logo-url'] = $resdata['src'];				
 		    } elseif ($key == 'ort') {
@@ -91,7 +69,9 @@ if ($list) {
 			$list[$i]['personal']['mitarbeiter'] = $resdata['content'];		
 		     } elseif ($key == 'studenten') {
 			$list[$i]['personal']['studenten'] = $resdata['content'];	
-		     } elseif ($key == 'davonprofessoren') {
+		     } elseif ($key == 'studierende') {
+			$list[$i]['personal']['studenten'] = $resdata['content'];	
+			} elseif ($key == 'davonprofessoren') {
 			$list[$i]['personal']['prof'] = $resdata['content'];	
 		    } elseif ($key == 'professoren') {
 			$list[$i]['personal']['prof'] = $resdata['content'];		
@@ -100,7 +80,9 @@ if ($list) {
 		     } elseif ($key == 'netzwerke') {
 			$list[$i]['netzwerke'] = $resdata['content'];				
 		     } elseif ($key == 'jahresetat') {
-			$list[$i]['jahresetat'] = $resdata['content'];				
+			$list[$i]['jahresetat'] = $resdata['content'];		
+		    } elseif (($key == 'aktivitt') && ($key == 'auflsung')) {
+			$list[$i]['aktivitaet'] = $resdata['content'];			
 		    } elseif ($key == 'land') {	
 			//brauch ich nicht
 		    } else {
@@ -150,19 +132,49 @@ if ($list) {
 	    if ($list[$i]['typ'] && $list[$i]['typ']['promotionsrecht']) {
 		if ($list[$i]['typ']['promotionsrecht'] == $entry['promotionsrecht']) {
 		} else {
-		    $list[$i]['typ']['promotionsrecht2'] = $list[$i]['promotionsrecht'];
+		    $list[$i]['typ']['promotionsrecht2'] = remove_refs_janein($list[$i]['promotionsrecht']);
 		}
 		unset($list[$i]['promotionsrecht']);
 	    } else {
-		$list[$i]['typ']['promotionsrecht'] = $list[$i]['promotionsrecht'];
+		$list[$i]['typ']['promotionsrecht'] = remove_refs_janein($list[$i]['promotionsrecht']);
 		unset($list[$i]['promotionsrecht']);
 	    }
 	}
+	if ($list[$i]['studierende']) {
+	    if ($list[$i]['personal'] && $list[$i]['personal']['studenten']) {
+		if ($list[$i]['studierende'] == $list[$i]['personal']['studenten']) {
+		} else {
+		    $list[$i]['personal']['studenten2'] = $list[$i]['studierende'];     
+		}
+		unset($list[$i]['studierende']);
+	    } else {
+		$list[$i]['personal']['studenten'] = $list[$i]['studierende'];
+		unset($list[$i]['studierende']);
+	    }
+	}
+	
+	
 	if (($list[$i]['grndung']) && ($list[$i]['gruendung'])) {
 	    unset($list[$i]['grndung']);
 	}
 	$n++;
+	
 
+	    echo $i;
+	    echo ". ".$list[$i]['name'];
+
+	if ($list[$i]['url']) {
+	  
+	      echo "\t".$list[$i]['url'];
+	} else {
+	    echo "\t-KEINE URL-";
+
+	}
+	 if ($list[$i]['aktivitaet']) {
+		echo "\t** UNI AUFGELOEST **";
+	 }
+	  echo "\n";
+	
 	sleep(1);
     }
 }
@@ -295,10 +307,8 @@ function get_single_hochschule($wikiurl) {
 
 		     $htitle = $th->item(0)->nodeValue;
 		     $cellcontent = $cells->item(0)->nodeValue;
-
 		     if (($th->item(0)) && ($th->item(0)->getAttribute('colspan') == "2") && ($cellcontent === null)) {
 			 // Überschrift
-			 $htitle = $th->item(0)->nodeValue;
 			 $res['name']['title'] = correctNodebreaks($htitle);
 
 
@@ -308,15 +318,21 @@ function get_single_hochschule($wikiurl) {
 			     $img = $cells->item(0)->getElementsByTagName('img');
 			     $res['logo']['src'] = $img->item(0)->getAttribute('src');
 			 }
-
+		     } elseif (trim($htitle) == 'Website') {
+			  $attrib = make_attribut($htitle);
+			   $res[$attrib]['title'] = correctNodebreaks($htitle);
+			   $res[$attrib]['content'] = remove_refs(correctNodebreaks($cellcontent));
+			    $link = $cells->item(0)->getElementsByTagName('a');
+			    if ($link) {
+				$res[$attrib]['href'] = $link->item(0)->getAttribute('href');
+			    }
+			  
+		
 		     } else {
-
-			 $htitle = $th->item(0)->nodeValue;
-			 $cellcontent = $cells->item(0)->nodeValue;
-
 			 $attrib = make_attribut($htitle);
 			 $res[$attrib]['title'] = correctNodebreaks($htitle);
 			 $res[$attrib]['content'] = remove_refs(correctNodebreaks($cellcontent));
+
 		     }
 
 		 }
@@ -325,6 +341,12 @@ function get_single_hochschule($wikiurl) {
     }
     return;
     
+}
+function remove_refs_janein($string) {
+     if (!empty($string)) {
+	$string = preg_replace('/[0-9]+/i', '', $string);
+     }
+     return $string;
 }
 
 function remove_refs($string) {
