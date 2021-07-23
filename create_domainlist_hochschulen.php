@@ -53,7 +53,8 @@ if ($list) {
 		    } elseif ($key == 'trgerschaft') {
 			$list[$i]['typ']['traeger'] = $resdata['content'];
 		    } elseif ($key == 'name') {
-			$list[$i]['name'] = $resdata['title'];	
+			$list[$i]['name'] = preg_replace('/[\n\r]+/i', ' ', $resdata['title']);
+			$list[$i]['name'] = remove_refs($list[$i]['name']);
 		    } elseif (in_array($key, $leitungstitel)) {
 			$list[$i]['leitung']['name'] = $resdata['content'];
 			$list[$i]['leitung']['title'] =  $resdata['title'];	
@@ -93,8 +94,8 @@ if ($list) {
 	 
 	}
 	if ($list[$i]['trger']) {
-	    if ($list[$i]['typ'] && $list[$i]['typ']['traeger']) {
-		if ($list[$i]['typ']['traeger'] == $entry['trger']) {
+	    if (isset($list[$i]['typ']) && isset($list[$i]['typ']['traeger'])) {
+		if (isset($list[$i]['typ']['traeger']) && ($list[$i]['typ']['traeger'] == $entry['trger'])) {
 		} else {
 		    
 		    if ($list[$i]['trger'] == 'privat') {
@@ -117,8 +118,8 @@ if ($list) {
 	    }
 	}
 	if ($list[$i]['form']) {
-	    if ($list[$i]['typ'] && isset($entry['form'])) {
-		if ($list[$i]['typ']['form'] == $entry['form']) {
+	    if (isset($entry['form'])) {
+		if (isset($list[$i]['typ']['form']) && ($list[$i]['typ']['form'] == $entry['form'])) {
 		} else {
 		    $list[$i]['typ']['form2'] = $list[$i]['form'];     
 		}
@@ -129,8 +130,8 @@ if ($list) {
 	    }
 	}
 	if ($list[$i]['promotionsrecht']) {
-	    if ($list[$i]['typ'] && isset($entry['promotionsrecht'])) {
-		if ($list[$i]['typ']['promotionsrecht'] == $entry['promotionsrecht']) {
+	    if (isset($entry['promotionsrecht']) ) {
+		if (isset($list[$i]['typ']['promotionsrecht']) && ($list[$i]['typ']['promotionsrecht'] == $entry['promotionsrecht'])) {
 		} else {
 		    $list[$i]['typ']['promotionsrecht2'] = remove_refs_janein($list[$i]['promotionsrecht']);
 		}
@@ -141,8 +142,8 @@ if ($list) {
 	    }
 	}
 	if ($list[$i]['studierende']) {
-	    if ($list[$i]['personal'] && $list[$i]['personal']['studenten']) {
-		if ($list[$i]['studierende'] == $list[$i]['personal']['studenten']) {
+	    if (isset($list[$i]['personal']) && isset($list[$i]['personal']['studenten'])) {
+		if (isset($list[$i]['studierende']) && ($list[$i]['studierende'] == $list[$i]['personal']['studenten'])) {
 		} else {
 		    $list[$i]['personal']['studenten2'] = $list[$i]['studierende'];     
 		}
@@ -154,7 +155,7 @@ if ($list) {
 	}
 	
 	
-	if (($list[$i]['grndung']) && ($list[$i]['gruendung'])) {
+	if (isset($list[$i]['grndung']) && isset($list[$i]['gruendung'])) {
 	    unset($list[$i]['grndung']);
 	}
 	$n++;
@@ -163,14 +164,14 @@ if ($list) {
 	    echo $i;
 	    echo ". ".$list[$i]['name'];
 
-	if ($list[$i]['url']) {
+	if (isset($list[$i]['url'])) {
 	  
 	      echo "\t".$list[$i]['url'];
 	} else {
 	    echo "\t-KEINE URL-";
 
 	}
-	 if ($list[$i]['aktivitaet']) {
+	 if (isset($list[$i]['aktivitaet'])) {
 		echo "\t** UNI AUFGELOEST **";
 	 }
 	  echo "\n";
@@ -304,6 +305,8 @@ function get_single_hochschule($wikiurl) {
 		 foreach ($rows as $row) {
 		     $th = $row->getElementsByTagName('th');
 		     $cells = $row->getElementsByTagName('td');
+		     $htitle = $cellcontent = '';
+		     
 		     if (isset($th) && ($th->item(0))) {
 			$htitle = $th->item(0)->nodeValue;
 		     }
@@ -313,7 +316,7 @@ function get_single_hochschule($wikiurl) {
 		     
 		 
 		     
-		     if (($th->item(0)) && ($th->item(0)->getAttribute('colspan') == "2") && ($cellcontent === null)) {
+		     if (($th->item(0)) && ($th->item(0)->getAttribute('colspan') == "2") && (empty($cellcontent))) {
 			 // Überschrift
 			 $res['name']['title'] = correctNodebreaks($htitle);
 
@@ -325,16 +328,15 @@ function get_single_hochschule($wikiurl) {
 			     $res['logo']['src'] = $img->item(0)->getAttribute('src');
 			 }
 		     } elseif (trim($htitle) == 'Website') {
-			  $attrib = make_attribut($htitle);
-			   $res[$attrib]['title'] = correctNodebreaks($htitle);
-			   $res[$attrib]['content'] = remove_refs(correctNodebreaks($cellcontent));
+			   $res['website']['title'] = correctNodebreaks($htitle);
+			   $res['website']['content'] = remove_refs(correctNodebreaks($cellcontent));
 			    $link = $cells->item(0)->getElementsByTagName('a');
 			    if ($link) {
-				$res[$attrib]['href'] = $link->item(0)->getAttribute('href');
+				$res['website']['href'] = $link->item(0)->getAttribute('href');
 			    }
 			  
 		
-		     } else {
+		     } elseif (!empty($htitle)) {
 			 $attrib = make_attribut($htitle);
 			 $res[$attrib]['title'] = correctNodebreaks($htitle);
 			 $res[$attrib]['content'] = remove_refs(correctNodebreaks($cellcontent));
