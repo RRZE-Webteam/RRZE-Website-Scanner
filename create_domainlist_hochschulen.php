@@ -117,7 +117,7 @@ if ($list) {
 	    }
 	}
 	if ($list[$i]['form']) {
-	    if ($list[$i]['typ'] && $list[$i]['typ']['form']) {
+	    if ($list[$i]['typ'] && isset($entry['form'])) {
 		if ($list[$i]['typ']['form'] == $entry['form']) {
 		} else {
 		    $list[$i]['typ']['form2'] = $list[$i]['form'];     
@@ -129,7 +129,7 @@ if ($list) {
 	    }
 	}
 	if ($list[$i]['promotionsrecht']) {
-	    if ($list[$i]['typ'] && $list[$i]['typ']['promotionsrecht']) {
+	    if ($list[$i]['typ'] && isset($entry['promotionsrecht'])) {
 		if ($list[$i]['typ']['promotionsrecht'] == $entry['promotionsrecht']) {
 		} else {
 		    $list[$i]['typ']['promotionsrecht2'] = remove_refs_janein($list[$i]['promotionsrecht']);
@@ -304,9 +304,15 @@ function get_single_hochschule($wikiurl) {
 		 foreach ($rows as $row) {
 		     $th = $row->getElementsByTagName('th');
 		     $cells = $row->getElementsByTagName('td');
-
-		     $htitle = $th->item(0)->nodeValue;
-		     $cellcontent = $cells->item(0)->nodeValue;
+		     if (isset($th) && ($th->item(0))) {
+			$htitle = $th->item(0)->nodeValue;
+		     }
+		     if (isset($cells) && ( $cells->item(0))) {
+			$cellcontent = $cells->item(0)->nodeValue;
+		     }
+		     
+		 
+		     
 		     if (($th->item(0)) && ($th->item(0)->getAttribute('colspan') == "2") && ($cellcontent === null)) {
 			 // Überschrift
 			 $res['name']['title'] = correctNodebreaks($htitle);
