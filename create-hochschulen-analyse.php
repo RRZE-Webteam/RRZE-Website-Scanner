@@ -103,12 +103,8 @@ function create_indextable($index, $wppagebreaks = true) {
 	return;
     }
     
-    $line = '';
-    $table = '';
     $cnt = 0;
-    $maxcnt = 20;
-    $breakat = 100;
-    $breakcnt = 0;
+    $maxcnt = 2000;
      
     if (isset($index['data'])) {
 	$domainindex = $index['data'];
@@ -119,13 +115,6 @@ function create_indextable($index, $wppagebreaks = true) {
     foreach ($domainindex as $num => $entry) {
 	$line = '';
 	$json_grunddata = $entry;
-	var_dump($entry);
-	 
-		
-		// $json_grunddata['url'] = $entry['url'];
-
-
-		
 		if ($cnt > $maxcnt) {
 		    break;
 		}
