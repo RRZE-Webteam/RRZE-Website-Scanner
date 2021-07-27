@@ -75,7 +75,7 @@ $table = create_indextable($index);
 
 
 if ($outjson) {
-    $json = json_encode(array('data' => $json_data));
+    $json = json_encode(array('data' => $table));
     if (file_put_contents($jsonfile, $json))
         echo "JSON file $jsonfile created successfully...\n";
     else 
@@ -114,12 +114,20 @@ function create_indextable($index, $wppagebreaks = true) {
     
     foreach ($domainindex as $num => $entry) {
 	$line = '';
-	$json_grunddata = $entry;
-		if ($cnt > $maxcnt) {
-		    break;
-		}
-		$cnt = $cnt +1;
-		
+	$json_grunddata = array();
+	// Notice: Bei allen Hochschulen wird die JSON zum speichern zu gross. Daher hier nur die Analysedaten-Ergebnisse
+	    if ($cnt > $maxcnt) {
+		break;
+	    }
+	    
+	    
+	    if (isset($entry['aktivitaet'])) {
+		// diese Hochschule ist inaktiv, wird uebersprungen
+		echo "Skipping  ".$entry['name']." (".$entry['wiki-url'].") \t\tInaktiv\n";
+		continue;
+	    }
+	    $cnt = $cnt +1;
+	    if (isset($entry['url'])) {
 	        $cc = new cURL();
 		$data = $cc->get($entry['url']);
 		$locationchange = $cc->is_url_location_host(true);
@@ -144,7 +152,8 @@ function create_indextable($index, $wppagebreaks = true) {
 		     $json_data[] = $jsonadd;
 	     
 	        } elseif (!$locationchange) {
-		    echo "\t wird umgelenkt auf: ".$cc->header['location']."\n";
+		    echo "\t (".$entry['wiki-url'].") wird umgelenkt auf: ".$cc->header['location']."\n";
+		    
 		    $json_grunddata['redirect'] = $cc->header['location'];
 		    $json_data[] = $json_grunddata;
 		    
@@ -153,7 +162,10 @@ function create_indextable($index, $wppagebreaks = true) {
 		    $json_data[] = $json_grunddata;
 		}
 		sleep(1);
-	   
+	    } else {
+		 echo " \t Keine URL bei ".$entry['name']." (".$entry['wiki-url'].")\n";
+		$json_data[] = $json_grunddata;
+	    }
 
     }
     return $json_data;

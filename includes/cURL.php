@@ -83,8 +83,16 @@ class cURL {
 	
 	
 	$location = curl_getinfo($process, CURLINFO_EFFECTIVE_URL);
-	if (($location !== $url) && ($location !== $res['header']['location'])) {
-	    $res['meta']['location'] = $location;
+	if ($location !== $url) {
+	    if (isset($res['header']['location'])) {
+		if ($location !== $res['header']['location']) {
+		    $res['meta']['location'] = $location;
+		}
+		
+	    } else {
+		$res['meta']['location'] = $location;
+	    }
+	    
 	}
 	
 	
