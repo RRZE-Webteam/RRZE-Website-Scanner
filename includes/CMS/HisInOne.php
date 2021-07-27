@@ -38,8 +38,17 @@ class HisInOne extends \CMS
         
 	public function readstatus() {
 		   if($data = $this->fetch($this->url."/qisserver/manifest.json")) {
+			$lines = explode(PHP_EOL, $data);
 
-			 return $this->get_info();
+			for($i=0;$i<count($lines);$i++) {
+				if (preg_match('/"name":"([a-z0-9\.]+)"/', $lines[$i], $matches)) {
+				    $this->version = $matches[1]; 
+				    return $this->get_info();
+				}
+			   
+
+			}
+			 return false;
 
 		}
 

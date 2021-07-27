@@ -195,10 +195,7 @@ class Analyse {
 	$p = parse_url($uri);
 	if (empty($p['host'])) {
 	    $baseurl = $this->url;
-	    $canonical = $this->get_canonical($content);
-	    if (!empty($canonical)) {
-		$baseurl = $canonical;
-	    }
+	   
 	    $baseurl =preg_replace('/\/$/i', '', $baseurl);
 	    $p['path'] = preg_replace('/^\//i', '', $p['path']);
 	    $url = $baseurl.'/'.$p['path'];
@@ -207,14 +204,16 @@ class Analyse {
 
     }
     
-    function find_external_ressources($content) {
+    function find_external_ressources($content = '') {
 	$res = array();
 	if (!isset($this->linkrels)) {
 	    $this->linkrels =  $this->get_meta_link($content);
 	}
 	
 	$baseurl = $this->url;
+	
 	$canonical = $this->get_canonical($content);
+	
 	if (!empty($canonical)) {
 	    $baseurl = $canonical;
 	}
@@ -414,14 +413,14 @@ class Analyse {
     function find_logo() {
 	$logo = '';
 	if ($this->template) {
-
+	    $template = '';
 	    if (in_array($this->template, ['FAU-Einrichtungen', 'FAU-Philfak', 'FAU-Natfak', 'FAU-Techfak', 'FAU_RWFak', 'FAU-Medfak'])) {
 		$template = 'fau-theme';
 	    } else {
 		$template = strtolower($this->template);
 	    }
 	    
-	    if ($this->filters[$template]) {
+	    if (!empty($template) && isset($this->filters[$template])) {
 		$logofilter = $this->filters[$template]['logo'];
 		
 		if (preg_match_all($logofilter, $this->content, $matches)) {

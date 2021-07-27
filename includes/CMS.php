@@ -43,7 +43,8 @@ class CMS {
 	"Mattermost",
 	"Nextcloud",
 	"HisInOne",
-	"IdM"
+	"IdM",
+	"PhusionPassenger"
 
     ];
     private $common_methods = ["generator_meta", "generator_header"];
@@ -86,7 +87,7 @@ class CMS {
         foreach ($this->systems as $system_name) {
             $system_class = 'CMS\\' . $system_name;
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
-
+	    $system->header = $this->header;
             foreach ($this->common_methods as $method) {
                 if (method_exists($system, $method)) {
                     if ($system->$method()) {
@@ -130,9 +131,10 @@ class CMS {
 	// Didnt find anything till yet. If meta tag filled with a string, return this.
 	
 	if (isset($tags)) {
-	    $genatorstring = trim($tags['generator']);
-	    $this->name = $genatorstring;
-	    
+	    if (isset($tags['generator'])) {
+		$genatorstring = trim($tags['generator']);
+		$this->name = $genatorstring;
+	    }
 	   
 	    return $this->name;
 	}
@@ -169,7 +171,7 @@ class CMS {
         }
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3);
@@ -178,7 +180,7 @@ class CMS {
 
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        if ($httpCode == 404) {
+        if ($httpCode >= 400) {
             curl_close($ch);
             return false;
         }
@@ -195,7 +197,7 @@ class CMS {
 
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3);
@@ -205,7 +207,7 @@ class CMS {
 
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        if ($httpCode == 404) {
+        if ($httpCode >= 400) {
             curl_close($ch);
             return false;
         }

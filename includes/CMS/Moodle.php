@@ -42,7 +42,7 @@ class Moodle extends \CMS {
 
 			for($i=0;$i<count($lines);$i++) {
 				if(strpos($lines[$i], "Moodle") !== FALSE) {
-					return TRUE;
+					 return $this->get_info();
 				}
 
 			}

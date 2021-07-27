@@ -25,7 +25,7 @@ class Nextcloud extends \CMS
 
      
     public function generator_meta($string = '') {
-	if (empty($string)) {
+	if ((empty($string)) && isset($this->tags['apple-itunes-app'])) {
 	    $string = $this->tags['apple-itunes-app'];
 	}
 	
@@ -73,7 +73,6 @@ class Nextcloud extends \CMS
         
 	public function readstatus() {
 		   if($data = $this->fetch($this->url."/status.php")) {
-
 			$lines = explode(PHP_EOL, $data);
 
 			for($i=0;$i<count($lines);$i++) {
@@ -84,7 +83,7 @@ class Nextcloud extends \CMS
 			   
 
 			}
-			 return $this->get_info();
+			 return false;
 
 		}
 

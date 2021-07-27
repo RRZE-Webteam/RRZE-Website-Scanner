@@ -25,7 +25,7 @@ class GovernmentSiteBuilder extends \CMS  {
 
      
     public function generator_meta($string = '') {
-	if (empty($string)) {
+	if ((empty($string)) && isset($this->tags['generator'])) {
 	    $string = $this->tags['generator'];
 	}
 	

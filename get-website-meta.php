@@ -130,7 +130,7 @@ function parse_website($url) {
 	    echo "Language:           ".$analyse->lang;
 	    echo "\n";
 	}
-	if (isset($analyse->generator)){
+	if ((isset($analyse->generator)) && (isset($analyse->generator['name']))) {
 	    echo "Generator:          ".$analyse->generator['name'];
 	    if (isset($analyse->generator['version'])) {
 		echo " (".$analyse->generator['version'].")";

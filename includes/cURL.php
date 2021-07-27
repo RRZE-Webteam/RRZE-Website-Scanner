@@ -14,7 +14,7 @@ class cURL {
     var $proxy;
     
     function cURL($cookies=TRUE,$cookie='cookies.txt',$compression='gzip',$proxy='') {
-	$this->headers[] = 'Accept: image/gif, image/x-bitmap, image/jpeg, image/pjpeg';
+	$this->headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
 	$this->headers[] = 'Connection: Keep-Alive';
 	$this->headers[] = 'Content-type: application/x-www-form-urlencoded;charset=UTF-8';
 	$this->user_agent = 'Mozilla/4.0 (RRZE CheckBot)';

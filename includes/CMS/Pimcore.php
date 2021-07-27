@@ -43,12 +43,11 @@ class Pimcore extends \CMS {
 	 */
 	public function generator_header() {
 
-		if(is_array($this->header)) {
-
-		    if (preg_match('/^pimcore/i', $this->header['x-powered-by'], $matches)) {
+		if (isset($this->header) && is_array($this->header)) {
+		    if (isset($this->header['x-powered-by']) && (preg_match('/^pimcore/i', $this->header['x-powered-by'], $matches))) {
 		       return true;
 		    }
-		    if (preg_match('/^pimcore/i', $this->header['X-Powered-By'], $matches)) {
+		    if (isset($this->header['X-Powered-By']) && (preg_match('/^pimcore/i', $this->header['X-Powered-By'], $matches))) {
 		       return true;
 		    }
 

@@ -2,20 +2,20 @@
 
 namespace CMS;
 
-class Zope extends \CMS {
+class PhusionPassenger extends \CMS {
 
     public $methods = array(
-        "generator_header"
+        "generator_header", 
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	    $this->classname = 'zope';
-	    $this->cmsurl = 'https://zope.org/';
+	    $this->classname = 'phusion';
+	    $this->cmsurl = 'https://www.phusionpassenger.com/';
 	    $this->url = $url;
 	    $this->tags = $tags;
 	    $this->content = $content;
-	    $this->name = "Zope";
+	    $this->name = "Phusion Passenger";
 	    $this->links = $links;
 	    $this->linkrels = $linkrels;
 	    $this->scripts = $scripts;
@@ -42,12 +42,13 @@ class Zope extends \CMS {
 	 * @return [boolean]
 	 */
 	public function generator_header() {
-
 		if (isset($this->header) && is_array($this->header)) {
-
-		    if (isset($this->header['Server']) && (preg_match('/^Zope\/\(([a-z0-9\.\-]+)/i', $this->header['Server'], $matches))) {
-			$this->version = $matches[1];
-		       return true;
+		 
+		    if (preg_match('/^phusion/i', $this->header['x-powered-by'], $matches)) {
+		        return $this->get_info();
+		    }
+		    if (preg_match('/Phusion/i', $this->header['server'], $matches)) {
+		        return $this->get_info();
 		    }
 
 		}
@@ -57,7 +58,4 @@ class Zope extends \CMS {
 	}
 
 	
-	
-
-
 }
