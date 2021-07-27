@@ -43,7 +43,7 @@ class ProcessWire extends \CMS {
 	 */
 	public function generator_header() {
 
-		if(is_array($this->header)) {
+		if(isset($this->header) AND is_array($this->header)) {
 
 		    if (preg_match('/^ProcessWire/i', $this->header['x-powered-by'], $matches)) {
 		       return true;
@@ -60,7 +60,7 @@ class ProcessWire extends \CMS {
 
 	public function application_name($string = '') {
 	    if (empty($string)) {
-		$string = $this->tags['application_name'];
+		$string = $this->tags['application_name'] ?? '';
 	    }
 
 	    if (empty($string)) {

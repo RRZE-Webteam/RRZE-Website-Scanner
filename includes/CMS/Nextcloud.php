@@ -26,7 +26,7 @@ class Nextcloud extends \CMS
      
     public function generator_meta($string = '') {
 	if (empty($string)) {
-	    $string = $this->tags['apple-itunes-app'];
+	    $string = $this->tags['apple-itunes-app'] ?? '';
 	}
 	
 	if (empty($string)) {

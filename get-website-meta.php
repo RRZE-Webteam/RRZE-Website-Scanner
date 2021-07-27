@@ -131,7 +131,7 @@ function parse_website($url) {
 	    echo "\n";
 	}
 	if (isset($analyse->generator)){
-	    echo "Generator:          ".$analyse->generator['name'];
+	    echo "Generator:          ".($analyse->generator['name'] ?? '');
 	    if (isset($analyse->generator['version'])) {
 		echo " (".$analyse->generator['version'].")";
 	    }

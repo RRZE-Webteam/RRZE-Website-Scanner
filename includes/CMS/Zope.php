@@ -43,7 +43,7 @@ class Zope extends \CMS {
 	 */
 	public function generator_header() {
 
-		if(is_array($this->header)) {
+		if(isset($this->header) AND is_array($this->header)) {
 
 		    if (preg_match('/^Zope\/\(([a-z0-9\.\-]+)/i', $this->header['Server'], $matches)) {
 			$this->version = $matches[1];

@@ -195,7 +195,7 @@ class Analyse {
 	$p = parse_url($uri);
 	if (empty($p['host'])) {
 	    $baseurl = $this->url;
-	    $canonical = $this->get_canonical($content);
+	    $canonical = $this->get_canonical($this->content);
 	    if (!empty($canonical)) {
 		$baseurl = $canonical;
 	    }
@@ -421,7 +421,7 @@ class Analyse {
 		$template = strtolower($this->template);
 	    }
 	    
-	    if ($this->filters[$template]) {
+	    if (!empty($this->filters[$template])) {
 		$logofilter = $this->filters[$template]['logo'];
 		
 		if (preg_match_all($logofilter, $this->content, $matches)) {

@@ -25,7 +25,7 @@ class Mattermost extends \CMS
      
     public function generator_meta($string = '') {
 	if (empty($string)) {
-	    $string = $this->tags['application-name'];
+	    $string = $this->tags['application-name'] ?? '';
 	}
 	
 	if (empty($string)) {

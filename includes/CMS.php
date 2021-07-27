@@ -130,7 +130,7 @@ class CMS {
 	// Didnt find anything till yet. If meta tag filled with a string, return this.
 	
 	if (isset($tags)) {
-	    $genatorstring = trim($tags['generator']);
+	    $genatorstring = trim($tags['generator'] ?? '');
 	    $this->name = $genatorstring;
 	    
 	   

@@ -26,7 +26,7 @@ class MediaWiki extends \CMS
      
     public function generator_meta($string = '') {
 	if (empty($string)) {
-	    $string = $this->tags['generator'];
+	    $string = $this->tags['generator'] ?? '';
 	}
 	
 	if (empty($string)) {
