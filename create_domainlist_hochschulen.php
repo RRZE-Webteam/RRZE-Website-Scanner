@@ -53,15 +53,17 @@ if ($list) {
 		    } elseif ($key == 'trgerschaft') {
 			$list[$i]['typ']['traeger'] = $resdata['content'];
 		    } elseif ($key == 'name') {
-			$list[$i]['name'] = preg_replace('/[\n\r]+/i', ' ', $resdata['title']);
-			$list[$i]['name'] = remove_refs($list[$i]['name']);
+			$thistitle = preg_replace('/[\n\r]+/i', ' ', $resdata['title']);
+			$thistitle = remove_refs($thistitle);
+			$thistitle = filter_var ( $thistitle, FILTER_SANITIZE_SPECIAL_CHARS);
+			$list[$i]['name'] = $thistitle;
 		    } elseif (in_array($key, $leitungstitel)) {
-			$list[$i]['leitung']['name'] = $resdata['content'];
-			$list[$i]['leitung']['title'] =  $resdata['title'];	
+			$list[$i]['leitung']['name'] =  filter_var ( $resdata['content'], FILTER_SANITIZE_SPECIAL_CHARS);
+			$list[$i]['leitung']['title'] =   filter_var ( $resdata['title'], FILTER_SANITIZE_SPECIAL_CHARS);
 		    } elseif ($key == 'logo') {
 			$list[$i]['logo-url'] = $resdata['src'];				
 		    } elseif ($key == 'ort') {
-			$list[$i]['ort'] = $resdata['content'];		
+			$list[$i]['ort'] = filter_var ( $resdata['content'], FILTER_SANITIZE_SPECIAL_CHARS);
 		    } elseif ($key == 'bundesland') {
 			$list[$i]['bundesland']['name'] = removeDubletten($resdata['content']);	
 		    } elseif ($key == 'motto') {
@@ -82,12 +84,17 @@ if ($list) {
 			$list[$i]['netzwerke'] = $resdata['content'];				
 		     } elseif ($key == 'jahresetat') {
 			$list[$i]['jahresetat'] = $resdata['content'];		
-		    } elseif (($key == 'aktivitt') && ($key == 'auflsung')) {
+		    } elseif (($key == 'aktivitt') || ($key == 'auflsung')) {
 			$list[$i]['aktivitaet'] = $resdata['content'];			
 		    } elseif ($key == 'land') {	
 			//brauch ich nicht
 		    } else {
-			$list[$i][$key] = $resdata;
+			$newkey = make_attribut($key);
+			if (is_string($resdata)) {
+			    $list[$i][$newkey] = filter_var ( $resdata, FILTER_SANITIZE_SPECIAL_CHARS);
+			} else {
+			    $list[$i][$newkey] = $resdata;
+			}
 		    }
     		}
 	    }
@@ -141,7 +148,7 @@ if ($list) {
 		unset($list[$i]['promotionsrecht']);
 	    }
 	}
-	if ($list[$i]['studierende']) {
+	if (isset($list[$i]['studierende'])) {
 	    if (isset($list[$i]['personal']) && isset($list[$i]['personal']['studenten'])) {
 		if (isset($list[$i]['studierende']) && ($list[$i]['studierende'] == $list[$i]['personal']['studenten'])) {
 		} else {
@@ -153,11 +160,20 @@ if ($list) {
 		unset($list[$i]['studierende']);
 	    }
 	}
-	
-	
-	if (isset($list[$i]['grndung']) && isset($list[$i]['gruendung'])) {
+	if (isset($list[$i]['aktivitt'])) {
+	    if (!isset($list[$i]['aktivitaet'])) {
+		$list[$i]['aktivitaet'] = $list[$i]['aktivitt'];
+	    } 
+	    unset($list[$i]['aktivitt']);
+	}
+	if (isset($list[$i]['grndung'])) {
+	    if (!isset($list[$i]['gruendung'])) {
+		$list[$i]['gruendung'] = $list[$i]['grndung'];
+	    } 
 	    unset($list[$i]['grndung']);
 	}
+
+
 	$n++;
 	
 
@@ -366,7 +382,7 @@ function remove_refs($string) {
 function make_attribut($string) {
     $res = trim($string);
     $string = strtolower($res);
-    $string = preg_replace('/[^a-z0-9_]+/i', '', $string);
+    $string = preg_replace('/[^a-z0-9_\-]+/i', '', $string);
 
   return $string;
 }
