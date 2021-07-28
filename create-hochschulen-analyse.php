@@ -72,16 +72,54 @@ $index = get_index();
 
 
 $table = create_indextable($index);
+if ($table) {
+    $table = utf8ize($table);
 
+    if ($outjson) {
+	$json = json_encode(  array('data' => $table) );
+       if($json === false || is_null($json)){
+	    echo "JSON Encoding schlug fehl.\n";
 
-if ($outjson) {
-    $json = json_encode(array('data' => $table));
-    if (file_put_contents($jsonfile, $json))
-        echo "JSON file $jsonfile created successfully...\n";
-    else 
-	echo "Oops! Error creating json file $jsonfile...\n";
+	     //Get the last JSON error.
+	    $jsonError = json_last_error();    
+	    //If an error exists.
+	    if($jsonError != JSON_ERROR_NONE){
+		$error = 'Could not decode JSON! ';
+
+		//Use a switch statement to figure out the exact error.
+		switch($jsonError){
+		    case JSON_ERROR_DEPTH:
+			$error .= 'Maximum depth exceeded!';
+		    break;
+		    case JSON_ERROR_STATE_MISMATCH:
+			$error .= 'Underflow or the modes mismatch!';
+		    break;
+		    case JSON_ERROR_CTRL_CHAR:
+			$error .= 'Unexpected control character found';
+		    break;
+		    case JSON_ERROR_SYNTAX:
+			$error .= 'Malformed JSON';
+		    break;
+		    case JSON_ERROR_UTF8:
+			 $error .= 'Malformed UTF-8 characters found!';
+		    break;
+		    default:
+			$error .= 'Unknown error!';
+		    break;
+		}
+		throw new Exception($error);
+	    }
+
+	    exit;
+       }
+	if (file_put_contents($jsonfile, $json))
+	    echo "JSON file $jsonfile created successfully...\n";
+	else 
+	    echo "Oops! Error creating json file $jsonfile...\n";
+    }
+} else {
+    echo "Ausgabe-Table leer\n";
 }
-
 exit;
 
 function sanitize_filename($name) {
@@ -114,27 +152,33 @@ function create_indextable($index, $wppagebreaks = true) {
     
     foreach ($domainindex as $num => $entry) {
 	$line = '';
-	$json_grunddata = array();
+//	$json_grunddata = array();
+	$json_grunddata = $entry;
 	// Notice: Bei allen Hochschulen wird die JSON zum speichern zu gross. Daher hier nur die Analysedaten-Ergebnisse
 	    if ($cnt > $maxcnt) {
 		break;
 	    }
-	    
-	    
+	    $cnt = $cnt +1;
+	     
+	
 	    if (isset($entry['aktivitaet'])) {
 		// diese Hochschule ist inaktiv, wird uebersprungen
 		echo "Skipping  ".$entry['name']." (".$entry['wiki-url'].") \t\tInaktiv\n";
 		continue;
 	    }
-	    $cnt = $cnt +1;
+	   
+	    $json_grunddata['name'] = $entry['name'];
+	    $json_grunddata['wiki-url'] = $entry['wiki-url'];
+	    
 	    if (isset($entry['url'])) {
+//		continue;
 	        $cc = new cURL();
 		$data = $cc->get($entry['url']);
 		$locationchange = $cc->is_url_location_host(true);
 		$certinfo = $cc->get_ssl_info();
 		
 		echo $cc->url;
-		
+		$json_grunddata['url'] = $entry['url'];
 		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
 		
 		
@@ -158,15 +202,20 @@ function create_indextable($index, $wppagebreaks = true) {
 		    $json_data[] = $json_grunddata;
 		    
 		} else {
-		    echo " \t Status Error (".$data['meta']['http_code'].")\n";
+		    echo " \t Status Error (".$data['meta']['http_code'].")  bei ".$entry['name']." (".$entry['wiki-url'].")\n";
 		    $json_data[] = $json_grunddata;
 		}
 		sleep(1);
 	    } else {
-		 echo " \t Keine URL bei ".$entry['name']." (".$entry['wiki-url'].")\n";
+		 echo " \t Keine URL bei ".$entry['name']." (".$entry['wiki-url']."). ";
+		 if (isset($entry['aktivitaet'])) {
+		     echo "Aktivität: ".$entry['aktivitaet'];
+		 } else {
+		     echo "Kein Eintrag bei Aktivität.";
+		 }
+		 echo "\n";
 		$json_data[] = $json_grunddata;
 	    }
-
     }
     return $json_data;
     
@@ -202,16 +251,46 @@ function get_index() {
 	if (($month <10) && (strlen($month) < 2)) {
 	    $month = '0'.$month;
 	}
-	$indexurl = 'https://statistiken.rrze.fau.de/webauftritte/domains/hochschulen-index-'.$month.'.'.$year.'.json';
+	$indexurl = 'https://statistiken.rrze.fau.de/webauftritte/hochschulen/hochschulen-index-'.$month.'.'.$year.'.json';
 	// echo "Missing current month index file. Trying last: ".$indexurl."\n";
+	echo "Lese ".$indexurl."\n";
 	$data = $index->get($indexurl);
     }
     $res = array();
     
     if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 400) {
 	$res = json_decode($data['content'], true);
-
+	
     }
     return $res;
 }
 
+function oldutf8ize( $mixed ) {
+    if (is_array($mixed)) {
+        foreach ($mixed as $key => $value) {
+            $mixed[$key] = oldutf8ize($value);
+        }
+    } elseif (is_string($mixed)) {
+        return mb_convert_encoding($mixed, "UTF-8", "UTF-8");
+    }
+    return $mixed;
+}
+
+
+ function utf8ize($d) {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                unset($d[$k]);
+		$d[utf8ize($k)] = utf8ize($v);
+            }
+        } else if (is_object($d)) {
+	    $objVars = get_object_vars($d);
+	    foreach($objVars as $key => $value) {
+	    $d->$key = utf8ize($value);
+        }       
+    } else if (is_string ($d)) {
+	 return mb_convert_encoding($d, "UTF-8", "UTF-8");
+//            return iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($d));
+    }
+    return $d;
+}

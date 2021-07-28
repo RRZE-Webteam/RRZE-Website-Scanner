@@ -44,8 +44,6 @@ class Plone extends \CMS  {
 	    $matches = $this->get_regexp_matches();
 	    foreach ($matches as $m) {
 		if (preg_match($m, $string, $matches)) {
-
-		    $this->version = $matches[1]; 
 		    return $this->get_info();
 		}
 	    }

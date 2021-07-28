@@ -172,8 +172,9 @@ if ($list) {
 	    } 
 	    unset($list[$i]['grndung']);
 	}
-
-
+	if (isset($list[$i]['stand'])) {
+	    $list[$i]['stand'] = remove_refs($list[$i]['stand']);
+	}
 	$n++;
 	
 

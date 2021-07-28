@@ -122,7 +122,9 @@ class Analyse {
 	$template = $cms->get_cms_template($this->meta,$data['content']);
 	if ($template !== false) {
 	     $this->template = $template['name'];
-	     $this->template_version = $template['version'];
+	     if (isset($template['version'])) {
+		$this->template_version = $template['version'];
+	     }
 	} else {
 	    $this->template = $cms->name;
 	}
