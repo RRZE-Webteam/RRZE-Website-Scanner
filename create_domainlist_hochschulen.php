@@ -34,8 +34,8 @@ spl_autoload_register(function ($class) {
 $list = get_hochschullist_from_wikipedia();
 $leitungstitel = array('geschftsfhrer', 'grndungsprsident', 'rektorkanzler', 
     'rektorprorektor', 'direktor', 'direktorin',
-    'rektor','rektorin', 'kanzlerin', 'prsident', 'prsidentin', 
-    'hochschulleitung', 'leitung', 'interimsprsident', 'prsidentinai');
+    'rektor','rektorin', 'kanzlerin', 'prsident', 'prsidentin', 'president',
+    'hochschulleitung', 'leitung', 'interimsprsident', 'prsidentinai', 'geschftsfhrenderprsident');
 
 if ($list) {
     $n = 0;
