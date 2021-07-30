@@ -49,7 +49,7 @@ class OpenCms extends \CMS  {
 		    $tld = $host_names[count($host_names)-1];
 		    $dom = $host_names[count($host_names)-2];
 		    
-		    $searchscript = '/export/system/modules/'.$tld.'.'.$dom;
+		    $searchscript = '/system/modules/'.$tld.'.'.$dom;
 		    
 		    foreach($this->scripts as $num => $element) {
 			    
