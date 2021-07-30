@@ -2,21 +2,21 @@
 
 namespace CMS;
 
-class InfoparkFiona extends \CMS
+class Contao extends \CMS
 {
 
     public $methods = array(
-        "generator_meta"
+        "generator_meta", "api"
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	     $this->classname = 'fiona';
-	    $this->cmsurl = 'https://fiona.infopark.com/de';
+	     $this->classname = 'contao';
+	    $this->cmsurl = 'https://contao.org';
 	    $this->url = $url;
 	    $this->tags = $tags;
 	    $this->content = $content;
-	    $this->name = "Infopark CMS Fiona";
+	    $this->name = "Contao";
 	    $this->links = $links;
 	    $this->linkrels = $linkrels;
 	    $this->scripts = $scripts;
@@ -44,7 +44,7 @@ class InfoparkFiona extends \CMS
 	    foreach ($matches as $m) {
 		if (preg_match($m, $string, $matches)) {
 		    if (isset($matches[1])) {
-			$this->version = $matches[1];
+			$this->version = $matches[1]; 
 		    }
 		    return $this->get_info();
 		}
@@ -55,9 +55,7 @@ class InfoparkFiona extends \CMS
     }
 	 private function get_regexp_matches() {
 	    $match_reg = [
-		'/^Infopark CMS Fiona; ([0-9\.\-a-z]+);/i',
-		'/Infopark CMS Fiona [a-z\(\)\.;\s]+Version ([0-9\.]+)/i',
-		'/Fiona ([0-9\,.]+) by Infopark AG/i',
+		'/^Contao Open Source CMS/i'
 	    ];
 	    return $match_reg;
 	}   
@@ -73,7 +71,30 @@ class InfoparkFiona extends \CMS
         
   
 
-      
+      /**
+	 * Check for Known Link rels
+	 * @return [boolean]
+	 */
+	public function api() {
+		if($this->linkrels) {
+		    foreach($this->linkrels as $num => $element) {
+			
+			  foreach($element as $type => $lc) {
+
+			    if ($type == 'stylesheet') {
+				if (strpos($lc['href'], '/tl_files/') !==FALSE)
+				    return true;
+			    }
+			    
+			    
+			}
+		    }
+
+		}
+
+		return FALSE;
+
+	}
 	
 	
 	

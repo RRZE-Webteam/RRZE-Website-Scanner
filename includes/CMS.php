@@ -26,6 +26,7 @@ class CMS {
 	"MediaWiki",
 	"DokuWiki",
 	"Joomla",
+	"Contao",
 	"Imperia",
 	"ActiveWeb",
 	"InfoparkFiona",
@@ -44,10 +45,16 @@ class CMS {
 	"Nextcloud",
 	"HisInOne",
 	"IdM",
-	"PhusionPassenger"
+	"PhusionPassenger",
+	"Additor",
+	"Idbase",
+	"Framula",
+	"Tucal",
+	"FirstSpirit",
+	"Sitepark"
 
     ];
-    private $common_methods = ["generator_meta", "generator_header"];
+    private $common_methods = ["generator_meta", "generator_header", "api", "scripts"];
     
     
     public function __construct($url) {

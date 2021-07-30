@@ -5,22 +5,22 @@
  */
 namespace CMS;
 
-class GovernmentSiteBuilder extends \CMS  {
+class Additor extends \CMS  {
     
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-         $this->classname = 'governmentsitebuilder';
-	 $this->cmsurl = 'https://www.government-site-builder.de';
+         $this->classname = 'additor';
+	 $this->cmsurl = 'https://additor.de/';
 	 $this->url = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
-	 $this->name = "Government Site Builder";
+	 $this->name = "additor";
 	 $this->links = $links;
 	 $this->linkrels = $linkrels;
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_meta", "api", "scripts", "content_string"
+	 "api", "scripts", "content_string"
 	);
 
      
@@ -44,9 +44,8 @@ class GovernmentSiteBuilder extends \CMS  {
 	    $matches = $this->get_regexp_matches();
 	    foreach ($matches as $m) {
 		if (preg_match($m, $string, $matches)) {
-		    if (isset($matches[1])) {
-			$this->version = $matches[1]; 
-		    }
+
+		    $this->version = $matches[1]; 
 		    return $this->get_info();
 		}
 	    }
@@ -74,13 +73,13 @@ class GovernmentSiteBuilder extends \CMS  {
     
 	
 	/**
-	 * Check for GovernmentSiteBuilder Core scripts
+	 * Check for Core scripts
 	 * @return [boolean]
 	 */
 	public function scripts() {
 		if($this->scripts) {
 		    foreach($this->scripts as $num => $element) {
-			    if (strpos($element, 'SiteGlobals/') !==FALSE)
+			    if (strpos($element, '/frontend/js/bundle/FrontendAssets/') !==FALSE)
 				    return true;
 		    }
 
@@ -91,7 +90,7 @@ class GovernmentSiteBuilder extends \CMS  {
 	}
 
 	/**
-	 * Check for Core API
+	 * Check for Known Link rels
 	 * @return [boolean]
 	 */
 	public function api() {
@@ -100,8 +99,8 @@ class GovernmentSiteBuilder extends \CMS  {
 			
 			  foreach($element as $type => $lc) {
 
-			    if ($type == 'alternate') {
-				if (strpos($lc['href'], 'SiteGlobals/') !==FALSE)
+			    if ($type == 'pingback') {
+				if (strpos($lc['href'], 'Additor/pingback') !==FALSE)
 				    return true;
 			    }
 			    
@@ -116,7 +115,7 @@ class GovernmentSiteBuilder extends \CMS  {
 	}
 	public function content_string() {
 	    if ($this->content) {
-		if (preg_match('/Realisiert mit dem Government Site Builder/i', $this->content, $matches)) {
+		if (preg_match('/window\.additor = \{/i', $this->content, $matches)) {
 		       return true;
 		}
 	    }

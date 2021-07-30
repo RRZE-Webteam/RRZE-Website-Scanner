@@ -45,8 +45,7 @@ class Express extends \CMS
 	public function generator_header() {
 
 		if (isset($this->header) && is_array($this->header)) {
-		    if (preg_match('/^Express/i', $this->header['x-powered-by'], $matches)) {
-			$this->version = $matches[1];
+		    if (isset($this->header['x-powered-by']) && (preg_match('/^Express/i', $this->header['x-powered-by'], $matches))) {
 		       return true;
 		    }
 

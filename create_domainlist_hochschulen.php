@@ -33,8 +33,8 @@ spl_autoload_register(function ($class) {
 
 $list = get_hochschullist_from_wikipedia();
 $leitungstitel = array('geschftsfhrer', 'grndungsprsident', 'rektorkanzler', 
-    'rektorprorektor', 'direktor', 'direktorin',
-    'rektor','rektorin', 'kanzlerin', 'prsident', 'prsidentin', 'president',
+    'rektorprorektor', 'direktor', 'direktorin', 'rektorklanzlerprorektor',
+    'rektor','rektorin', 'kanzlerin', 'prsident', 'prsidentin', 'president', 
     'hochschulleitung', 'leitung', 'interimsprsident', 'prsidentinai', 'geschftsfhrenderprsident');
 
 if ($list) {
@@ -399,7 +399,7 @@ function correctNodebreaks($string) {
 function removeDubletten($string) {
     if (isset($string)) {
 	$res = trim($string);
-	$string = preg_replace('/(\b\S+\b)(($|\s+)\1)+/', '$1', $res);
+	$string = preg_replace('/(\b[\-\w\x{0080}-\x{FFFF}]+\b)\W+\1/iu', '$1', $res);
 	return $string;
     }
     return; 

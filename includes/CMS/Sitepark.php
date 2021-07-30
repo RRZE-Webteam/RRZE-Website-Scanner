@@ -5,22 +5,22 @@
  */
 namespace CMS;
 
-class GovernmentSiteBuilder extends \CMS  {
+class Sitepark extends \CMS  {
     
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-         $this->classname = 'governmentsitebuilder';
-	 $this->cmsurl = 'https://www.government-site-builder.de';
+         $this->classname = 'sitepark';
+	 $this->cmsurl = 'https://www.sitepark.com/';
 	 $this->url = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
-	 $this->name = "Government Site Builder";
+	 $this->name = "Sitepark";
 	 $this->links = $links;
 	 $this->linkrels = $linkrels;
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_meta", "api", "scripts", "content_string"
+	 "generator_meta"
 	);
 
      
@@ -57,7 +57,9 @@ class GovernmentSiteBuilder extends \CMS  {
      
     private function get_regexp_matches() {
 	$match_reg = [
-	    '/^Government Site Builder/i'
+	    '/^Infosite ([0-9\.]+) /i',
+	    '/Information Enterprise Server\s+Sitepark/i',
+	     '/Sitepark/i',
 	];
 	return $match_reg;
     }   
@@ -73,53 +75,5 @@ class GovernmentSiteBuilder extends \CMS  {
     
     
 	
-	/**
-	 * Check for GovernmentSiteBuilder Core scripts
-	 * @return [boolean]
-	 */
-	public function scripts() {
-		if($this->scripts) {
-		    foreach($this->scripts as $num => $element) {
-			    if (strpos($element, 'SiteGlobals/') !==FALSE)
-				    return true;
-		    }
 
-		}
-
-		return FALSE;
-
-	}
-
-	/**
-	 * Check for Core API
-	 * @return [boolean]
-	 */
-	public function api() {
-		if($this->linkrels) {
-		    foreach($this->linkrels as $num => $element) {
-			
-			  foreach($element as $type => $lc) {
-
-			    if ($type == 'alternate') {
-				if (strpos($lc['href'], 'SiteGlobals/') !==FALSE)
-				    return true;
-			    }
-			    
-			    
-			}
-		    }
-
-		}
-
-		return FALSE;
-
-	}
-	public function content_string() {
-	    if ($this->content) {
-		if (preg_match('/Realisiert mit dem Government Site Builder/i', $this->content, $matches)) {
-		       return true;
-		}
-	    }
-	    return FALSE;
-	}
 }

@@ -2,21 +2,21 @@
 
 namespace CMS;
 
-class InfoparkFiona extends \CMS
+class Tucal extends \CMS
 {
 
     public $methods = array(
-        "generator_meta"
+       "api"
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	     $this->classname = 'fiona';
-	    $this->cmsurl = 'https://fiona.infopark.com/de';
+	     $this->classname = 'tucal';
+	    $this->cmsurl = 'https://www.tu-chemnitz.de/urz/www/tucal.html';
 	    $this->url = $url;
 	    $this->tags = $tags;
 	    $this->content = $content;
-	    $this->name = "Infopark CMS Fiona";
+	    $this->name = "TUCAL";
 	    $this->links = $links;
 	    $this->linkrels = $linkrels;
 	    $this->scripts = $scripts;
@@ -73,7 +73,30 @@ class InfoparkFiona extends \CMS
         
   
 
-      
+      /**
+	 * Check for Known Link rels
+	 * @return [boolean]
+	 */
+	public function api() {
+		if($this->linkrels) {
+		    foreach($this->linkrels as $num => $element) {
+			
+			  foreach($element as $type => $lc) {
+
+			    if ($type == 'stylesheet') {
+				if (strpos($lc['href'], '/tucal4/') !==FALSE)
+				    return true;
+			    }
+			    
+			    
+			}
+		    }
+
+		}
+
+		return FALSE;
+
+	} 
 	
 	
 	

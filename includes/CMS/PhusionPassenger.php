@@ -44,10 +44,10 @@ class PhusionPassenger extends \CMS {
 	public function generator_header() {
 		if (isset($this->header) && is_array($this->header)) {
 		 
-		    if (preg_match('/^phusion/i', $this->header['x-powered-by'], $matches)) {
+		    if (isset($this->header['x-powered-by']) && (preg_match('/^phusion/i', $this->header['x-powered-by'], $matches))) {
 		        return $this->get_info();
 		    }
-		    if (preg_match('/Phusion/i', $this->header['server'], $matches)) {
+		    if (isset($this->header['server']) && (preg_match('/Phusion/i', $this->header['server'], $matches))) {
 		        return $this->get_info();
 		    }
 
