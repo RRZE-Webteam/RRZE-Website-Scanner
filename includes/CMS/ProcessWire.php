@@ -59,7 +59,7 @@ class ProcessWire extends \CMS {
 	}
 
 	public function application_name($string = '') {
-	if ((empty($string)) && isset($this->tags['generator'])) {
+	if ((empty($string)) && isset($this->tags['application_name'])) {
 		$string = $this->tags['application_name'];
 	    }
 

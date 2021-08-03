@@ -49,7 +49,16 @@ class OpenCms extends \CMS  {
 		    $tld = $host_names[count($host_names)-1];
 		    $dom = $host_names[count($host_names)-2];
 		    
+		   if (strpos($dom, "-") !==FALSE) {
+		       $part_dom  = explode("-", $dom);
+		       $dom2 = $part_dom[count($part_dom)-1];
+		       $dom1 = $part_dom[count($part_dom)-2];
+		       
+		       $dom = $dom2.'.'.$dom1;
+		   }
+		    
 		    $searchscript = '/system/modules/'.$tld.'.'.$dom;
+		    
 		    
 		    foreach($this->scripts as $num => $element) {
 			    

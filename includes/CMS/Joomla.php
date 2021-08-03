@@ -58,6 +58,7 @@ class Joomla extends \CMS {
 	$match_reg = [
 	    '/^Joomla! ([0-9\.]+) /i',
 	    '/^Joomla! \- Open Source Content Management \- Version ([0-9\/\-\.]+)$/ui',
+	    '/^Joomla! \- Open Source Content Management/i',
 	    '/^Joomla /i'
 	    
 	    

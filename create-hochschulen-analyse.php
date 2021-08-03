@@ -290,7 +290,6 @@ function oldutf8ize( $mixed ) {
         }       
     } else if (is_string ($d)) {
 	 return mb_convert_encoding($d, "UTF-8", "UTF-8");
-//            return iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($d));
     }
     return $d;
 }

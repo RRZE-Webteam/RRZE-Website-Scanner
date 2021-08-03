@@ -2,28 +2,28 @@
 
 namespace CMS;
 
-class Tucal extends \CMS
-{
+class CraftCMS extends \CMS {
 
     public $methods = array(
-       "api"
+        "generator_header"
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	     $this->classname = 'tucal';
-	    $this->cmsurl = 'https://www.tu-chemnitz.de/urz/www/tucal.html';
+	    $this->classname = 'craftCMS';
+	    $this->cmsurl = 'https://craftcms.com/';
 	    $this->url = $url;
 	    $this->tags = $tags;
 	    $this->content = $content;
-	    $this->name = "TUCAL";
+	    $this->name = "Craft CMS";
 	    $this->links = $links;
 	    $this->linkrels = $linkrels;
 	    $this->scripts = $scripts;
 	} 
 
-     
-    
+
+	
+	
 	public function get_info() {
 	    $info = array();
 	    $info['icon']	    = $this->icon;
@@ -36,31 +36,25 @@ class Tucal extends \CMS
         
   
 
-      /**
-	 * Check for Known Link rels
+      
+	/**
+	 * Check for Generator header
 	 * @return [boolean]
 	 */
-	public function api() {
-		if($this->linkrels) {
-		    foreach($this->linkrels as $num => $element) {
-			
-			  foreach($element as $type => $lc) {
+	public function generator_header() {
 
-			    if ($type == 'stylesheet') {
-				if (strpos($lc['href'], '/tucal4/') !==FALSE)
-				    return true;
-			    }
-			    
-			    
-			}
+		if (isset($this->header) && is_array($this->header)) {
+
+		    if (isset($this->header['x-powered-by']) && (preg_match('/^Craft CMS/i', $this->header['x-powered-by'], $matches))) {
+		       return true;
 		    }
 
 		}
 
 		return FALSE;
 
-	} 
-	
+	}
+
 	
 	
 

@@ -363,8 +363,9 @@ class Analyse {
 	 if (preg_match('/rel=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
 	     $rel = $matches[1]; 
 	 }
+	 $res = array();
 	 if ($rel) {
-	     $res = array();
+	     
 	    if (preg_match('/href=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
 		$res[$rel]['href'] = $matches[1]; 
 	    }
@@ -560,7 +561,7 @@ class Analyse {
     function sanitize_string($name) {
     // remove illegal file system characters https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
 	if ((isset($name)) && (!empty(trim($name)))) {
-	    $file = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $name);
+	    $file = mb_ereg_replace("([^\w\s\d\-_~,;!\[\]\(\).])", '', $name);
 	    // Remove any runs of periods (thanks falstro!)
 	    $file = mb_ereg_replace("([\.]{2,})", '', $file);
 	    return $file;

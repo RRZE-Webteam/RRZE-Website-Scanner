@@ -43,7 +43,9 @@ class CMS {
 	"Pimcore",
 	"Mattermost",
 	"Nextcloud",
+	"Sharepoint",
 	"HisInOne",
+	"Neos",
 	"IdM",
 	"PhusionPassenger",
 	"Additor",
@@ -51,7 +53,8 @@ class CMS {
 	"Framula",
 	"Tucal",
 	"FirstSpirit",
-	"Sitepark"
+	"Sitepark",
+	"CraftCMS"
 
     ];
     private $common_methods = ["generator_meta", "generator_header", "api", "scripts"];
