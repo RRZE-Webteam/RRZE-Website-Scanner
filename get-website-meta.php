@@ -99,7 +99,14 @@ function parse_website($url) {
     echo "\n";
     echo "Header: \n";
     foreach ($cc->header as $name => $value) {
-	echo "\t$name: $value\n";
+	if (is_string($value)) {
+	    echo "\t$name: $value\n";
+	} elseif (is_array($value)) {
+	    echo "\t$name = Array:\n";
+	    foreach ($value as $kv => $vv) {
+		echo "\t\t".$kv.': '.$vv."\n";
+	    }
+	}
     }
     echo "\n"; 
     
@@ -145,8 +152,23 @@ function parse_website($url) {
 	    }
 	    echo "\n";
 	}
-	if (isset($analyse->meta) && isset($analyse->meta['description'])) {
-	    echo "Meta-Description:   ".$analyse->meta['description']."\n";
+	//if (isset($analyse->meta) && isset($analyse->meta['description'])) {
+	//    echo "Meta-Description:   ".$analyse->meta['description']."\n";
+	//}
+	if (isset($analyse->meta)) {
+	    echo "\nMeta-Angaben (HTML-Kopf):\n";
+	     foreach ($analyse->meta as $key => $value) {
+		echo "\t".$key.":\t";
+		if (is_string($value)) {
+		    echo $value;
+		} elseif (is_array($value)) {
+		    echo "\n";
+		     foreach ($value as $msub => $mval) {
+			 echo "\t\t".$msub." => ".$mval."\n";
+		     }
+		}
+		echo "\n";
+	    }
 	}
 	if (isset($analyse->favicon)) {
 	    echo "Favicon:            ".$analyse->favicon['href'];

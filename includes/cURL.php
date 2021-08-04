@@ -214,7 +214,16 @@ class cURL {
 			    list($name, $value) = explode(": ", $cur);
 			    if ((!empty($name)) && (!empty($value))) {
 				$name = strtolower($name);
-				$this->header[$name] = $value;
+				if ((isset($this->header[$name])) && (is_string($this->header[$name]))) {
+				    $oldval = $this->header[$name];
+				    $this->header[$name] = array();
+				    $this->header[$name][] = $oldval;
+				    $this->header[$name][] = $value;
+				} elseif  ((isset($this->header[$name])) && (is_array($this->header[$name]))) {   
+				    $this->header[$name][] = $value;
+				} else {
+				    $this->header[$name] = $value;
+				}
 			    }
 			}
 		    }

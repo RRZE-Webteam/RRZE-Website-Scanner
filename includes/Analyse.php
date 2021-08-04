@@ -91,10 +91,19 @@ class Analyse {
 		      $tags[$attrbname][] = $oldsingle;
 		      $tags[$attrbname][] = $metaTag->getAttribute('content');
 		  }
-		
-	      }
-	      elseif ($metaTag->getAttribute('property') != "") {
-		$tags[$metaTag->getAttribute('property')] = $metaTag->getAttribute('content');
+	     
+	      } else {
+		  if ($metaTag->getAttribute('property') != "") {
+		      $attrbname = strtolower($metaTag->getAttribute('property'));
+		      $tags['_property'][$attrbname] = $metaTag->getAttribute('content');
+		  }
+		  if ($metaTag->getAttribute('http-equiv') != "") {
+		      $attrbname = strtolower($metaTag->getAttribute('http-equiv'));
+		      $tags['_http-equiv'][$attrbname] = $metaTag->getAttribute('content');
+		  }
+		  if ($metaTag->getAttribute('charset') != "") {
+		      $tags['_charset'] = $metaTag->getAttribute('charset');
+		  }
 	      }
 	}
 	$this->meta = $tags;

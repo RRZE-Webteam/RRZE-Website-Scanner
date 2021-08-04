@@ -1,26 +1,27 @@
 <?php
 
+/* 
+ * Getting Infos from a detecting Government Site Builder CMS
+ */
 namespace CMS;
 
-class Contao extends \CMS
-{
-
-    public $methods = array(
-        "generator_meta", "api", "content_string"
-    );
-
+class Magnolia extends \CMS  {
+    
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	     $this->classname = 'contao';
-	    $this->cmsurl = 'https://contao.org';
-	    $this->url = $url;
-	    $this->tags = $tags;
-	    $this->content = $content;
-	    $this->name = "Contao";
-	    $this->links = $links;
-	    $this->linkrels = $linkrels;
-	    $this->scripts = $scripts;
-	} 
+         $this->classname = 'magnolia';
+	 $this->cmsurl = 'http://www.magnolia-cms.com';
+	 $this->url = $url;
+	 $this->tags = $tags;
+	 $this->content = $content;
+	 $this->name = "Magnolia CMS";
+	 $this->links = $links;
+	 $this->linkrels = $linkrels;
+	 $this->scripts = $scripts;
+     } 
+     public $methods = array(
+	 "generator_meta", "api", "content_string"
+	);
 
      
     public function generator_meta($string = '') {
@@ -53,26 +54,28 @@ class Contao extends \CMS
 	return false;
 	
     }
-	 private function get_regexp_matches() {
-	    $match_reg = [
-		'/^Contao Open Source CMS/i'
-	    ];
-	    return $match_reg;
-	}   
-	public function get_info() {
-	    $info = array();
-	    $info['icon']	    = $this->icon;
-	    $info['classname']  = $this->classname;	   
-	    $info['url']	    = $this->url;
-	    $info['name']	    = $this->name; 
-	    $info['version']    = $this->version; 
-	    return $info;
-	}
-        
-  
+     
+    private function get_regexp_matches() {
+	$match_reg = [
+	    '/^Magnolia CMS/i'
+	];
+	return $match_reg;
+    }   
+    public function get_info() {
+	$info = array();
+        $info['icon']	    = $this->icon;
+	$info['classname']  = $this->classname;	   
+	$info['url']	    = $this->url;
+	$info['name']	    = $this->name; 
+	$info['version']    = $this->version; 
+	return $info;
+    }
+    
+    
+	
 
-      /**
-	 * Check for Known Link rels
+	/**
+	 * Check for Core API
 	 * @return [boolean]
 	 */
 	public function api() {
@@ -82,8 +85,9 @@ class Contao extends \CMS
 			  foreach($element as $type => $lc) {
 
 			    if ($type == 'stylesheet') {
-				if (strpos($lc['href'], '/tl_files/') !==FALSE)
+				if ((preg_match('/\/resources\/templating\-kit\/themes\//i', $lc['href'], $matches)))
 				    return true;
+				
 			    }
 			    
 			    
@@ -95,18 +99,12 @@ class Contao extends \CMS
 		return FALSE;
 
 	}
-	
-	
 	public function content_string() {
 	    if ($this->content) {
-		if (preg_match('/"contao":"http/i', $this->content, $matches)) {
+		if (preg_match('/<span>Powered by<\/span> <a href="http:\/\/www\.magnolia\-cms\.com"><strong>Magnolia<\/strong>/i', $this->content, $matches)) {
 		       return true;
 		}
 	    }
 	    return FALSE;
 	}
-	
-	
-
-
 }

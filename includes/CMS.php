@@ -54,7 +54,8 @@ class CMS {
 	"Tucal",
 	"FirstSpirit",
 	"Sitepark",
-	"CraftCMS"
+	"CraftCMS",
+	"Magnolia"
 
     ];
     private $common_methods = ["generator_meta", "generator_header", "api", "scripts"];
