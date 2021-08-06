@@ -1,27 +1,27 @@
 <?php
 
 /* 
- * Getting Infos from a detecting MS Sharepoint
- *  https://www.c-sharpcorner.com/blogs/how-to-identify-whether-a-site-is-based-on-sharepoint-or-not
+ * Getting Infos from a detecting HubSpot
  */
 namespace CMS;
 
-class Sharepoint extends \CMS  {
+class HubSpot extends \CMS  {
     
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-         $this->classname = 'sharepoint';
-	 $this->cmsurl = 'https://www.microsoft.com/de-de/microsoft-365/sharepoint/collaboration';
+         $this->classname = 'hubspot';
+	 $this->cmsurl = 'https://www.hubspot.de/';
 	 $this->url = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
-	 $this->name = "Microsoft Sharepoint";
+	 $this->name = "HubSpot";
 	 $this->links = $links;
 	 $this->linkrels = $linkrels;
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_meta",  "scripts",  "mssharepoint_errorpage", "generator_header"	);
+	 "generator_meta", "api", "scripts", "content_string", "generator_header"
+	);
 
      
     public function generator_meta($string = '') {
@@ -57,7 +57,7 @@ class Sharepoint extends \CMS  {
      
     private function get_regexp_matches() {
 	$match_reg = [
-	    '/^Microsoft SharePoint/i'
+	    '/^HubSpot/i'
 	];
 	return $match_reg;
     }   
@@ -72,54 +72,16 @@ class Sharepoint extends \CMS  {
     }
     
     
-        /**
-	 * Check for errorcode on a known sharepoint url
-	 *
-	 * @return [boolean]
-	 */
-	public function mssharepoint_errorpage() {
-		if($data = $this->fetch($this->url."/_layouts/lists.asmx")) {
-			   
-		   if (preg_match('/SharePointError/i', $data, $matches)) {
-		       return true;
-		    }
-		}
-
-		return FALSE;
-
-	}
-    
-	/**
-	 * Check for Generator header
-	 * @return [boolean]
-	 */
-	public function generator_header() {
-		if (isset($this->header) && is_array($this->header)) {
-		 
-		    if (isset($this->header['microsoftsharepointteamservices'])) {
-			$this->version = $this->header['microsoftsharepointteamservices'];
-			
-		        return $this->get_info();
-		    }
-	//	     if (isset($this->header['server']) && (preg_match('/Microsoft\-IIS/i', $this->header['server'], $matches))) {
-	//	        return $this->get_info();
-	//	    }
-
-		}
-
-		return FALSE;
-
-	}
 	
 	/**
-	 * Check for GovernmentSiteBuilder Core scripts
+	 * Check for Core scripts
 	 * @return [boolean]
 	 */
 	public function scripts() {
 		if($this->scripts) {
 		    foreach($this->scripts as $num => $element) {
-			if ((preg_match('/_layouts\/[0-9]+\/init\.js/i', $element, $matches)))
-			    return true;
+			    if (strpos($element, 'HubspotToolsMenu/') !==FALSE)
+				    return true;
 		    }
 
 		}
@@ -128,5 +90,59 @@ class Sharepoint extends \CMS  {
 
 	}
 
+	/**
+	 * Check for Core API
+	 * @return [boolean]
+	 */
+	public function api() {
+		if($this->linkrels) {
+		    foreach($this->linkrels as $num => $element) {
+			
+			  foreach($element as $type => $lc) {
+
+			    if ($type == 'stylesheet') {
+				if ((preg_match('/hub_generated\/module_assets/i', $lc['href'], $matches)))
+				    return true;
+				
+			    }
+			    
+			    
+			}
+		    }
+
+		}
+
+		return FALSE;
+
+	}
+	/**
+	 * Check for Content part
+	 * @return [boolean]
+	 */
+	public function content_string() {
+	    if ($this->content) {
+		if (preg_match('/<!\-\-HubSpot Call\-to\-Action Code \-\->/i', $this->content, $matches)) {
+		       return true;
+		}
+	    }
+	    return FALSE;
+	}
 	
+	/**
+	 * Check for Generator header
+	 * @return [boolean]
+	 */
+	public function generator_header() {
+
+		if (isset($this->header) && is_array($this->header)) {
+
+		    if (isset($this->header['x-powered-by']) && (preg_match('/^Hubspot/i', $this->header['x-powered-by'], $matches))) {
+		       return true;
+		    }
+
+		}
+
+		return FALSE;
+
+	}
 }

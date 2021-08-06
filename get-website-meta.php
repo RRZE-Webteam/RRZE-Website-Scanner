@@ -126,7 +126,14 @@ function parse_website($url) {
 	echo "Original-URL:       ".$analyse->url."\n";
 
 	if (isset($analyse->header['location'])) {
-	    echo "Location:           ".$analyse->header['location']."\n";
+	   if (is_array($analyse->header['location'])) {
+		    echo "Location:\n";
+		     foreach ($analyse->header['location'] as $msub => $mval) {
+			 echo "\t\t".$msub." => ".$mval."\n";
+		     }
+	    } else {
+		echo "Location:           ".$analyse->header['location']."\n";
+	    }
 	}
 	
 	if (isset($analyse->canonical)){

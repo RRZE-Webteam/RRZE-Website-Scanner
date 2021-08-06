@@ -46,12 +46,10 @@ class Roxen extends \CMS
 
 		if (isset($this->header) && is_array($this->header)) {
 
-		    if (isset($this->header['Server']) && (preg_match('/^Roxen\/([a-z0-9\.\-]+)/i', $this->header['Server'], $matches))) {
-			$this->version = $matches[1];
-		       return true;
-		    }
 		    if (isset($this->header['server']) && (preg_match('/^Roxen\/([a-z0-9\.\-]+)/i', $this->header['server'], $matches))) {
-			$this->version = $matches[1];
+			if (isset($matches[1])) {
+			    $this->version = $matches[1];
+			}
 		       return true;
 		    }
 

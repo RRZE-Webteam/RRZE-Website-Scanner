@@ -55,7 +55,16 @@ class CMS {
 	"FirstSpirit",
 	"Sitepark",
 	"CraftCMS",
-	"Magnolia"
+	"Magnolia",
+	"Cabacos",
+	"GCMS",
+	"MaGIC",
+	"SilverStripe",
+	"Scrivito",
+	"PlatoCMS",
+	"WebEdition",
+	"XIMS",
+	"HubSpot"
 
     ];
     private $common_methods = ["generator_meta", "generator_header", "api", "scripts"];

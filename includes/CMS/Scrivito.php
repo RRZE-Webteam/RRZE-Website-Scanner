@@ -1,26 +1,26 @@
 <?php
 
 /* 
- * Getting Infos from a detecting Government Site Builder CMS
+ * Getting Infos from a detecting  Scrivito
  */
 namespace CMS;
 
-class FirstSpirit extends \CMS  {
+class Scrivito extends \CMS  {
     
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-         $this->classname = 'firstspirit';
-	 $this->cmsurl = 'https://www.e-spirit.com/';
+         $this->classname = 'scrivito';
+	 $this->cmsurl = 'https://www.scrivito.com/';
 	 $this->url = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
-	 $this->name = "FirstSpirit";
+	 $this->name = "Scrivito";
 	 $this->links = $links;
 	 $this->linkrels = $linkrels;
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_meta", "api"
+	 "generator_meta"
 	);
 
      
@@ -57,7 +57,7 @@ class FirstSpirit extends \CMS  {
      
     private function get_regexp_matches() {
 	$match_reg = [
-	    '/^FirstSpirit ([0-9\.]+)/i'
+	    '/^Scrivito/i',
 	];
 	return $match_reg;
     }   
@@ -71,19 +71,14 @@ class FirstSpirit extends \CMS  {
 	return $info;
     }
     
-    
-	/**
-	 * Check for Core API
-	 * @return [boolean]
-	 */
-	public function api() {
+    public function api() {
 		if($this->linkrels) {
 		    foreach($this->linkrels as $num => $element) {
 			
 			  foreach($element as $type => $lc) {
 
-			    if ($type == 'stylesheet') {
-				if ((preg_match('/\/media\/[\/_a-z]+\/css_[0-9]+\//i', $lc['href'], $matches)))
+			    if ($type == 'preconnect') {
+				if ((preg_match('/api\.scrivito\.com/i', $lc['href'], $matches)))
 				    return true;
 				
 			    }
@@ -97,5 +92,4 @@ class FirstSpirit extends \CMS  {
 		return FALSE;
 
 	}
-
 }

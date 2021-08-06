@@ -1,20 +1,20 @@
 <?php
 
 /* 
- * Getting Infos from a detecting Government Site Builder CMS
+ * Getting Infos from a detecting Cabocos CMS
  */
 namespace CMS;
 
-class FirstSpirit extends \CMS  {
+class Cabacos extends \CMS  {
     
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-         $this->classname = 'firstspirit';
-	 $this->cmsurl = 'https://www.e-spirit.com/';
+         $this->classname = 'cabacos';
+	 $this->cmsurl = 'https://www.cabacos-cms.de/';
 	 $this->url = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
-	 $this->name = "FirstSpirit";
+	 $this->name = "Cabacos";
 	 $this->links = $links;
 	 $this->linkrels = $linkrels;
 	 $this->scripts = $scripts;
@@ -57,7 +57,8 @@ class FirstSpirit extends \CMS  {
      
     private function get_regexp_matches() {
 	$match_reg = [
-	    '/^FirstSpirit ([0-9\.]+)/i'
+	    '/^Cabacos CMS \(Version ([0-9\.]+)\)/i',
+	    '/^Cabacos CMS/i',
 	];
 	return $match_reg;
     }   
@@ -83,7 +84,7 @@ class FirstSpirit extends \CMS  {
 			  foreach($element as $type => $lc) {
 
 			    if ($type == 'stylesheet') {
-				if ((preg_match('/\/media\/[\/_a-z]+\/css_[0-9]+\//i', $lc['href'], $matches)))
+				if ((preg_match('/Cabacos_formats\.css/i', $lc['href'], $matches)))
 				    return true;
 				
 			    }
@@ -96,6 +97,15 @@ class FirstSpirit extends \CMS  {
 
 		return FALSE;
 
+	}
+	
+	public function content_string() {
+	    if ($this->content) {
+		if (preg_match('/Cabacos CMS Templateinformation/i', $this->content, $matches)) {
+		       return true;
+		}
+	    }
+	    return FALSE;
 	}
 
 }

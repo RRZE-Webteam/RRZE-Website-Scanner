@@ -1,26 +1,26 @@
 <?php
 
 /* 
- * Getting Infos from a detecting Government Site Builder CMS
+ * Getting Infos from a detecting Göttinger Content Management System (GCMS)
  */
 namespace CMS;
 
-class FirstSpirit extends \CMS  {
+class GCMS extends \CMS  {
     
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-         $this->classname = 'firstspirit';
-	 $this->cmsurl = 'https://www.e-spirit.com/';
+         $this->classname = 'gcms';
+	 $this->cmsurl = 'http://gcms-hilfe.uni-goettingen.de';
 	 $this->url = $url;
 	 $this->tags = $tags;
 	 $this->content = $content;
-	 $this->name = "FirstSpirit";
+	 $this->name = "Göttinger Content Management System";
 	 $this->links = $links;
 	 $this->linkrels = $linkrels;
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_meta", "api"
+	 "generator_meta"
 	);
 
      
@@ -57,7 +57,8 @@ class FirstSpirit extends \CMS  {
      
     private function get_regexp_matches() {
 	$match_reg = [
-	    '/^FirstSpirit ([0-9\.]+)/i'
+	    '/^G&ouml;ttinger Content Management System \(GCMS\)/i',
+	    '/Content Management System \(GCMS\)/i',
 	];
 	return $match_reg;
     }   
@@ -72,30 +73,4 @@ class FirstSpirit extends \CMS  {
     }
     
     
-	/**
-	 * Check for Core API
-	 * @return [boolean]
-	 */
-	public function api() {
-		if($this->linkrels) {
-		    foreach($this->linkrels as $num => $element) {
-			
-			  foreach($element as $type => $lc) {
-
-			    if ($type == 'stylesheet') {
-				if ((preg_match('/\/media\/[\/_a-z]+\/css_[0-9]+\//i', $lc['href'], $matches)))
-				    return true;
-				
-			    }
-			    
-			    
-			}
-		    }
-
-		}
-
-		return FALSE;
-
-	}
-
 }

@@ -215,10 +215,13 @@ class cURL {
 			    if ((!empty($name)) && (!empty($value))) {
 				$name = strtolower($name);
 				if ((isset($this->header[$name])) && (is_string($this->header[$name]))) {
-				    $oldval = $this->header[$name];
-				    $this->header[$name] = array();
-				    $this->header[$name][] = $oldval;
-				    $this->header[$name][] = $value;
+				    if ($value !== $this->header[$name]) {
+					// Nur wenn der neue Wert nicht gleich dem alten ist...
+					$oldval = $this->header[$name];
+					$this->header[$name] = array();
+					$this->header[$name][] = $oldval;
+					$this->header[$name][] = $value;
+				    }
 				} elseif  ((isset($this->header[$name])) && (is_array($this->header[$name]))) {   
 				    $this->header[$name][] = $value;
 				} else {
@@ -236,7 +239,7 @@ class cURL {
      }
      
      public function is_url_location_host($setnew = false) {
-	 if (isset($this->header['location'])) {
+	 if ((isset($this->header['location'])) && is_string($this->header['location'])) {
 	     $lu = parse_url($this->header['location']);     
 	     $lo = parse_url($this->url);
  
