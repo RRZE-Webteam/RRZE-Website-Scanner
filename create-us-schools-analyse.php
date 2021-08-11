@@ -192,12 +192,12 @@ function create_indextable($index) {
 		    $json_data[] = $json_grunddata;
 		    
 		} else {
-		    echo " \t Status Error (".$data['meta']['http_code'].")  bei ".$entry['name']." (".$entry['wiki-url'].")\n";
+		    echo " \t Status Error (".$data['meta']['http_code'].")  bei ".$entry['school.name']." (".$url.")\n";
 		    $json_data[] = $json_grunddata;
 		}
 		sleep(1);
 	    } else {
-		 echo " \t Keine URL bei ".$entry['name']." (".$entry['wiki-url']."). ";
+		 echo " \t Keine URL bei ".$entry['name'];
 		 echo "\n";
 		$json_data[] = $json_grunddata;
 	    }
@@ -247,6 +247,7 @@ function sanitize_url($url) {
 	} else {
 	    $url = 'http://'.$url;
 	}
+	$url = trim($url,"/");
 	return $url;
     }
 }
