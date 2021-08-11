@@ -141,7 +141,10 @@ function create_indextable($index) {
     } else {
 	$domainindex = $index;
     }
-    
+    $total = 0;
+    if (isset($index['meta']['total'])) {
+	$total = $index['meta']['total'];
+    }
     foreach ($domainindex as $num => $entry) {
 	$line = '';
 	$json_grunddata = $entry;
@@ -166,6 +169,13 @@ function create_indextable($index) {
 		$locationchange = $cc->is_url_location_host(true);
 		$certinfo = $cc->get_ssl_info();
 		
+		echo $num;
+		
+		if ($total>0) {
+		    echo " / ".$total." ";
+		} else {
+		    echo ". ";
+		}
 		echo $cc->url;
 		$json_grunddata['url'] = $url;
 		unset($json_grunddata['school.school_url']);
