@@ -27,47 +27,49 @@ spl_autoload_register(function ($class) {
     }
 });
     
-$shortopts = "o:j:h:";
+$shortopts = "o:i:h:";
 $longopts  = array(
-    "output:",
-    "json:"    // Optional value
+    "out:",
+    "input:"    // Optional value
 );
 $displayhelp = false;
 
-// Script example.php
 $options = getopt($shortopts,$longopts);
 
 
 
-
-if (isset($options['j'])) {
-   $jsonfile = $options['j'];
-} elseif (isset($options['json'])) {
-   $jsonfile = $options['json'];
+if (isset($options['o'])) {
+   $jsonfile = $options['o'];
+} elseif (isset($options['out'])) {
+   $jsonfile = $options['out'];
 } else {
     $jsonfile = $config["analyse_file"];
 }
+if (isset($options['i'])) {
+   $inputfile = $options['i'];
+} elseif (isset($options['input'])) {
+   $inputfile = $options['input'];
+} else {
+    $inputfile = $config["index_jsonfile"];
+}
+
 if (isset($options['h'])) {
    $displayhelp = true;
 }
 if ($displayhelp) {
     echo "Usage: php create-us-schools-analyse.php \n";
     
-    echo "\tmit:\n";
-    echo "\t-j|--json\n";
+    echo "\t-o|--out\n";
     echo "\t\tJSON Ausgabedatei\n";
-    echo "\t\tDefault: $jsonfile\n";
+     echo "\t\tDefault: ".$config["analyse_file"]."\n";
+    echo "\t-i|--input\n";
+    echo "\t\tJSON Input Index\n";
+    echo "\t\tDefault: ".$config["index_jsonfile"]."\n";
     exit;
    
 } 
 
-
-
-echo "JSONFIle: \"$jsonfile\"\n";
-
-
-
-$index = get_index();
+$index = get_index($inputfile);
 $table = create_indextable($index);
 
 
@@ -77,12 +79,15 @@ if ($table) {
 
 	
 	$dataarray['data'] = $table;
-	$dataarray['meta']['date'] = date("d.m.Y h:i:s");
+	$dataarray['meta']['date-analyse'] = date("d.m.Y h:i:s");
 	$dataarray['meta']['total'] = count($table);
+	if (isset($index['meta']['date-list'])) {
+		$dataarray['meta']['date-list'] = $index['meta']['date-list'];
+	}
 	$json = json_encode($dataarray);
 	
        if($json === false || is_null($json)){
-	    echo "JSON Encoding schlug fehl.\n";
+	    echo "JSON Encoding failed.\n";
 
 	     //Get the last JSON error.
 	    $jsonError = json_last_error();    
@@ -133,7 +138,7 @@ function create_indextable($index) {
 	return;
     }
     
-    $cnt = 0;
+    $cnt = $sc = 0;
     $maxcnt = 5000;
      
     if (isset($index['data'])) {
@@ -169,13 +174,14 @@ function create_indextable($index) {
 		$locationchange = $cc->is_url_location_host(true);
 		$certinfo = $cc->get_ssl_info();
 		
-		echo $num;
+		echo $cnt;
 		
 		if ($total>0) {
-		    echo " / ".$total." ";
+		    echo "/".$total;
 		} else {
-		    echo ". ";
+		    echo ".";
 		}
+		echo "\t";
 		echo $cc->url;
 		$json_grunddata['url'] = $url;
 		unset($json_grunddata['school.school_url']);
@@ -191,23 +197,50 @@ function create_indextable($index) {
 		    echo " \t Ok\n";
 		
 		     $analysedata = $analyse->get_analyse_data();  
+		     	     
+		     if (isset($analysedata['title']))
+			$json_grunddata['title'] = $analysedata['title'];
 		     
-		     $jsonadd =  array_merge($json_grunddata, $analysedata);
-		     $json_data[] = $jsonadd;
+		     if (isset($analysedata['logo_src']))
+			$json_grunddata['logo_src'] = $analysedata['logo_src'];
+		     
+		     if (isset($analysedata['favicon_src']))
+			$json_grunddata['favicon_src'] = $analysedata['favicon_src'];
+		     
+		     if (isset($analysedata['content']) && isset($analysedata['content']['lang']))
+			$json_grunddata['content']['lang'] = $analysedata['content']['lang'];
+		     
+		      if (isset($analysedata['content']) && isset($analysedata['content']['tos']))
+			$json_grunddata['content']['tos'] = $analysedata['content']['tos'];
+		      
+		     if (isset($analysedata['generator'])) 
+			 $json_grunddata['generator'] = $analysedata['generator'];
+		     
+		     if (isset($analysedata['template']))
+			$json_grunddata['template'] = $analysedata['template'];
+		     
+		     $json_data[] = $json_grunddata;
 	     
 	        } elseif (!$locationchange) {
-		    echo "\t (".$url.") wird umgelenkt auf: ".$cc->header['location']."\n";
+		    echo "\t (".$url.") redirect to: ".$cc->header['location']."\n";
 		    
 		    $json_grunddata['redirect'] = $cc->header['location'];
 		    $json_data[] = $json_grunddata;
 		    
 		} else {
-		    echo " \t Status Error (".$data['meta']['http_code'].")  bei ".$entry['school.name']." (".$url.")\n";
+		    echo " \t Status Error (".$data['meta']['http_code'].")  at ".$entry['school.name']." (".$url.")\n";
 		    $json_data[] = $json_grunddata;
 		}
-		sleep(1);
+		
+		$sc++;
+		if ($sc > 5) {
+		    $sc =0;
+		    sleep(1);
+		    // sleep every 5 seconds to be friendly to our network :)
+		}
+		
 	    } else {
-		 echo " \t Keine URL bei ".$entry['name'];
+		 echo " \t No URL at ".$entry['name'];
 		 echo "\n";
 		$json_data[] = $json_grunddata;
 	    }
@@ -218,9 +251,9 @@ function create_indextable($index) {
 
 
 
-function get_index() {
+function get_index($inputfile) {
     global $config;
-    $data = file_get_contents($config['index_jsonfile']);
+    $data = file_get_contents($inputfile);
 
     $res = json_decode($data, true);
 

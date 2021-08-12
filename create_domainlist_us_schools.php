@@ -33,6 +33,7 @@ $config = [
 	// Flag for currently operating institution, 0=closed, 1=operating
 	 "school.degrees_awarded.highest" => '3,4',
 	// Filter for schools with their hightest degree. 
+	"school.ownership"  => 1,
     ],
     "output_jsonfile"   => 'current-us-schools.json',
     "outjson"	=> true,
@@ -132,34 +133,74 @@ spl_autoload_register(function ($class) {
 });
 
 
+$shortopts = "o:j:h:a:";
+$longopts  = array(
+    "owner:",
+    "api:",
+    "json:"    // Optional value
+);
+$displayhelp = false;
+
+$options = getopt($shortopts,$longopts);
 
 
-if (empty($config['api_key']) || ($config['api_key'] == 'DEMO_KEY')) {
-    
-    if ($argc !== 2) {
-	echo "Usage: php crate-domainlist_us_schools.php <api key>\n";
-	
-	echo "\nGet your API Key at: https://api.data.gov/ \n";
-	exit(1);
-    }
-    $apikey = $argv[1];
-    if (!empty($apikey)) {
-	$config['api_key'] = urlencode($apikey);
-    }
+if (isset($options['o'])) {
+   $ownership = $options['o'];
+} elseif (isset($options['owner'])) {
+   $ownership = $options['owner'];
+} else {
+   $ownership = 1;
 }
 
+if (isset($options['j'])) {
+   $jsonfile = $options['j'];
+} elseif (isset($options['json'])) {
+   $jsonfile = $options['json'];
+} else {
+    $jsonfile = $config["output_jsonfile"];
+}
 
-$list = get_hochschullist_from_api();
+if (isset($options['a'])) {
+   $apikey = $options['a'];
+} elseif (isset($options['api'])) {
+   $apikey = $options['api'];
+} else {
+    $apikey = $config['api_key'];
+}
+$config['api_key'] = urlencode($apikey);
+
+if (empty($apikey) || ($apikey == 'DEMO_KEY')) {
+     $displayhelp = true;
+}
+
+if (isset($options['h'])) {
+   $displayhelp = true;
+}
+if ($displayhelp) {
+    echo "Usage: php create-us-schools-analyse.php \n";
+   
+    echo "\t-a|--api\n";
+    echo "\t\tAPI-KEY: String (Get your API Key at: https://api.data.gov/ )\n";   
+    echo "\t-j|--json\n";
+    echo "\t\tJSON Ausgabedatei\n";
+    echo "\t\tDefault: $jsonfile\n";
+    echo "\t-o|--owner\n";
+    echo "\t\tOwnership: 1 (public), 2 (privat non profit), 3 (privat for profit)\n";
+    exit;
+   
+} 
+
+
+$list = get_hochschullist_from_api($ownership);
 
 
 if ($list) {
     if ($config['outjson']) {
 	
 	$dataarray['data'] = $list;
-	$dataarray['meta']['date'] = date("d.m.Y h:i:s");
+	$dataarray['meta']['date-list'] = date("d.m.Y h:i:s");
 	$dataarray['meta']['total'] = count($list);
 	$json = json_encode($dataarray);
-	$jsonfile = $config['output_jsonfile'];
 	if (file_put_contents($jsonfile, $json)) {
 	    echo "JSON file $jsonfile created successfully.\n";
 	} else {
@@ -171,11 +212,12 @@ if ($list) {
 exit;
 
 
-function get_hochschullist_from_api() {
+function get_hochschullist_from_api($ownership) {
     global $config;
     $page = 0;
     
-    $thisurl = make_apiurl($page);
+    
+    $thisurl = make_apiurl($page, $ownership);
     echo $thisurl."\n";
     
         $cc = new cURL();
@@ -218,7 +260,7 @@ function get_hochschullist_from_api() {
 		    
 		    for ($i = 1; $i <= $maxreq; $i++) {
 			
-			$thisurl = make_apiurl($i);
+			$thisurl = make_apiurl($i,$ownership);
 			echo "Getting page URL ".$i.": ".$thisurl."\n";
 			
 			
@@ -255,7 +297,7 @@ function get_hochschullist_from_api() {
 
 
 
-function make_apiurl($page = 0) {
+function make_apiurl($page = 0, $ownership) {
      global $config;
      
      $url = $config['api_url'];
@@ -269,7 +311,13 @@ function make_apiurl($page = 0) {
 	 $url .= '?api_key='.$api_key;
 	 
 	 foreach ($config['filter'] as $filter => $value) {
-	     $url .= '&'.$filter.'='.$value;
+	     
+	     if (($filter == 'school.ownership') && ($ownership > 0)) {
+		  $url .= '&school.ownership='.$ownership;
+	     } else {
+		  $url .= '&'.$filter.'='.$value;
+	     }
+	    
 	 }
 	 
 	 if ($config['result_fields']) {
