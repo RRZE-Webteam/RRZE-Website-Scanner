@@ -56,7 +56,8 @@ class WordPress extends \CMS  {
      
     private function get_regexp_matches() {
 	$match_reg = [
-	    '/^WordPress\s*([0-9\.]+)$/i'
+	    '/^WordPress\s*([0-9\.]+)$/i',
+	    '/^WordPress$/i'
 	];
 	return $match_reg;
     }   
@@ -164,6 +165,12 @@ class WordPress extends \CMS  {
 				if (strpos($lc['href'], 's.w.org') !==FALSE)
 				    return true;
 			    }
+			      if ($type == 'stylesheet') {
+				if ((preg_match('/\/wp\-content\//i', $lc['href'], $matches)))
+				    return true;
+				
+			    }
+			    
 			    
 			}
 		    }

@@ -64,7 +64,7 @@ class CMS {
 	"PlatoCMS",
 	"WebEdition",
 	"XIMS",
-	"HubSpot"
+	"HubSpot", "CleanSlate", "ASP", "Dreamweaver"
 
     ];
     private $common_methods = ["generator_meta", "generator_header", "api", "scripts"];
