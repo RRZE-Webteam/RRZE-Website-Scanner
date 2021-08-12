@@ -19,7 +19,7 @@ $config = [
 	    "school.school_url",
 	    "school.degrees_awarded.highest",
 	    "school.ownership",
-	    "school.state_fipsv",
+	    "school.state_fips",
 	    "school.online_only",
 	    "latest.student.size",
 	    "latest.student.grad_students"
@@ -38,81 +38,7 @@ $config = [
     "output_jsonfile"   => 'current-us-schools.json',
     "outjson"	=> true,
 ];
-$degree_award = [
-    "0" => "Non-degree-granting",
-    "1" => "Certificate degree",
-    "2" => "Associate degree",
-    "3" => "Bachelor's degree",
-    "4" => "Graduate degree",
-];
 
-
-$ownership = [
-    "1"	 => "Public",
-    "2"	 => "Private nonprofit",
-    "3"	 => "Private for-profit"
-];
-
-$fips_codes = [
-    "1" => "Alabama",
-    "2" => "Alaska",
-    "4" => "Arizona",
-    "5" => "Arkansas",
-    "6" => "California",
-    "8" => "Colorado",
-    "9" => "Connecticut",
-    "10" => "Delaware",
-    "11" => "District of Columbia",
-    "12" => "Florida",
-    "13" => "Georgia",
-    "15" => "Hawaii",
-    "16" => "Idaho",
-    "17" => "Illinois",
-    "18" => "Indiana",
-    "19" => "Iowa",
-    "20" => "Kansas",
-    "21" => "Kentucky",
-    "22" => "Louisiana",
-    "23" => "Maine",
-    "24" => "Maryland",
-    "25" => "Massachusetts",
-    "26" => "Michigan",
-    "27" => "Minnesota",
-    "28" => "Mississippi",
-    "29" => "Missouri",
-    "30" => "Montana",
-    "31" => "Nebraska",
-    "32" => "Nevada",
-    "33" => "New Hampshire",
-    "34" => "New Jersey",
-    "35" => "New Mexico",
-    "36" => "New York",
-    "37" => "North Carolina",
-    "38" => "North Dakota",
-    "39" => "Ohio",
-    "40" => "Oklahoma",
-    "41" => "Oregon",
-    "42" => "Pennsylvania",
-    "44" => "Rhode Island",
-    "45" => "South Carolina",
-    "46" => "South Dakota",
-    "47" => "Tennessee",
-    "48" => "Texas",
-    "49" => "Utah",
-    "50" => "Vermont",
-    "51" => "Virginia",
-    "53" => "Washington",
-    "54" => "West Virginia",
-    "55" => "Wisconsin",
-    "56" => "Wyoming",
-    "60" => "American Samoa",
-    "64" => "Federated States of Micronesia",
-    "66" => "Guam",
-    "69" => "Northern Mariana Islands",
-    "70" => "Palau",
-    "72" => "Puerto Rico",
-    "78" => "Virgin Islands"
-];
 
 // Automatische Laden von Klassen.
 spl_autoload_register(function ($class) {
@@ -198,7 +124,7 @@ if ($list) {
     if ($config['outjson']) {
 	
 	$dataarray['data'] = $list;
-	$dataarray['meta']['date-list'] = date("d.m.Y h:i:s");
+	$dataarray['meta']['date-list'] = date("d.m.Y H:i:s");
 	$dataarray['meta']['total'] = count($list);
 	$json = json_encode($dataarray);
 	if (file_put_contents($jsonfile, $json)) {

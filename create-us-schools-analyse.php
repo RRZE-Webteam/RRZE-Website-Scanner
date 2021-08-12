@@ -79,7 +79,7 @@ if ($table) {
 
 	
 	$dataarray['data'] = $table;
-	$dataarray['meta']['date-analyse'] = date("d.m.Y h:i:s");
+	$dataarray['meta']['date-analyse'] = date("d.m.Y H:i:s");
 	$dataarray['meta']['total'] = count($table);
 	if (isset($index['meta']['date-list'])) {
 		$dataarray['meta']['date-list'] = $index['meta']['date-list'];
