@@ -7,7 +7,6 @@ class HisInOne extends \CMS
 
     public $methods = array(
         "css",
-	"readstatus",
 	"content_string"
     );
 

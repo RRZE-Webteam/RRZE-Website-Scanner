@@ -64,10 +64,11 @@ class CMS {
 	"PlatoCMS",
 	"WebEdition",
 	"XIMS",
-	"HubSpot", "CleanSlate", "ASP", "Dreamweaver"
+	"HubSpot", "CleanSlate",  "Dreamweaver", "Percussion", "Omni",
+	"ASP"
 
     ];
-    private $common_methods = ["generator_meta", "generator_header", "api", "scripts"];
+    private $common_methods = ["generator_meta", "generator_header", "api", "scripts", "content_string"];
     
     
     public function __construct($url) {
