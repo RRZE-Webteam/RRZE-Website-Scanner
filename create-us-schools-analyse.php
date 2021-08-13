@@ -137,7 +137,7 @@ function create_indextable($index) {
     if (!isset($index)){
 	return;
     }
-    
+    $urlcache = array();
     $cnt = $sc = 0;
     $maxcnt = 5000;
      
@@ -167,13 +167,13 @@ function create_indextable($index) {
 	    if (isset($entry['school.school_url'])) {
 		
 		
-	        $cc = new cURL();
+	     
 		$url = sanitize_url($entry['school.school_url']);
 		
-		$data = $cc->get($url);
-		$locationchange = $cc->is_url_location_host(true);
-		$certinfo = $cc->get_ssl_info();
 		
+		
+		
+
 		echo $cnt;
 		
 		if ($total>0) {
@@ -182,63 +182,79 @@ function create_indextable($index) {
 		    echo ".";
 		}
 		echo "\t";
-		echo $cc->url;
-		$json_grunddata['url'] = $url;
-		unset($json_grunddata['school.school_url']);
-		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
 		
-		
-		if ($locationchange &&  $data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
-		   
-		    $analyse = new Analyse($cc->url);
-		    $analyse->header = $cc->header;
-		    @ $analyse->init($data);
-    
-		    echo " \t Ok\n";
-		
-		     $analysedata = $analyse->get_analyse_data();  
-		     	     
-		     if (isset($analysedata['title']))
-			$json_grunddata['title'] = $analysedata['title'];
-		     
-		     if (isset($analysedata['logo_src']))
-			$json_grunddata['logo_src'] = $analysedata['logo_src'];
-		     
-		     if (isset($analysedata['favicon_src']))
-			$json_grunddata['favicon_src'] = $analysedata['favicon_src'];
-		     
-		     if (isset($analysedata['content']) && isset($analysedata['content']['lang']))
-			$json_grunddata['content']['lang'] = $analysedata['content']['lang'];
-		     
-		      if (isset($analysedata['content']) && isset($analysedata['content']['tos']))
-			$json_grunddata['content']['tos'] = $analysedata['content']['tos'];
-		      
-		     if (isset($analysedata['generator'])) 
-			 $json_grunddata['generator'] = $analysedata['generator'];
-		     
-		     if (isset($analysedata['template']))
-			$json_grunddata['template'] = $analysedata['template'];
-		     
-		     $json_data[] = $json_grunddata;
-	     
-	        } elseif (!$locationchange) {
-		    echo "\t (".$url.") redirect to: ".$cc->header['location']."\n";
-		    
-		    $json_grunddata['redirect'] = $cc->header['location'];
-		    $json_data[] = $json_grunddata;
-		    
-		} else {
-		    echo " \t Status Error (".$data['meta']['http_code'].")  at ".$entry['school.name']." (".$url.")\n";
-		    $json_data[] = $json_grunddata;
-		}
-		
-		$sc++;
-		if ($sc > 5) {
-		    $sc =0;
-		    sleep(1);
-		    // sleep every 5 seconds to be friendly to our network :)
-		}
-		
+		if (isset($urlcache[$url])) {
+			 echo $url;
+			 echo "\t (Redundant, wird nicht erneut gescannt).\n";
+			  $json_data[] = $urlcache[$url];
+			 
+		 } else {
+		    $cc = new cURL();
+		    $data = $cc->get($url);
+		    $locationchange = $cc->is_url_location_host(true);
+		    $certinfo = $cc->get_ssl_info();
+
+		    echo $cc->url;
+		    $json_grunddata['url'] = $url;
+		    unset($json_grunddata['school.school_url']);
+		    $json_grunddata['httpstatus'] = $data['meta']['http_code'];
+
+
+		    if ($locationchange &&  $data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
+
+			$analyse = new Analyse($cc->url);
+			$analyse->header = $cc->header;
+			@ $analyse->init($data);
+
+			echo " \t Ok\n";
+
+			 $analysedata = $analyse->get_analyse_data();  
+
+			 if (isset($analysedata['title']))
+			    $json_grunddata['title'] = $analysedata['title'];
+
+			 if (isset($analysedata['logo_src']))
+			    $json_grunddata['logo_src'] = $analysedata['logo_src'];
+
+			 if (isset($analysedata['favicon_src']))
+			    $json_grunddata['favicon_src'] = $analysedata['favicon_src'];
+
+			 if (isset($analysedata['content']) && isset($analysedata['content']['lang']))
+			    $json_grunddata['content']['lang'] = $analysedata['content']['lang'];
+
+			  if (isset($analysedata['content']) && isset($analysedata['content']['tos']))
+			    $json_grunddata['content']['tos'] = $analysedata['content']['tos'];
+
+			 if (isset($analysedata['generator'])) 
+			     $json_grunddata['generator'] = $analysedata['generator'];
+
+			 if (isset($analysedata['template']))
+			    $json_grunddata['template'] = $analysedata['template'];
+
+			 $json_data[] = $json_grunddata;
+
+			 if (!isset($urlcache[$url])) {
+			     $urlcache[$url]= $json_grunddata;
+			 }
+
+		    } elseif (!$locationchange) {
+			echo "\t (".$url.") redirect to: ".$cc->header['location']."\n";
+
+			$json_grunddata['redirect'] = $cc->header['location'];
+			$json_data[] = $json_grunddata;
+
+		    } else {
+			echo " \t Status Error (".$data['meta']['http_code'].")  at ".$entry['school.name']." (".$url.")\n";
+			$json_data[] = $json_grunddata;
+		    }
+
+		    $sc++;
+		    if ($sc > 5) {
+			$sc =0;
+			sleep(1);
+			// sleep every 5 seconds to be friendly to our network :)
+		    }
+		 }
 	    } else {
 		 echo " \t No URL at ".$entry['name'];
 		 echo "\n";
