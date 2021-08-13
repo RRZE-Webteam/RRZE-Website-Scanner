@@ -64,7 +64,7 @@ class CMS {
 	"PlatoCMS",
 	"WebEdition",
 	"XIMS","Liferay", 
-	"HubSpot", "CleanSlate",  "Dreamweaver", "Percussion", "Omni", "DayCMS","Cascade",
+	"HubSpot", "CleanSlate",  "Dreamweaver", "Percussion", "Omni", "DayCMS","Cascade","Kentico",
 	"ASP"
 
     ];
