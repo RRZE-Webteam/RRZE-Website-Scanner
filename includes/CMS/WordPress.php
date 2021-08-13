@@ -20,7 +20,7 @@ class WordPress extends \CMS  {
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_meta", "button_css", "api", "scripts"
+	 "generator_meta", "button_css", "api", "scripts", "content_string"
 	);
 
      
@@ -57,7 +57,7 @@ class WordPress extends \CMS  {
     private function get_regexp_matches() {
 	$match_reg = [
 	    '/^WordPress\s*([0-9\.]+)$/i',
-	    '/^WordPress$/i'
+	    '/^WordPress/i'
 	];
 	return $match_reg;
     }   
@@ -179,5 +179,16 @@ class WordPress extends \CMS  {
 
 		return FALSE;
 
+	}
+	public function content_string() {
+	    if ($this->content) {
+		if (preg_match('/\/wp\-content\/plugins\//i', $this->content, $matches)) {
+		       return true;
+		}
+		if (preg_match('/\/wp\-content\/uploads\//i', $this->content, $matches)) {
+		       return true;
+		}
+	    }
+	    return FALSE;
 	}
 }

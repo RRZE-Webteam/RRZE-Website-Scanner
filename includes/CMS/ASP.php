@@ -5,7 +5,7 @@ namespace CMS;
 class ASP extends \CMS {
 
     public $methods = array(
-        "generator_header"
+        "generator_header", "content_string"
     );
 
     
@@ -56,7 +56,15 @@ class ASP extends \CMS {
 	}
 
 	
+	public function content_string() {
+	    if ($this->content) {
+		if (preg_match('/<form method="post" action="\.\/default\.aspx"/i', $this->content, $matches)) {
+		       return true;
+		}
 	
+	    }
+	    return FALSE;
+	}
 
 
 }
