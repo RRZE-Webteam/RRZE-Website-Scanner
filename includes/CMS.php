@@ -63,8 +63,8 @@ class CMS {
 	"Scrivito",
 	"PlatoCMS",
 	"WebEdition",
-	"XIMS",
-	"HubSpot", "CleanSlate",  "Dreamweaver", "Percussion", "Omni",
+	"XIMS","Liferay", 
+	"HubSpot", "CleanSlate",  "Dreamweaver", "Percussion", "Omni", "DayCMS","Cascade",
 	"ASP"
 
     ];

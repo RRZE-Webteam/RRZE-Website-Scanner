@@ -54,6 +54,16 @@ class Omni extends \CMS  {
 		if (preg_match('/rel="nofollow" href="https:\/\/a\.ou\./i', $this->content, $matches)) {
 		       return true;
 		}
+		if (preg_match('/ href="https:\/\/omni\.[a-z0-9\-;&=\/\?]+path=\/index\.pcf">/i', $this->content, $matches)) {
+		       return true;
+		}
+		if (preg_match('/ href="https:\/\/ou\.[a-z0-9\-;&=\/\?]+path=\/index\.pcf">/i', $this->content, $matches)) {
+		       return true;
+		}
+		
+		if (preg_match('/<script src="\/_resources\/js\/direct\-edit\.js"><\/script>/i', $this->content, $matches)) {
+		       return true;
+		}
 	
 	    }
 	    return FALSE;
