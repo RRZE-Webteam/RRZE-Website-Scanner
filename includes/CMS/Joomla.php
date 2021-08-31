@@ -7,7 +7,8 @@ class Joomla extends \CMS {
 		"readme",
 		"generator_meta",
 		"core_js",
-	    "core_site_js"
+	    "core_site_js",
+	    "content_string"
 	);
 
 	
@@ -176,4 +177,14 @@ class Joomla extends \CMS {
 	    return false;
 	}
     }
+    
+    public function content_string() {
+	    if ($this->content) {
+		if (preg_match('/<script type=application\/json class="joomla\-script\-options/i', $this->content, $matches)) {
+		       return true;
+		}
+	
+	    }
+	    return FALSE;
+	}
 }

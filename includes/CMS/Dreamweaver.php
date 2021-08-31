@@ -45,6 +45,9 @@ class Dreamweaver extends \CMS  {
 		if (preg_match('/<!\-\- InstanceBeginEditable name="[a-z0-9\-]+" \-\->/i', $this->content, $matches)) {
 		       return true;
 		}
+		if (preg_match('/<!\-\- #BeginTemplate "\/Templates\/[a-z]+/i', $this->content, $matches)) {
+		       return true;
+		}
 	    }
 	    return FALSE;
 	}

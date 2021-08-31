@@ -20,7 +20,7 @@ class WordPress extends \CMS  {
 	 $this->scripts = $scripts;
      } 
      public $methods = array(
-	 "generator_meta", "button_css", "api", "scripts", "content_string"
+	 "generator_meta", "button_css", "api", "scripts", "content_string", "generator_header"
 	);
 
      
@@ -57,7 +57,9 @@ class WordPress extends \CMS  {
     private function get_regexp_matches() {
 	$match_reg = [
 	    '/^WordPress\s*([0-9\.]+)$/i',
-	    '/^WordPress/i'
+	    '/^WordPress/i',
+	    '/^WPML /i'
+	    
 	];
 	return $match_reg;
     }   
@@ -190,5 +192,38 @@ class WordPress extends \CMS  {
 		}
 	    }
 	    return FALSE;
+	}
+	
+	/**
+	 * Check for Generator header
+	 * @return [boolean]
+	 */
+	public function generator_header() {
+		if (isset($this->header) && is_array($this->header)) {
+		 
+		    if (isset($this->header['link'])) {
+			
+			if (is_array($this->header['link'])) {
+			    foreach($this->header['link'] as $i => $element) {
+				if (strpos($element, '/wp-json/') !==FALSE)
+					return $this->get_info();	
+				if (strpos($element, 'rel="https://api.w.org/"') !==FALSE)
+					return $this->get_info();	
+			    }
+			} else {
+			    if (strpos($this->header['link'], '/wp-json/') !==FALSE)
+					return $this->get_info();	
+			    if (strpos($this->header['link'], 'https://api.w.org/') !==FALSE)
+					return $this->get_info();	
+			}
+			
+					
+		    }
+		   
+
+		}
+
+		return FALSE;
+
 	}
 }
