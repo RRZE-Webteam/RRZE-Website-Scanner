@@ -34,6 +34,9 @@ $ignore_domains = [
     '/[a-z0-9\-]+\.webhummel\.rrze\uni\-erlangen\.de/',
     '/[a-z0-9\-]+\.tindu\.rrze\uni\-erlangen\.de/',
     '/berta\.wmp\.rrze\uni\-erlangen\.de/',
+    '/go\\.fau\.de/',
+    '/cris\-demo\.zuv\.fau\.de/',
+    '/www\.rrze\.fau\.info/'
 ];
 
 		
