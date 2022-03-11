@@ -132,7 +132,7 @@ function create_indextable($index, $wppagebreaks = true) {
     $line = '';
     $table = '';
     $cnt = 0;
-    $maxcnt = 2000;
+    $maxcnt = 20;
     $breakat = 100;
     $breakcnt = 0;
     $failstr = '<span class="fail">-</span>'; 
@@ -172,12 +172,12 @@ function create_indextable($index, $wppagebreaks = true) {
 		   
 		    $line .= '<td class="title">';
 		    if (isset($analyse->lang)){
-			$line .= '<h2 lang="'.$analyse->lang.'">';
+			$line .= '<span lang="'.$analyse->lang.'">';
 		    }
 		    
 		    $line .= $analyse->title;
 		    if (isset($analyse->lang)){
-			$line .= '</h2>';
+			$line .= '</span>';
 		    }
 		    $line .=  '<span class="url"><a href="'.$analyse->url.'">'.$analyse->url.'</a></span></td>';
 
@@ -231,18 +231,10 @@ function create_indextable($index, $wppagebreaks = true) {
 		       $line .= '<td class="generator">';
 		       $line .= '<span class="'.$analyse->generator['classname'].'">'.$analyse->generator['name'].'</span>';
 
-		//	if (isset($analyse->generator['version'])) {
-		//	     $line .= " (".$analyse->generator['version'].")";
-		//	}
-			
-			
-			if ((isset($analyse->template)) && ($analyse->template !== $analyse->generator['name'])) {
-			    $line .= '<br><span class="template">'.$analyse->template;
-			    if (isset($analyse->template_version)) {
-				$line .=  " (".$analyse->template_version.")";
-			    }
-			     $line .= '</span>';
+			if (isset($analyse->generator['version'])) {
+			     $line .= " (".$analyse->generator['version'].")";
 			}
+			
 			
 			
 		       $line .= '</td>';
@@ -250,10 +242,21 @@ function create_indextable($index, $wppagebreaks = true) {
 		    } else {
 			$line .= '<td class="generator"></td>';
 		    }
-	
 		    
+		
+		    
+		   if ($analyse->external) {
+		     $line .= '<td class="external">';
+			 foreach ($analyse->external as $link) {
+			    $line .=  "\t".$link."<br>\n";
+			 }
+			$line .= '</td>';
+		    
+		    
+		    }else {
+			$line .= '<td class="external"></td>';
+		    }
 		     $line .= '</tr>'."\n";
-		     
 		     $analysedata = $analyse->get_analyse_data();  
 		     
 		     $jsonadd =  array_merge($json_grunddata, $analysedata);
@@ -288,6 +291,7 @@ function create_indextable($index, $wppagebreaks = true) {
 	$head .= '<th scope="col" rowspan="2">Favicon</th>';
 	$head .= '<th scope="col" colspan="3">Rechtstexte</th>';
 	$head .= '<th scope="col" rowspan="2">CMS</th>';
+	$head .= '<th scope="col" rowspan="2">Externe Ressourcen</th>';
 	$head .= '</tr>';
 	$head .= '<tr class="center">';
 	$head .= '<td class="small vertical">Impressum</td>';
