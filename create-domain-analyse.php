@@ -18,7 +18,7 @@ $ignore_domains = [
     '/cms\.tun\.rrze\.net$/',
     '/[a-z0-9\-]+\.cms\.rrze\.de/',
     '/[0-9]+\.kurse.rrze\.fau\.de$/',
-    '/[a-z0-9\-]+\.kurse\.rrze\uni\-erlangen\.de/',
+    '/[a-z0-9\-]+\.kurse\.rrze\.uni\-erlangen\.de/',
     '/\.webspace.rrze\.fau\.de$/',
     '/webserver\-default\.uni\-erlangen\.de/',
     '/infoload\.rrze\.uni\-erlangen\.de/',
@@ -31,12 +31,15 @@ $ignore_domains = [
     '/zuv[0-9\-]+\.fau\.info/',
     '/[a-z0-9\-]+\.test\.rrze\.fau\.de/',
     '/[a-z0-9\-]+\.test\.rrze\.uni\-erlangen\.de/',
-    '/[a-z0-9\-]+\.webhummel\.rrze\uni\-erlangen\.de/',
+    '/[a-z0-9\-]+\.webhummel\.rrze\.uni\-erlangen\.de/',
     '/[a-z0-9\-]+\.tindu\.rrze\uni\-erlangen\.de/',
-    '/berta\.wmp\.rrze\uni\-erlangen\.de/',
-    '/go\\.fau\.de/',
+    '/berta\.wmp\.rrze\.uni\-erlangen\.de/',
+    '/go\.fau\.de/',
+    '/api\.fau\.de/',
+    '/dev\.wmp\.rrze\.fau\.de/',
     '/cris\-demo\.zuv\.fau\.de/',
-    '/www\.rrze\.fau\.info/'
+    '/www\.rrze\.fau\.info/',
+    '/www\.cdn\.video\.uni\-erlangen\.de/'
 ];
 
 		
