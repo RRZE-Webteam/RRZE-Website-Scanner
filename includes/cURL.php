@@ -329,7 +329,7 @@ class cURL {
      
      // sets the redirect location if need
      private function set_redirect_location($url) {
-	 if ((!empty($url)) && (is_valid_url($url))) {
+	 if ((!empty($url)) && ($this->is_valid_url($url))) {
 	     $this->header['_http_equiv-redirection'] = $url;
 	     return true;
 	 }
