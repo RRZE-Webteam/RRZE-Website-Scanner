@@ -145,12 +145,12 @@ class Analyse {
 	$this->logosrc =  $this->find_logo();	
 	$this->lang = $this->get_language($data['content']);
 	$this->external = $this->find_external_ressources($data['content']);
-	
+	$this->scripts = $this->get_script_link($data['content']);
 	
     } 
     
     
-    function get_analyse_data() {
+    public function get_analyse_data() {
 	$res = array();
 	$res['url'] = $this->url;
 	$res['httpstatus'] = $this->httpstatus;
@@ -190,9 +190,7 @@ class Analyse {
 	    $res['template']['version'] =  $this->template_version;  
 	}
 	
-	
-	
-	
+
 	return $res;
     }
     
