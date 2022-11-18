@@ -1,9 +1,7 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Grundlegende Funktionen zum Abruf einer URL
  */
 
 class cURL {
@@ -13,19 +11,25 @@ class cURL {
     var $cookie_file;
     var $proxy;
     
-    function cURL($cookies=TRUE,$cookie='cookies.txt',$compression='gzip',$proxy='') {
-	$this->headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
-	$this->headers[] = 'Connection: Keep-Alive';
-	$this->headers[] = 'Content-type: application/x-www-form-urlencoded;charset=UTF-8';
-	$this->user_agent = 'Mozilla/4.0 (RRZE CheckBot)';
-	$this->compression=$compression;
-	$this->proxy=$proxy;
-	$this->cookies=$cookies;
-	$this->header = array();
-	if ($this->cookies == TRUE) $this->cookie($cookie);
-    }
     
-    function cookie($cookie_file) {
+     public function __construct($cookies=TRUE,$cookie='cookies.txt',$compression='gzip',$proxy='') {
+
+	$this->headers = array(
+	    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+	    'Connection: Keep-Alive',
+	    'Content-type: application/x-www-form-urlencoded;charset=UTF-8'
+	);
+	$this->user_agent   = 'Mozilla/4.0 (RRZE CheckBot)';
+	$this->compression  = $compression;
+	$this->proxy	    = $proxy;
+	$this->cookies	    = $cookies;
+	$this->header	    = array();
+	if ($this->cookies == TRUE) 
+		$this->cookie($cookie);
+	
+     } 
+
+    public function cookie($cookie_file) {
 	if (file_exists($cookie_file)) {
 	    $this->cookie_file=$cookie_file;
 	} else {
@@ -34,7 +38,7 @@ class cURL {
 	    fclose($this->cookie_file);
 	}
     }
-    function get($url) {
+    public function get($url) {
 	$res = array(
 	    "content" => '',
 	    "meta" => array(
@@ -112,7 +116,7 @@ class cURL {
 	return $res;
     }
      
-    function post($url,$data) {
+    public function post($url,$data) {
 	$res = array(
 	    "content" => '',
 	    "meta" => array(
@@ -156,11 +160,11 @@ class cURL {
 	
 	return $res;
     }
-    function error($error) {
+    private function error($error) {
 	echo "cURL Error: $error";
 	die;
     }
-    function get_ssl_info() {
+    public function get_ssl_info() {
 	if (!$this->is_valid_url($this->url)) {
 	    return false;
 	}
@@ -194,8 +198,8 @@ class cURL {
 	return false;
 	
     }
-    function is_valid_url($urlinput) {
-	$url = filter_var($urlinput, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
+    public function is_valid_url($urlinput) {
+	$url = filter_var($urlinput, FILTER_VALIDATE_URL);
 
 	if (empty($url) || (strlen($url) != strlen($urlinput))) {
 	    return false;
@@ -239,8 +243,18 @@ class cURL {
      }
      
      public function is_url_location_host($setnew = false) {
-	 if ((isset($this->header['location'])) && is_string($this->header['location'])) {
-	     $lu = parse_url($this->header['location']);     
+	 $location = '';
+	 if (!empty($this->header['location'])) {
+	     if (is_array($this->header['location'])) {
+		 $location = end($this->header['location']);
+	     } elseif (is_string($this->header['location'])) {
+		 $location = $this->header['location'];
+	     }
+	 }
+	 
+	 
+	 if (!empty($location)) {
+	     $lu = parse_url($location);     
 	     $lo = parse_url($this->url);
  
 	     
@@ -257,10 +271,10 @@ class cURL {
 		 
 		 if ($lu['host'] == $wwwlo )  {
 		     // Ist Umlenkung auf Domainhost ohne www, es bleibt also dieselbe Domain
-		   if ($setnew) {
-		       $this->url = $this->header['location']; 
-		   }
-		     return true;
+		    if ($setnew) {
+			$this->url = $this->header['location']; 
+		    }
+		    return true;
 		 }
 		 if ($wwwlu == $lo['host'] )  {
 		     // Ist Umlenkung auf Domainhost mit www, es bleibt also dieselbe Domain
