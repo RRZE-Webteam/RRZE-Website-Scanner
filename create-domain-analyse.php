@@ -225,7 +225,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		$locationchange = $cc->is_url_location_host(true);
 		$certinfo = $cc->get_ssl_info();
 		
-		echo $cc->url;
+		echo $entry['url'];
 
 		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
 		
@@ -248,7 +248,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		    if (isset($analyse->lang)){
 			$line .= '</h2>';
 		    }
-		    $line .=  '<span class="url"><a href="'.$analyse->url.'">'.$analyse->url.'</a></span></td>';
+		    $line .=  '<span class="url"><a href="'.$entry['url'].'">'.$entry['url'].'</a></span></td>';
 
 		    if (isset($analyse->logosrc) && !empty($analyse->logosrc)) {
 			$line .= '<td class="logo"><img class="borderless noshadow" src="'.$analyse->logosrc.'" style="max-width: 240px; max-height: 65px;" alt=""></td>';
