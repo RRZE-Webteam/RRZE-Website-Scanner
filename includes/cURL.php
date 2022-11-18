@@ -316,10 +316,21 @@ class cURL {
 	
 	 if (!empty($content)) {
 	     // first look for a <meta http-equiv="Refresh" content="0; url='TARGET'" />
-	     preg_match_all('/<meta\s*[^<>]*\s*http\-equiv\s*=\s*["\']refresh["\']+\s*content=\s*["\']+([0-9]+);\s+url=["\']+([a-z]+:\/\/[a-z0-9\-\/\.]+)["\']+\s*[^<>]*>/i', $content, $output_array);
+	     preg_match_all('/<meta\s*[^<>]*\s*http\-equiv\s*=\s*["\']refresh["\']+\s*content=\s*["\']+([0-9]+);\s+url=["\']*([:a-z0-9\-\/\.]+)["\']*\s*[^<>]*>/i', $content, $output_array);
 	     if (!empty($output_array)) {
 		 if (isset($output_array[2][0])) {
-		     return $output_array[2][0];
+		     
+		     if (preg_match_all('/^[a-z]+:\/\//i', $output_array[2][0], $absmatch)) {
+			 // absolute URL
+			 return $output_array[2][0];
+		     } else {
+			 $uri = preg_replace('/^\//i', '', $output_array[2][0]);
+			 $input = preg_replace('/\/$/i', '', $this->url);
+			 $abs = $input.'/'.$uri;
+			 return $abs;
+		     }
+		     
+		     
 		 }
 	     } 
 	 }
@@ -329,7 +340,7 @@ class cURL {
      
      // sets the redirect location if need
      private function set_redirect_location($url) {
-	 if ((!empty($url)) && ($this->is_valid_url($url))) {
+	 if (!empty($url))  {
 	     $this->header['_http_equiv-redirection'] = $url;
 	     return true;
 	 }
