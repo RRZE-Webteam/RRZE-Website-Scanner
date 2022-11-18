@@ -320,6 +320,14 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		     $analysedata = $analyse->get_analyse_data();  
 		     
 		     $jsonadd =  array_merge($json_grunddata, $analysedata);
+		     if ($jsonadd['url'] !== $entry['url']) {
+			
+			 if (empty($jsonadd['redirect'])) {
+			     $jsonadd['redirect'] = $jsonadd['url'];
+			 }
+			$jsonadd['url'] = $entry['url'];
+		     }
+		     
 		     $json_data[] = $jsonadd;
 	     
 	        } elseif (!$locationchange) {
