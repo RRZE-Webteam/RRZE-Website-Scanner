@@ -1,5 +1,8 @@
 <?php
 
+/******************************************************************************
+ * Konstanten
+ *****************************************************************************/
 $servertypen = [
                 1       => "RRZE-Webdienst-Server",
                 2       => "RRZE Server fuer Spezialdienste",
@@ -44,15 +47,15 @@ $ignore_domains = [
 
 		
 
-$outputfile = "";
+$outputfile	    = "";
 $prefix_outhtmlfile = "domain-analyse";
 $prefix_outjsonfile = "domain-analyse";
-$outjson = true;
-$defaultservertyp = 18;
-$json_data = array();
-
-
-// Automatische Laden von Klassen.
+$outjson	    = true;
+$defaultservertyp   = 18;
+$json_data	    = array();
+/******************************************************************************
+ *  Automatische Laden von Klassen.
+ *****************************************************************************/
 spl_autoload_register(function ($class) {
     $prefix = __NAMESPACE__;
     $base_dir = __DIR__ . '/includes/';
@@ -69,7 +72,9 @@ spl_autoload_register(function ($class) {
         require_once $file;
     }
 });
-    
+/******************************************************************************
+ * Start
+ *****************************************************************************/    
 $shortopts = "s:o:j:";
 $longopts  = array(
     "server:",
@@ -77,8 +82,6 @@ $longopts  = array(
     "json:"    // Optional value
 );
 $displayhelp = false;
-
-// Script example.php
 $options = getopt($shortopts,$longopts);
 
 if (isset($options['s'])) {
@@ -156,14 +159,17 @@ file_put_contents($outputfile, $table);
 
 if ($outjson) {
     $json = json_encode(array('data' => $json_data));
-    if (file_put_contents($jsonfile, $json))
+    if (file_put_contents($jsonfile, $json)) {
         echo "JSON file $jsonfile created successfully...\n";
-    else 
+    } else { 
 	echo "Oops! Error creating json file $jsonfile...\n";
+    }
 }
 
 exit;
-
+/******************************************************************************
+ * Functions
+ *****************************************************************************/
 function sanitize_filename($name) {
 // remove illegal file system characters https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
     if ((isset($name)) && (!empty(trim($name)))) {
@@ -175,7 +181,10 @@ function sanitize_filename($name) {
 	return "";
     }
 }
-
+/*
+ * Analyse each URL and creates a resulting HTML table. Also adds results as values in the
+ * global $json_data array
+ */
 function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wppagebreaks = true) {
     global $json_data;
     
@@ -198,7 +207,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 	
 	if (($refstatus==-1) || (($refstatus > -1) && (in_array($entry['wmp_refservertyp'], $refserver)) )) {
 	   
-		
+
 		$json_grunddata['url'] = $entry['url'];
 		$json_grunddata['wmp']['refservertyp'] = $entry['wmp_refservertyp'];
 		$json_grunddata['wmp']['refstatus'] = $entry['wmp_refstatus'];
@@ -217,7 +226,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		$certinfo = $cc->get_ssl_info();
 		
 		echo $cc->url;
-		
+
 		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
 		
 		
@@ -289,13 +298,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		    
 		    if ((isset($analyse->generator)) && (!empty($analyse->generator['name']))) {
 		       $line .= '<td class="generator">';
-		       $line .= '<span class="'.$analyse->generator['classname'].'">'.$analyse->generator['name'].'</span>';
-
-		//	if (isset($analyse->generator['version'])) {
-		//	     $line .= " (".$analyse->generator['version'].")";
-		//	}
-			
-			
+		       $line .= '<span class="'.$analyse->generator['classname'].'">'.$analyse->generator['name'].'</span>';			
 			if ((isset($analyse->template)) && ($analyse->template !== $analyse->generator['name'])) {
 			    $line .= '<br><span class="template">'.$analyse->template;
 			    if (isset($analyse->template_version)) {
@@ -320,8 +323,14 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		     $json_data[] = $jsonadd;
 	     
 	        } elseif (!$locationchange) {
-		    echo "\t wird umgelenkt auf: ".$cc->header['location']."\n";
-		    $json_grunddata['redirect'] = $cc->header['location'];
+		    if (is_array($cc->header['location'])) {
+			$location = end($cc->header['location']);
+		    } else {
+			$location = $cc->header['location'];
+		    }
+		    
+		    echo "\t wird umgelenkt auf: ".$location."\n";
+		    $json_grunddata['redirect'] = $location;
 		    $json_data[] = $json_grunddata;
 		    
 		} else {
