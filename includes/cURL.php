@@ -12,21 +12,23 @@ class cURL {
     var $proxy;
     
     
-     public function __construct($cookies=TRUE,$cookie='cookies.txt',$compression='gzip',$proxy='') {
+     public function __construct($cookies = true, $cookie = 'cookies.txt', $compression = 'gzip', $proxy='') {
 
 	$this->headers = array(
 	    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
 	    'Connection: Keep-Alive',
 	    'Content-type: application/x-www-form-urlencoded;charset=UTF-8'
 	);
+	$this->follow_html_redirection = true;
 	$this->user_agent   = 'Mozilla/4.0 (RRZE CheckBot)';
 	$this->compression  = $compression;
 	$this->proxy	    = $proxy;
 	$this->cookies	    = $cookies;
 	$this->header	    = array();
-	if ($this->cookies == TRUE) 
+	$this->body	    = '';
+	if ($this->cookies) {
 		$this->cookie($cookie);
-	
+	}
      } 
 
     public function cookie($cookie_file) {
@@ -79,34 +81,49 @@ class cURL {
 
 	
 	$header = substr($response, 0, $header_size);
-	$body = substr($response, $header_size);
-	
+	$this->body = substr($response, $header_size);	
 	$this->parse_header($header);
-	$res['header'] = $this->header;
+	
 	$res['meta'] = curl_getinfo($process);
 	
 	
 	$location = curl_getinfo($process, CURLINFO_EFFECTIVE_URL);
 	if ($location !== $url) {
-	    if (isset($res['header']['location'])) {
-		if ($location !== $res['header']['location']) {
-		    $res['meta']['location'] = $location;
+	    if (isset($this->header['location'])) {
+		if ($location !== $this->header['location']) {
+		    $this->header['location'] = $location;
 		}
 		
 	    } else {
-		$res['meta']['location'] = $location;
+		$this->header['location'] = $location;
 	    }
 	    
 	}
+	$this->recheck_location_with_body();
+
+	if (($this->follow_html_redirection) && (!empty($this->header['_http_equiv-redirection']))) {
+	    $newurl = $this->header['_http_equiv-redirection'];
+	    $oldheader = $this->header;
+	    $oldurl =  $this->url;
+	    $this->header = array();
+	    
+	    $newdata = $this->get($newurl);
+	    $this->header['_http_equiv_from'] = $oldurl;
+	    $this->header['_former_location'] = $oldheader['location'];
+	    $newdata['header'] = $this->header;
+	    return $newdata;
+	}
 	
+	$res['header'] = $this->header;
 	
 	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
 	curl_close($process);
 
 	if ($httpcode>=200 && $httpcode<500) {
-	    $res['content'] = $body;	   
+	    $res['content'] =   $this->body;	   
+	  
 	} else {
-	     $res['content'] = '';
+	    $res['content'] = '';
 	}
 	
 	
@@ -288,5 +305,59 @@ class cURL {
 	     }
 	 }
 	 return true;
+     }
+     
+     // checks if there is a redirection by the HTML Meta HTTP-EQUIV Tag
+     // if so, it returns the target, otherwise false
+     public function is_htmlmeta_redirection($content = '') {
+	 if ((empty($content)) && (!empty($this->body))) {
+	     $content = $this->body;
+	 }
+	
+	 if (!empty($content)) {
+	     // first look for a <meta http-equiv="Refresh" content="0; url='TARGET'" />
+	     preg_match_all('/<meta\s*[^<>]*\s*http\-equiv\s*=\s*["\']refresh["\']+\s*content=\s*["\']+([0-9]+);\s+url=["\']+([a-z]+:\/\/[a-z0-9\-\/\.]+)["\']+\s*[^<>]*>/i', $content, $output_array);
+	     if (!empty($output_array)) {
+		 if (isset($output_array[2][0])) {
+		     return $output_array[2][0];
+		 }
+	     } 
+	 }
+	 
+	 return false;
+     }
+     
+     // sets the redirect location if need
+     private function set_redirect_location($url) {
+	 if ((!empty($url)) && (is_valid_url($url))) {
+	     $this->header['_http_equiv-redirection'] = $url;
+	     return true;
+	 }
+	 return false;
+     }
+     
+     private function recheck_location_with_body() {
+	 $htmlredir = $this->is_htmlmeta_redirection();
+	 if ($htmlredir) {
+	     return $this->set_redirect_location($htmlredir);
+	 }
+	 return false;
+     }
+     
+     private function same_url($url1, $url2) {
+	 
+	 if ((empty($url1)) && (!empty($url2))) {
+	     return false;
+	 }
+	 if ((!empty($url1)) && (empty($url2))) {
+	     return false;
+	 }
+	 $url1 = preg_replace('/\/$/i', '', $url1);
+	 $url2 = preg_replace('/\/$/i', '', $url2);
+	 
+	 if (strtolower($url1) == strtolower($url2)) {
+	     return true;
+	 }
+	 return false;
      }
 }
