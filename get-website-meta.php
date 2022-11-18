@@ -22,11 +22,20 @@ spl_autoload_register(function ($class) {
 
 
 
-if ($argc !== 2) {
-    echo "Usage: php get-website-meta.php <url>\n";
+if (empty($argv[1])) {
+    echo "Usage: php get-website-meta.php <url> ([display-content-hash] [display-content-raw])\n";
     exit(1);
 }
 $url = $argv[1];
+
+$display_content_hash = false;
+if (!empty($argv[2])) {
+    $display_content_hash = true;
+}
+$display_content_raw = false;
+if (!empty($argv[3])) {
+    $display_content_raw = true;
+}
 
 if (is_valid_url($url)) {
     echo "Checking URL ".$url."\n";
@@ -42,7 +51,9 @@ if (is_valid_url($url)) {
 function parse_website($url) {
     if (empty($url)) return false;
     
-
+    global $display_content_hash;
+    global $display_content_raw;
+    
     $cc = new cURL();
     $data = $cc->get($url);
     $locationchange = $cc->is_url_location_host(true);
@@ -163,7 +174,7 @@ function parse_website($url) {
 	//    echo "Meta-Description:   ".$analyse->meta['description']."\n";
 	//}
 	if (isset($analyse->meta)) {
-	    echo "\nMeta-Angaben (HTML-Kopf):\n";
+	    echo "\nMeta-Angaben (Response Head):\n";
 	     foreach ($analyse->meta as $key => $value) {
 		echo "\t".$key.":\t";
 		if (is_string($value)) {
@@ -177,14 +188,14 @@ function parse_website($url) {
 		echo "\n";
 	    }
 	}
-	if (isset($analyse->favicon)) {
+	if ((isset($analyse->favicon)) && (!empty($analyse->favicon['href']))) {
 	    echo "Favicon:            ".$analyse->favicon['href'];
 	    if (!empty($analyse->favicon['sizes'])) {
 		echo " (".$analyse->favicon['sizes'].")";
 	    }
 	    echo "\n";
 	}
-	if (isset($analyse->logosrc)) {
+	if (!empty($analyse->logosrc)) {
 	    echo "Logo:               ".$analyse->logosrc."\n";
 	}
 	if ($analyse->toslinks) {
@@ -193,11 +204,65 @@ function parse_website($url) {
 		echo "\t".$tos.":\t".$value['linktext']." (".$value['href'].")\n";
 	    }
 	}
-	if ($analyse->external) {
+	if (!empty($analyse->linkrels)) {
+	    echo "\n<Link> im HTML <meta>:\n";
+	      foreach ($analyse->linkrels as $i => $entry) {
+		  if (is_array($entry)) {
+		      foreach ($entry as $name => $sub) {
+			  echo "\t".$name.":\t";
+			  if (is_array($sub)) {
+			      foreach ($sub as $i => $val) {
+				  echo "\"$i\"=\"$val\" ";
+			      }
+			      echo "\n";
+			  } else {
+			      echo $sub."\n";
+			  }
+		      }
+		  } else {
+		      echo "\t".$entry."\n";
+		  }
+	      }
+	}
+	if (!empty($analyse->scripts)) {
+	    echo "\nSkripten:\n";
+	      foreach ($analyse->scripts as $i => $entry) {
+		  if (is_array($entry)) {
+		      foreach ($entry as $name => $sub) {
+			  echo "\t".$name.":\t";
+			  if (is_array($sub)) {
+			      foreach ($sub as $i => $val) {
+				  echo "\"$i\"=\"$val\" ";
+			      }
+			      echo "\n";
+			  } else {
+			      echo $sub."\n";
+			  }
+		      }
+		  } else {
+		      echo "\t".$entry."\n";
+		  }
+	      }
+	}
+	
+	if (!empty($analyse->external)) {
 	    echo "\nExterne Ressourcen:\n";
 	     foreach ($analyse->external as $link) {
 		echo "\t".$link."\n";
 	    }
+	}
+	
+	if ($display_content_hash) {
+	    var_dump($analyse->get_analyse_data());
+	}
+	if ($display_content_raw) {
+	    echo "\n";
+	    echo "################################################################################\n";
+	    echo "# Content:\n";
+	    echo "################################################################################\n";
+	    
+	    echo $analyse->content;
+	    
 	}
     } elseif (!$locationchange) {
 	echo "Domain ".$cc->url." wird umgelenkt auf: ".$cc->header['location']."\n";
@@ -210,7 +275,7 @@ function parse_website($url) {
     
     
 function is_valid_url($urlinput) {
-    $url = filter_var($urlinput, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
+    $url = filter_var($urlinput, FILTER_VALIDATE_URL);
     
     if (empty($url) || (strlen($url) != strlen($urlinput))) {
 	return false;
