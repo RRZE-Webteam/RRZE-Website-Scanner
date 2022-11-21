@@ -102,30 +102,31 @@ class cURL {
 	}
 	$this->recheck_location_with_body();
 
-	if (($this->follow_html_redirection) && (!empty($this->header['_http_equiv-redirection']))) {
-	    $newurl = $this->header['_http_equiv-redirection'];
-	    $oldheader = $this->header;
-	    $oldurl =  $this->url;
-	    $this->header = array();
-	    
-	    $newdata = $this->get($newurl);
-	    $this->header['_http_equiv_from'] = $oldurl;
-	    $this->header['_former_location'] = $oldheader['location'];
-	    $newdata['header'] = $this->header;
-	    return $newdata;
-	} elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) && (!empty($this->header['_http_equiv-redirection']))) { 
-	    $newurl = $this->header['_http_equiv-redirection'];
-	    $oldheader = $this->header;
-	    $oldurl =  $this->url;
-	    $this->header = array();
-	    
-	    $newdata = $this->get($newurl);
-	    $this->header['_http_equiv_from'] = $oldurl;
-	    $this->header['_former_location'] = $oldheader['location'];
-	    $newdata['header'] = $this->header;
-	    return $newdata;
+	if  (!empty($this->header['_http_equiv-redirection'])) {
+	    if ($this->follow_html_redirection)  {
+		$newurl = $this->header['_http_equiv-redirection'];
+		$oldheader = $this->header;
+		$oldurl =  $this->url;
+		$this->header = array();
+
+		$newdata = $this->get($newurl);
+		$this->header['_http_equiv_from'] = $oldurl;
+		$this->header['_former_location'] = $oldheader['location'];
+		$newdata['header'] = $this->header;
+		return $newdata;
+	    } elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) ) { 
+		$newurl = $this->header['_http_equiv-redirection'];
+		$oldheader = $this->header;
+		$oldurl =  $this->url;
+		$this->header = array();
+
+		$newdata = $this->get($newurl);
+		$this->header['_http_equiv_from'] = $oldurl;
+		$this->header['_former_location'] = $oldheader['location'];
+		$newdata['header'] = $this->header;
+		return $newdata;
+	    }
 	}
-	
 	$res['header'] = $this->header;
 	
 	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
