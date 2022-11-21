@@ -112,6 +112,8 @@ class cURL {
 		$newdata = $this->get($newurl);
 		$this->header['_http_equiv_from'] = $oldurl;
 		$this->header['_former_location'] = $oldheader['location'];
+		$newdata['meta']['_http_equiv_from'] = $oldurl;
+		$newdata['meta']['_former_location'] = $oldheader['location'];
 		$newdata['header'] = $this->header;
 		return $newdata;
 	    } elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) ) { 
@@ -123,8 +125,12 @@ class cURL {
 		$newdata = $this->get($newurl);
 		$this->header['_http_equiv_from'] = $oldurl;
 		$this->header['_former_location'] = $oldheader['location'];
+		$newdata['meta']['_http_equiv_from'] = $oldurl;
+		$newdata['meta']['_former_location'] = $oldheader['location'];
 		$newdata['header'] = $this->header;
 		return $newdata;
+	    } else {
+		$res['meta']['_http_equiv-redirection'] = $this->header['_http_equiv-redirection'];
 	    }
 	}
 	$res['header'] = $this->header;
@@ -329,22 +335,21 @@ class cURL {
 	if ($url1 == $url2) {
 	    return true;
 	}
-	
-	
+
 	$purl1 = parse_url($url1);     
 	$purl2 = parse_url($url2);
  
 	if ((!isset($purl1['host'])) && (!isset($purl2['host']))) {
 	    // beide relativ
 	    return true;
-	} else {
+	} elseif (((!isset($purl1['host'])) && (isset($purl2['host']))) || ((isset($purl1['host'])) && (!isset($purl2['host'])))) {
 	    // einer ist relativ, der andere nicht
 	    return false;
 	}
+
 	if ($purl1['host'] == $purl2['host']) {
 	    return true;
 	}
-	
 	// vielleicht hat einer der beiden eine Umleitung auf die Subdomain, der andere nicht
 	if ((preg_match('/^www\./i',$purl1['host'])) && (!preg_match('/^www\./i',$purl2['host']))) {
 	   // url1 beginnt mit www.

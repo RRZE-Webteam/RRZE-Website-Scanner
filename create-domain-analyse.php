@@ -204,7 +204,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 	$line = '';
 	$json_grunddata = array();
 
-	
+
 	if (($refstatus==-1) || (($refstatus > -1) && (in_array($entry['wmp_refservertyp'], $refserver)) )) {
 	   
 
@@ -232,11 +232,18 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		if ($correctedurl != $entry['url']) {
 		    echo " (".$entry['url'].")";
 		}
+		
 		if (!empty($data['meta']['_http_equiv-redirection'])) {
 		     if (!$cc->is_same_domain($correctedurl, $data['meta']['_http_equiv-redirection'])) {
 			 $json_grunddata['redirect'] = $data['meta']['_http_equiv-redirection'];
 			 $stayonhost = false;
 		     }
+		}
+		if (!empty($data['meta']['_http_equiv_from'] )) {
+		    $json_grunddata['_http_equiv_from'] = $data['meta']['_http_equiv_from'];
+		}
+		if (!empty($data['meta']['_former_location'] )) {
+		    $json_grunddata['_former_location'] = $data['meta']['_former_location'];
 		}
 		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
 		
@@ -367,6 +374,9 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 	    
 	}
     }
+    
+  
+    
     if (!empty($table)) {
 	$head = '<table class="sorttable">';
 	$head .= '<thead>';
