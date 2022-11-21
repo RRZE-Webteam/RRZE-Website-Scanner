@@ -20,6 +20,7 @@ class cURL {
 	    'Content-type: application/x-www-form-urlencoded;charset=UTF-8'
 	);
 	$this->follow_html_redirection = false;
+	$this->follow_html_redirection_on_samehost = true;
 	$this->user_agent   = 'Mozilla/4.0 (RRZE CheckBot)';
 	$this->compression  = $compression;
 	$this->proxy	    = $proxy;
@@ -102,6 +103,17 @@ class cURL {
 	$this->recheck_location_with_body();
 
 	if (($this->follow_html_redirection) && (!empty($this->header['_http_equiv-redirection']))) {
+	    $newurl = $this->header['_http_equiv-redirection'];
+	    $oldheader = $this->header;
+	    $oldurl =  $this->url;
+	    $this->header = array();
+	    
+	    $newdata = $this->get($newurl);
+	    $this->header['_http_equiv_from'] = $oldurl;
+	    $this->header['_former_location'] = $oldheader['location'];
+	    $newdata['header'] = $this->header;
+	    return $newdata;
+	} elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) && (!empty($this->header['_http_equiv-redirection']))) { 
 	    $newurl = $this->header['_http_equiv-redirection'];
 	    $oldheader = $this->header;
 	    $oldurl =  $this->url;
