@@ -19,7 +19,7 @@ class cURL {
 	    'Connection: Keep-Alive',
 	    'Content-type: application/x-www-form-urlencoded;charset=UTF-8'
 	);
-	$this->follow_html_redirection = true;
+	$this->follow_html_redirection = false;
 	$this->user_agent   = 'Mozilla/4.0 (RRZE CheckBot)';
 	$this->compression  = $compression;
 	$this->proxy	    = $proxy;

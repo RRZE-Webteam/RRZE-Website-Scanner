@@ -222,16 +222,26 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		$cnt = $cnt +1;
 		
 	        $cc = new cURL();
+		$cc->follow_html_redirection = false;
 		$data = $cc->get($entry['url']);
-		$locationchange = $cc->is_url_location_host(true);
-		$certinfo = $cc->get_ssl_info();
 		
-		echo $entry['url'];
-
+		$stayonhost = $cc->is_url_location_host(true);
+		$certinfo = $cc->get_ssl_info();
+		$correctedurl = $cc->url;
+		echo $correctedurl;
+		if ($correctedurl != $entry['url']) {
+		    echo " (".$entry['url'].")";
+		}
+		if (!empty($data['meta']['_http_equiv-redirection'])) {
+		     if (!$cc->is_same_domain($correctedurl, $data['meta']['_http_equiv-redirection'])) {
+			 $json_grunddata['redirect'] = $data['meta']['_http_equiv-redirection'];
+			 $stayonhost = false;
+		     }
+		}
 		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
 		
 		
-		if ($locationchange &&  $data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
+		if ($stayonhost &&  $data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
 		   
 		    $analyse = new Analyse($cc->url);
 		    $analyse->header = $cc->header;
@@ -249,7 +259,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		    if (isset($analyse->lang)){
 			$line .= '</h2>';
 		    }
-		    $line .=  '<span class="url"><a href="'.$entry['url'].'">'.$entry['url'].'</a></span></td>';
+		    $line .=  '<span class="url"><a href="'.$correctedurl.'">'.$correctedurl.'</a></span></td>';
 
 		    if (isset($analyse->logosrc) && !empty($analyse->logosrc)) {
 			$line .= '<td class="logo"><img class="borderless noshadow" src="'.$analyse->logosrc.'" style="max-width: 240px; max-height: 65px;" alt=""></td>';
@@ -322,16 +332,17 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		     
 		     $jsonadd =  array_merge($json_grunddata, $analysedata);
 		     
-		     if (!$cc->is_same_domain($jsonadd['url'] , $entry['url'])) {
+		     if (!$cc->is_same_domain($jsonadd['url'] , $correctedurl)) {
 			 if (empty($jsonadd['redirect'])) {
 			     $jsonadd['redirect'] = $jsonadd['url'];
 			 }
-			 $jsonadd['url'] = $entry['url'];
+			 $jsonadd['url'] = $correctedurl;
 		     }
 
 		     $json_data[] = $jsonadd;
 	     
-	        } elseif (!$locationchange) {
+	        } elseif (!$stayonhost) {
+		    // Host hat sich geaendert.
 		    if (is_array($cc->header['location'])) {
 			$location = end($cc->header['location']);
 		    } else {
