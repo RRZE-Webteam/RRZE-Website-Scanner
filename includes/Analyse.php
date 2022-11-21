@@ -40,7 +40,9 @@ class Analyse {
 	  return $this->url;
     }
     function init($data) {
-	
+	if (empty($data['content'])) {
+	    return false;
+	}
 	$this->content = $data['content'];
 	$doc = new DomDocument();
 	@ $doc->loadHTML($data['content']);

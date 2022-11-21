@@ -35,7 +35,7 @@ $ignore_domains = [
     '/[a-z0-9\-]+\.test\.rrze\.fau\.de/',
     '/[a-z0-9\-]+\.test\.rrze\.uni\-erlangen\.de/',
     '/[a-z0-9\-]+\.webhummel\.rrze\.uni\-erlangen\.de/',
-    '/[a-z0-9\-]+\.tindu\.rrze\uni\-erlangen\.de/',
+    '/[a-z0-9\-]+\.tindu\.rrze\.uni\-erlangen\.de/',
     '/berta\.wmp\.rrze\.uni\-erlangen\.de/',
     '/go\.fau\.de/',
     '/api\.fau\.de/',
@@ -209,6 +209,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 	   
 
 		$json_grunddata['url'] = $entry['url'];
+		$json_grunddata['wmp']['url'] = $entry['url'];
 		$json_grunddata['wmp']['refservertyp'] = $entry['wmp_refservertyp'];
 		$json_grunddata['wmp']['refstatus'] = $entry['wmp_refstatus'];
 		$json_grunddata['wmp']['refid'] = $entry['wmp_id'];
@@ -320,14 +321,14 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		     $analysedata = $analyse->get_analyse_data();  
 		     
 		     $jsonadd =  array_merge($json_grunddata, $analysedata);
-		     // if ($jsonadd['url'] !== $entry['url']) {
-			
-	//		 if (empty($jsonadd['redirect'])) {
-	//		     $jsonadd['redirect'] = $jsonadd['url'];
-	//		 }
-	//		$jsonadd['url'] = $entry['url'];
-	//	     }
 		     
+		     if (!$cc->is_same_domain($jsonadd['url'] , $entry['url'])) {
+			 if (empty($jsonadd['redirect'])) {
+			     $jsonadd['redirect'] = $jsonadd['url'];
+			 }
+			 $jsonadd['url'] = $entry['url'];
+		     }
+
 		     $json_data[] = $jsonadd;
 	     
 	        } elseif (!$locationchange) {
@@ -470,7 +471,7 @@ function get_index() {
 		}
 		
 		if (strpos($url, "http") == FALSE) {
-		    $url = 'http://'.$url;
+		    $url = 'https://'.$url;
 		}
 
 		$res[$num]['url'] = $url;

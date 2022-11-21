@@ -212,7 +212,7 @@ function parse_website($url) {
 			  echo "\t".$name.":\t";
 			  if (is_array($sub)) {
 			      foreach ($sub as $i => $val) {
-				  echo "\"$i\"=\"$val\" ";
+				  echo "$i=\"$val\" ";
 			      }
 			      echo "\n";
 			  } else {

@@ -153,7 +153,18 @@ class CMS {
 	
 	if (isset($tags)) {
 	    if (isset($tags['generator'])) {
-		$genatorstring = trim($tags['generator']);
+		if (is_array($tags['generator'])) {
+		    $genatorstring = '';
+		    foreach ($tags['generator'] as $entry) {
+			if (!empty($genatorstring)) {
+			    $genatorstring .= ', ';
+			}
+			$genatorstring .= trim($entry);
+		    }
+		} else {
+		    $genatorstring = trim($tags['generator']);
+		}
+		
 		$this->name = $genatorstring;
 	    }
 	   

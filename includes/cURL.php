@@ -118,7 +118,7 @@ class cURL {
 	
 	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
 	curl_close($process);
-
+	$res['meta']['http_code'] = $httpcode;
 	if ($httpcode>=200 && $httpcode<500) {
 	    $res['content'] =   $this->body;	   
 	  
@@ -306,6 +306,50 @@ class cURL {
 	 }
 	 return true;
      }
+     
+     // checks if two urls are the same by the host 
+     public function is_same_domain($url1 = '', $url2 = '') {
+	if ((empty($url1)) || (empty($url2))) {
+	    return false;
+	} 
+	
+	if ($url1 == $url2) {
+	    return true;
+	}
+	
+	
+	$purl1 = parse_url($url1);     
+	$purl2 = parse_url($url2);
+ 
+	if ((!isset($purl1['host'])) && (!isset($purl2['host']))) {
+	    // beide relativ
+	    return true;
+	} else {
+	    // einer ist relativ, der andere nicht
+	    return false;
+	}
+	if ($purl1['host'] == $purl2['host']) {
+	    return true;
+	}
+	
+	// vielleicht hat einer der beiden eine Umleitung auf die Subdomain, der andere nicht
+	if ((preg_match('/^www\./i',$purl1['host'])) && (!preg_match('/^www\./i',$purl2['host']))) {
+	   // url1 beginnt mit www.
+	    $clipwww =  preg_replace('/^www\./i', '', $purl1['host']);
+	   if ($clipwww == $purl2['host']) {
+	       return true;
+	   }	
+	}
+	if ((preg_match('/^www\./i',$purl2['host'])) && (!preg_match('/^www\./i',$purl1['host']))) {
+	   // url2 beginnt mit www.
+	    $clipwww =  preg_replace('/^www\./i', '', $purl2['host']);
+	   if ($clipwww == $purl1['host']) {
+	       return true;
+	   }	
+	}
+	return false;
+     }
+     
      
      // checks if there is a redirection by the HTML Meta HTTP-EQUIV Tag
      // if so, it returns the target, otherwise false
