@@ -293,35 +293,13 @@ class cURL {
 	     $lu = parse_url($location);     
 	     $lo = parse_url($this->url);
  
-	     
-	     if (!isset($lu['host'])) {
-		 // Kein Host angegeben => relativer Link, Umleitung bleibt beim selben Host
-		 return true;
-	     }
-	     $wwwlu = 'www.'.$lu['host'];
-	     $wwwlo = 'www.'.$lo['host'];
-	     if ($lu['host'] == $lo['host']) {
-		 return true;
-
-	     } else {
-		 
-		 if ($lu['host'] == $wwwlo )  {
-		     // Ist Umlenkung auf Domainhost ohne www, es bleibt also dieselbe Domain
-		    if ($setnew) {
-			$this->url = $this->header['location']; 
-		    }
-		    return true;
-		 }
-		 if ($wwwlu == $lo['host'] )  {
-		     // Ist Umlenkung auf Domainhost mit www, es bleibt also dieselbe Domain
-		    if ($setnew) {
-		       $this->url = $this->header['location']; 
-		    }
-		     return true;
-		 }
-		 
-		 return false;
-	     }
+	    $same = $this->is_same_domain($this->url,$location);
+	    if ($same && $setnew) {
+		$this->url = $location; 
+	    }
+	    return $same;
+		     
+	    
 	 }
 	 return true;
      }

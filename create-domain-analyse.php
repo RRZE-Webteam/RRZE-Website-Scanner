@@ -234,10 +234,22 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		}
 		
 		if (!empty($data['meta']['_http_equiv-redirection'])) {
-		     if (!$cc->is_same_domain($correctedurl, $data['meta']['_http_equiv-redirection'])) {
-			 $json_grunddata['_http_equiv-redirection'] = $data['meta']['_http_equiv-redirection'];
-			 $stayonhost = false;
-		     }
+		    $json_grunddata['_http_equiv-redirection'] = $data['meta']['_http_equiv-redirection'];
+		    if (!empty($cc->header['location'])) {
+			if (is_array($cc->header['location'])) {
+			    $location = end($cc->header['location']);
+			} else {
+			    $location = $cc->header['location'];
+			}
+			if (!$cc->is_same_domain($location, $data['meta']['_http_equiv-redirection'])) {
+			    $stayonhost = false;
+			}
+		    } else {
+			if (!$cc->is_same_domain($correctedurl, $data['meta']['_http_equiv-redirection'])) {
+			    $json_grunddata['_http_equiv-redirection'] = $data['meta']['_http_equiv-redirection'];
+			    $stayonhost = false;
+			}
+		    }
 		}
 		if (!empty($data['meta']['_http_equiv_from'] )) {
 		    $json_grunddata['_http_equiv_from'] = $data['meta']['_http_equiv_from'];
