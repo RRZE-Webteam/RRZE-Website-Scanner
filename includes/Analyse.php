@@ -136,8 +136,6 @@ class Analyse {
 	     if (isset($template['version'])) {
 		$this->template_version = $template['version'];
 	     }
-	} else {
-	    $this->template = $cms->name;
 	}
 
 	
@@ -210,6 +208,9 @@ class Analyse {
 	    $baseurl =preg_replace('/\/$/i', '', $baseurl);
 	    $p['path'] = preg_replace('/^\//i', '', $p['path']);
 	    $url = $baseurl.'/'.$p['path'];
+	    if (!empty($p['query'])) {
+		$url .= '?'.$p['query'];
+	    }
 	}
 	return $url;
 
@@ -497,11 +498,11 @@ class Analyse {
 	$tospages = array(
 	  "Impressum" => [
 	      'uri' => '/impressum[\b\.\/]+/i, /imprint[\b\.\/]+/i',
-	      'text' => '/Impressum/Ui, /Imprint/Ui, /Legal notice/Ui'	
+	      'text' => '/Impressum/Ui, /Imprint/i, /Legal notice/Ui, /Rechtliches/i'	
 	  ],
 	    "Datenschutz" => [
 	      'uri' => '/datenschutz[\b\.\/]+/i, /datenschutzhinweise/i, /privacy[\b\.\/]+/i',
-	      'text' => '/Datenschutzerklärung\b/ui, /Datenschutzhinweis/ui, /Datenschutz\b/Ui, /Datenschutzinformation\b/Ui, /Privacy\b/Ui, /Data protection\b/Ui, /Privatsp/Ui'	
+	      'text' => '/Datenschutzerklärung\b/ui, /Datenschutzhinweis/ui, /Datenschutz\b/Ui, /Datenschutzinformation\b/Ui, /Privacy\b/Ui, /Data protection\b/Ui, /Privatsp/Ui, /Rechtliches/i'	
 	  ],
 	     "Barrierefreiheit" => [
 	      'uri' => '/barrierefreiheit[\b\.\/]+/, /accessibility[\b\.\/]+/, /a11y[\b\.\/]+/',
@@ -523,14 +524,15 @@ class Analyse {
 	return $toslink;
     }
     
-    function find_link_by_string($uristrings,$textstrings) {		
+    function find_link_by_string($uristrings,$textstrings,$absolutelinks = true) {		
 	$found = false;
 	foreach($this->links as $link) {
 	    if (isset($link['href']) && strlen(trim($link['href']))>1) {
 		foreach (explode(",",$uristrings)  as $search) {
 		   if (preg_match($search, $link['href'], $matches)) {
-		       
-		       $link['href'] = $this->make_absolute_link($link['href']);
+		       if ($absolutelinks) {
+			    $link['href'] = $this->make_absolute_link($link['href']);
+		       }
 		       $found = $link;
 		       break;
 		   }
@@ -542,7 +544,9 @@ class Analyse {
 		    $link['linktext'] = trim($link['linktext']);
 		    foreach (explode(",",$textstrings)  as $search) {
 		       if (preg_match($search, $link['linktext'], $matches)) {
-			   $link['href'] = $this->make_absolute_link($link['href']);
+			    if ($absolutelinks) {
+				$link['href'] = $this->make_absolute_link($link['href']);
+			    }
 			   $found = $link;
 			   break;
 		       }
@@ -570,7 +574,7 @@ class Analyse {
     function sanitize_string($name) {
     // remove illegal file system characters https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
 	if ((isset($name)) && (!empty(trim($name)))) {
-	    $file = mb_ereg_replace("([^\w\s\d\-_~,;!\[\]\(\).])", '', $name);
+	    $file = mb_ereg_replace("([^\w\s\d\-_~,;!\[\]\(\).\/])", '', $name);
 	    // Remove any runs of periods (thanks falstro!)
 	    $file = mb_ereg_replace("([\.]{2,})", '', $file);
 	    return $file;
