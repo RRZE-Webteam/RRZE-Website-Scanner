@@ -365,6 +365,42 @@ class cURL {
 	       return true;
 	   }	
 	}
+	
+	// Ausnahmefall: FAU.de
+	// An der FAU gibt es für (fast) jede alte Domain den alten CNAME Alias 
+	// mit "uni-erlangen." 
+	// D.h. www.bla.uni-erlangen.de ist dann gleich www.bla.fau.de.
+	// Das gilt auch für die englische Form:
+	// bla.uni-erlangen.de ist gleich bla.fau.eu
+	
+	
+	if ((preg_match('/\.uni\-erlangen\.de$/', $purl1['host'])) && (preg_match('/\.fau\.de$/', $purl2['host']))) {
+	    $newhost1 = preg_replace('/\.uni\-erlangen\.de/', '.fau.de', $purl1['host']);    
+	    if ($newhost1 == $purl2['host']) {
+		return true;
+	    }
+	}
+	if ((preg_match('/\.uni\-erlangen\.de$/', $purl2['host'])) && (preg_match('/\.fau\.de$/', $purl1['host']))) {
+	    $newhost2 = preg_replace('/\.uni\-erlangen\.de/', '.fau.de', $purl2['host']);
+	    if ($newhost2 == $purl1['host']) {
+		return true;
+	    }
+	}
+	if ((preg_match('/\.uni\-erlangen\.org$/', $purl1['host'])) && (preg_match('/\.fau\.eu$/', $purl2['host']))) {
+	    $newhost1 = preg_replace('/\.uni\-erlangen\.org/', '.fau.eu', $purl1['host']);    
+	    if ($newhost1 == $purl2['host']) {
+		return true;
+	    }
+	}
+	if ((preg_match('/\.uni\-erlangen\.org$/', $purl2['host'])) && (preg_match('/\.fau\.eu$/', $purl1['host']))) {
+	    $newhost2 = preg_replace('/\.uni\-erlangen\.org/', '.fau.eu', $purl2['host']);
+	    if ($newhost2 == $purl1['host']) {
+		return true;
+	    }
+	}
+	
+
+	
 	return false;
      }
      

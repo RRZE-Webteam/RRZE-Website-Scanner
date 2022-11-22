@@ -235,7 +235,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		
 		if (!empty($data['meta']['_http_equiv-redirection'])) {
 		     if (!$cc->is_same_domain($correctedurl, $data['meta']['_http_equiv-redirection'])) {
-			 $json_grunddata['redirect'] = $data['meta']['_http_equiv-redirection'];
+			 $json_grunddata['_http_equiv-redirection'] = $data['meta']['_http_equiv-redirection'];
 			 $stayonhost = false;
 		     }
 		}
@@ -350,12 +350,17 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 	     
 	        } elseif (!$stayonhost) {
 		    // Host hat sich geaendert.
-		    if (is_array($cc->header['location'])) {
-			$location = end($cc->header['location']);
-		    } else {
-			$location = $cc->header['location'];
+		    $location = '';
+		    if (!empty($cc->header['location'])) {
+			if (is_array($cc->header['location'])) {
+			    $location = end($cc->header['location']);
+			} else {
+			    $location = $cc->header['location'];
+			}
 		    }
-		    
+		    if (!empty( $data['meta']['_http_equiv-redirection'])) {
+			$location = $data['meta']['_http_equiv-redirection'];
+		    }
 		    echo "\t wird umgelenkt auf: ".$location."\n";
 		    $json_grunddata['redirect'] = $location;
 		    $json_data[] = $json_grunddata;
