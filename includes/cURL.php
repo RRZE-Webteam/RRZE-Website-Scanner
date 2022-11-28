@@ -27,6 +27,7 @@ class cURL {
 	$this->cookies	    = $cookies;
 	$this->header	    = array();
 	$this->body	    = '';
+	$this->original_url = '';
 	if ($this->cookies) {
 		$this->cookie($cookie);
 	}
@@ -55,6 +56,10 @@ class cURL {
 	}
 	$process = curl_init($url);
 	$this->url = $url;
+	
+	if (empty($this->original_url)) {
+	    $this->original_url = $url;
+	}
 	curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
 	curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
 	curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
@@ -145,7 +150,7 @@ class cURL {
 	    $res['content'] = '';
 	}
 	
-	
+
 	// if ((empty($res['content'])) && ($httpcode == 303) && ($res['meta']['redirect_url']) && ($res['meta']['redirect_url'] !== $url)) {
 	//     return $this->get($res['meta']['redirect_url']);
 	// }

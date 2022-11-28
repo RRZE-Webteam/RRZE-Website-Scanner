@@ -56,13 +56,13 @@ function parse_website($url) {
     
     $cc = new cURL();
     $data = $cc->get($url);
-    $locationchange = $cc->is_url_location_host(true);
+    $locationchange = $cc->is_url_location_host(false);
 
-    
     if ($data['meta']['http_code'] < 0 ) {
 	echo "Invalid URL to analyse: \"".$url."\"\n";
 	exit;
     }
+
     echo "Status Code:        ".$data['meta']['http_code']."\n";
     if (($data['meta']['http_code'] >= 300) && ($data['meta']['http_code']<=303)) {
 	echo "Redirect Location:  ".$data['meta']['location']."\n";
@@ -75,7 +75,7 @@ function parse_website($url) {
     echo "primary_ip:         ".$data['meta']['primary_ip']."\n";
     echo "SSL:                ";
    
-    
+ 
 
     $certinfo = $cc->get_ssl_info();
     if ($certinfo) {
@@ -125,7 +125,7 @@ function parse_website($url) {
 	echo "*ACHTUNG: Kein Inhalt erhalten*\n";
     }
     if (($locationchange) && ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500)) {
-	
+	echo "CHECKE URL ".$cc->url."\n";
 	$analyse = new Analyse($cc->url);
 	$analyse->header = $cc->header;
 	$analyse->httpstatus = $data['meta']['http_code'];
@@ -134,7 +134,12 @@ function parse_website($url) {
 	echo "Analyse:\n";
 	
 	echo "Title:              ".$analyse->title."\n";
-	echo "Original-URL:       ".$analyse->url."\n";
+	echo "URL:                ".$analyse->url."\n";
+	if (isset($analyse->original_url)){
+	    echo "Original URL:      ".$analyse->original_url;
+	    echo "\n";
+	}
+
 
 	if (isset($analyse->header['location'])) {
 	   if (is_array($analyse->header['location'])) {

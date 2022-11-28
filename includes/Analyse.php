@@ -121,9 +121,15 @@ class Analyse {
 	
 	if ($cms->name) {
 	   $this->generator['name'] = $this->sanitize_string($cms->name);
+	   if (!empty($cms->version)) {
+	       $ver = $cms->version;
+	       if (is_array($ver)) {
+		   $cms->version = implode(',', $ver);  
+	       }
 	    if (strlen(trim($cms->version))>0) {
 		$this->generator['version'] = $cms->version;
 	    }
+	}
 	    $this->generator['classname'] = $cms->classname;
 	    $this->generator['icon'] = $cms->icon;
 	    $this->generator['url'] = $cms->cmsurl;

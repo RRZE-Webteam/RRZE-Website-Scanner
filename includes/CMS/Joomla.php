@@ -8,6 +8,7 @@ class Joomla extends \CMS {
 		"generator_meta",
 		"core_js",
 	    "core_site_js",
+	    "api",
 	    "content_string"
 	);
 
@@ -103,6 +104,29 @@ class Joomla extends \CMS {
 	    return FALSE;
         }
 	
+	public function api() {
+        /* by: https://tfrommen.de/how-to-detect-joomla-websites/ 
+         * Depending on the template, you may be able to access further information via a dedicated file, templateDetails.xml. 
+	 * The file, if exists, is located in the template root, so for example, at /templates/protostar/templateDetails.xml. 
+	 * Trying to access and then analyze the file is helpful if you were able to detect one or more /templates/* links,
+	 *  but could not reliably verify the website to be powered by Joomla.
+	 * You should be able to find a few references to Joomla in this file, one of which is usually the document type declaration, like so:
+	* <!DOCTYPE install PUBLIC "-//Joomla! 2.5//DTD template 1.0//EN" "https://www.joomla.org/xml/dtd/2.5/template-install.dtd">
+	 */
+
+                if($data = $this->fetch($this->url."/templates/protostar/templateDetails.xml")) {
+
+			preg_match_all('/<\!doctype [^<>"]+ "\-\/\/Joomla\! ([0-9\.a-z]+)\/(.*)">/i', $data, $output_array);
+		    
+			if (!empty($output_array[1])) {
+			    $this->version = $output_array[1];
+			    return true;
+			}
+
+              
+                }
+	    return FALSE;
+        }
 	
 	 /**
 	 * Check /media/system/js/core.js content

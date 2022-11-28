@@ -225,7 +225,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		$cc->follow_html_redirection = false;
 		$data = $cc->get($entry['url']);
 		
-		$stayonhost = $cc->is_url_location_host(true);
+		$stayonhost = $cc->is_url_location_host(false);
 		$certinfo = $cc->get_ssl_info();
 		$correctedurl = $cc->url;
 		echo $correctedurl;
