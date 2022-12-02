@@ -362,12 +362,39 @@ class cURL {
 	    if ($newhost1 == $purl2['host']) {
 		return true;
 	    }
+	    
+	    // Pruefe ob die Umleitung auch ohne www laeuft:
+	    // www.bla.uni-erlangen.de => bla.fau.de
+	    
+	    // vielleicht hat einer der beiden eine Umleitung auf die Subdomain, der andere nicht
+	    if ((preg_match('/^www\./i',$newhost1)) && (!preg_match('/^www\./i',$purl2['host']))) {
+	       // url1 beginnt mit www.
+		$clipwww =  preg_replace('/^www\./i', '', $newhost1);
+	       if ($clipwww == $purl2['host']) {
+		   return true;
+	       }	
+	    }
+	    
+	    
 	}
 	if ((preg_match('/\.uni\-erlangen\.de$/', $purl2['host'])) && (preg_match('/\.fau\.de$/', $purl1['host']))) {
 	    $newhost2 = preg_replace('/\.uni\-erlangen\.de/', '.fau.de', $purl2['host']);
 	    if ($newhost2 == $purl1['host']) {
 		return true;
 	    }
+	    
+	    // Pruefe ob die Umleitung auch ohne www laeuft:
+	    // www.bla.fau.de => bla.uni-erlangen.de
+	    
+	    // vielleicht hat einer der beiden eine Umleitung auf die Subdomain, der andere nicht
+	    if ((preg_match('/^www\./i',$newhost2)) && (!preg_match('/^www\./i',$purl2['host']))) {
+	       // url1 beginnt mit www.
+		$clipwww =  preg_replace('/^www\./i', '', $newhost2);
+	       if ($clipwww == $purl2['host']) {
+		   return true;
+	       }	
+	    }
+	    
 	}
 	if ((preg_match('/\.uni\-erlangen\.org$/', $purl1['host'])) && (preg_match('/\.fau\.eu$/', $purl2['host']))) {
 	    $newhost1 = preg_replace('/\.uni\-erlangen\.org/', '.fau.eu', $purl1['host']);    

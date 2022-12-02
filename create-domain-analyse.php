@@ -189,6 +189,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
     global $json_data;
     
     if (!isset($index)){
+	echo "Index empty\n";
 	return;
     }
     
@@ -216,6 +217,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		$json_grunddata['wmp']['internal_domain'] = $entry['internal_domain'];
 		$json_grunddata['redirect'] = '';
 		
+
 		if ($cnt > $maxcnt) {
 		    break;
 		}
@@ -225,13 +227,15 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		$cc->follow_html_redirection = false;
 		$data = $cc->get($entry['url']);
 		
-		$stayonhost = $cc->is_url_location_host(false);
+		$stayonhost = $cc->is_url_location_host(true);
 		$certinfo = $cc->get_ssl_info();
 		$correctedurl = $cc->url;
 		echo $correctedurl;
 		if ($correctedurl != $entry['url']) {
 		    echo " (".$entry['url'].")";
 		}
+		
+		
 		
 		if (!empty($data['meta']['_http_equiv-redirection'])) {
 		    $json_grunddata['_http_equiv-redirection'] = $data['meta']['_http_equiv-redirection'];
@@ -490,6 +494,9 @@ function get_index() {
 	// echo "Missing current month index file. Trying last: ".$indexurl."\n";
 	$data = $index->get($indexurl);
     }
+    echo "Loading index from $indexurl\n";
+    
+    
     $res = array();
     
     if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 400) {
@@ -525,6 +532,8 @@ function get_index() {
 		
 	    }
 	}
+    } else {
+	echo "Failed getting data from index. Errorcode: ".$data['meta']['http_code']."\n";
     }
     return $res;
 }
