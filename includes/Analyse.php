@@ -227,32 +227,16 @@ class Analyse {
 	if (!isset($this->linkrels)) {
 	    $this->linkrels =  $this->get_meta_link($content);
 	}
-	
-	$baseurl = $this->url;
-	
-	$canonical = $this->get_canonical($content);
-	
-	if (!empty($canonical)) {
-	    $baseurl = $canonical;
-	}
-	$basehost = parse_url($baseurl)['host'];
-	$baseurl =preg_replace('/\/$/i', '', $baseurl);
-	
-	
+
 	foreach ($this->linkrels as $i => $link) {
 	     if (isset($link['stylesheet'])) {
 		   $p = parse_url($link['stylesheet']['href']);
-		   if (empty($p['host'])) {
-			   // relative url, ignore
-		       
-		    } else {
-			if ($p['host'] == $basehost) {
-				 // internal link. ignore yet
-			 } else {
-			     
-			      $res[] = $link['stylesheet']['href'];
-			 }
-		     
+		   
+		   if ($this->is_same_host($link['stylesheet']['href'])) {
+		       // same or relative
+		       // do nothing yet...
+		   } else {
+		        $res[] = $link['stylesheet']['href'];
 		   }
 	     }
 	}
@@ -260,23 +244,60 @@ class Analyse {
 	$scriptsrcs = $this->get_script_link($content);
 	foreach ($scriptsrcs as $link) {
 	       if ($link) {
-		   $p = parse_url($link);
-
-		   if (empty($p['host'])) {
-			   // relative url, ignore
+		    if ($this->is_same_host($link)) {
+		       // same or relative
+		       // do nothing yet...
 		    } else {
-			if ($p['host'] == $basehost) {
-			   // Local URL
-			} else {
-			     $res[] = $link;
-			}
+		        $res[] = $link;
 		    }
+		   
 	       }
 	    
 	}
 	
 	return $res;
     } 
+    
+    private function is_same_host($someurl) {
+	
+	$host = parse_url($someurl)['host'];
+	if (empty($host)) {
+	    // sounds wrong to answer with true. But an empty host in urls will
+	    // result als relative link and therfor it will use the same host
+	    return true;
+	}
+	    
+	$baseurl = $this->url;   
+	$basehost = parse_url($baseurl)['host'];
+	if (empty($basehost)) {
+	   
+	    return false;
+	}
+	
+	$domainlist = explode(".",$basehost);
+	$entries = count($domainlist);
+	$basehost = $domainlist[$entries-2].".".$domainlist[$entries-1];
+	
+	if ($domainlist[$entries-2] == 'fau') {
+	    $basehostalternative = 'uni-erlangen'.".".$domainlist[$entries-1];
+	} elseif ($domainlist[$entries-2] == 'uni-erlangen') {
+	    $basehostalternative = 'fau'.".".$domainlist[$entries-1];
+	}
+	
+	$domainlist = explode(".",$host);
+	$entries = count($domainlist);
+	$matchhost = $domainlist[$entries-2].".".$domainlist[$entries-1];
+	
+	// ok, this could have been a simple regexp, but i want to
+	// make it so, that anyone can understand the code later :)
+	
+	if (($matchhost == $basehost) || ($matchhost == $basehostalternative)) {
+	    return true;
+	}
+	return false;
+	
+	
+    }
     
     function get_canonical($content) {
 	$canonical = '';
