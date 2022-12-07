@@ -121,8 +121,11 @@ class cURL {
 		$newdata['meta']['_former_location'] = $oldheader['location'];
 		$newdata['header'] = $this->header;
 		return $newdata;
-	    } elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) ) { 
+	    } elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) 
+		    && (!$this->is_local_index_redirection($this->header['_http_equiv-redirection']))) { 
 		$newurl = $this->header['_http_equiv-redirection'];
+		
+		echo "TRY NEW URL CAUSE RDEIRECT: $newurl\n";
 		$oldheader = $this->header;
 		$oldurl =  $this->url;
 		$this->header = array();
@@ -427,11 +430,21 @@ class cURL {
 	     preg_match_all('/<meta\s*[^<>]*\s*http\-equiv\s*=\s*["\']refresh["\']+\s*content=\s*["\']+([0-9]+);\s+url=["\']*([:a-z0-9\-\/\.]+)["\']*\s*[^<>]*>/i', $content, $output_array);
 	     if (!empty($output_array)) {
 		 if (isset($output_array[2][0])) {
-		     
-		     if (preg_match_all('/^[a-z]+:\/\//i', $output_array[2][0], $absmatch)) {
+		     $htmlurl = $output_array[2][0];
+		     if (preg_match_all('/^[a-z]+:\/\//i', $htmlurl, $absmatch)) {
 			 // absolute URL
-			 return $output_array[2][0];
+			 return $htmlurl;
 		     } else {
+			 
+			 
+			 if (preg_match('/^www\./', $htmlurl, $output_array)) {
+			     // here someone obviously forgot the protocol
+			     $p = parse_url($this->url);
+			     $redurl = $p['scheme'].'://'.$htmlurl;
+			     return $redurl;
+			 }
+			 
+			 
 			 $uri = preg_replace('/^\//i', '', $output_array[2][0]);
 			 $input = preg_replace('/\/$/i', '', $this->url);
 			 $abs = $input.'/'.$uri;
@@ -445,6 +458,24 @@ class cURL {
 	 
 	 return false;
      }
+     
+     
+     // falls jemand eine Redirection auf seine eigene Startseite gelegt hat, 
+     // wollen wir kein Loop...
+     private function is_local_index_redirection($redirection) {
+	if ($this->is_same_domain($this->url, $redirection) ) {
+	    
+	    $p = parse_url($redirection);
+	    $search = '/'.preg_quote($p['host']).'\/index\.(php|shtml|htm|html)$/i';
+	    
+	    if (preg_match($search, $redirection)) {
+		return true;
+	    }
+	}
+	
+	return false;
+     }
+     
      
      // sets the redirect location if need
      private function set_redirect_location($url) {

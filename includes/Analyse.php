@@ -259,8 +259,12 @@ class Analyse {
     } 
     
     private function is_same_host($someurl) {
-	
-	$host = parse_url($someurl)['host'];
+	$p = parse_url($someurl);
+	$host = '';
+	if (!empty($p['host'])) {
+	    $host = $p['host'];
+	}
+
 	if (empty($host)) {
 	    // sounds wrong to answer with true. But an empty host in urls will
 	    // result als relative link and therfor it will use the same host
@@ -277,11 +281,11 @@ class Analyse {
 	$domainlist = explode(".",$basehost);
 	$entries = count($domainlist);
 	$basehost = $domainlist[$entries-2].".".$domainlist[$entries-1];
-	
+	$basehostalternative = '';
 	if ($domainlist[$entries-2] == 'fau') {
 	    $basehostalternative = 'uni-erlangen'.".".$domainlist[$entries-1];
 	} elseif ($domainlist[$entries-2] == 'uni-erlangen') {
-	    $basehostalternative = 'fau'.".".$domainlist[$entries-1];
+	    $basehostalternative = 'fau'.".".$domainlist[$entries-1];	    
 	}
 	
 	$domainlist = explode(".",$host);
