@@ -217,7 +217,9 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		$json_grunddata['wmp']['internal_domain'] = $entry['internal_domain'];
 		$json_grunddata['redirect'] = '';
 		
-
+	
+	
+		
 		if ($cnt > $maxcnt) {
 		    break;
 		}
