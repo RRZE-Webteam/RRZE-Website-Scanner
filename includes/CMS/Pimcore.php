@@ -5,7 +5,7 @@ namespace CMS;
 class Pimcore extends \CMS {
 
     public $methods = array(
-        "generator_header", "scripts"
+        "generator_header", "scripts", "content_string"
     );
 
     
@@ -44,10 +44,10 @@ class Pimcore extends \CMS {
 	public function generator_header() {
 
 		if (isset($this->header) && is_array($this->header)) {
-		    if (isset($this->header['x-powered-by']) && (preg_match('/^pimcore/i', $this->header['x-powered-by'], $matches))) {
+		    if (isset($this->header['x-powered-by']) && (!is_array($this->header['x-powered-by'])) && (preg_match('/^pimcore/i', $this->header['x-powered-by'], $matches))) {
 		       return true;
 		    }
-		    if (isset($this->header['X-Powered-By']) && (preg_match('/^pimcore/i', $this->header['X-Powered-By'], $matches))) {
+		    if (isset($this->header['X-Powered-By']) && (!is_array($this->header['x-powered-by'])) && (preg_match('/^pimcore/i', $this->header['X-Powered-By'], $matches))) {
 		       return true;
 		    }
 
@@ -79,6 +79,18 @@ class Pimcore extends \CMS {
 		return FALSE;
 
 	}
+	public function content_string() {
 
+	    if ($this->content) {
+		if (preg_match('/pimcore_area_content/i', $this->content, $matches)) {
+		       return true;
+		}
+		if (preg_match('/pimcore_area_headline/i', $this->content, $matches)) {
+		       return true;
+		}
+	
+	    }
+	    return FALSE;
+	}
 
 }

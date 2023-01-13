@@ -57,8 +57,12 @@ class ASP extends \CMS {
 
 	
 	public function content_string() {
+
 	    if ($this->content) {
 		if (preg_match('/<form method="post" action="\.\/default\.aspx"/i', $this->content, $matches)) {
+		       return true;
+		}
+		if (preg_match('/<input type=\"hidden\" name=\"__VIEWSTATE\"/i', $this->content, $matches)) {
 		       return true;
 		}
 	

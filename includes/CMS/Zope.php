@@ -49,7 +49,7 @@ class Zope extends \CMS {
 			$this->version = $matches[1];
 		       return true;
 		    }
-		    if (isset($this->header['x-powered-by']) && (preg_match('/^Zope /i', $this->header['x-powered-by'], $matches))) {
+		    if (!empty($this->header['x-powered-by']) && (!is_array($this->header['x-powered-by'])) && (preg_match('/^Zope /i', $this->header['x-powered-by'], $matches))) {
 		       return true;
 		    }
 

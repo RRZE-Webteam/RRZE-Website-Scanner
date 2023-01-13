@@ -45,10 +45,10 @@ class ProcessWire extends \CMS {
 
 		if (isset($this->header) && is_array($this->header)) {
 
-		    if (isset($this->header['x-powered-by']) && (preg_match('/^ProcessWire/i', $this->header['x-powered-by'], $matches))) {
+		    if (!empty($this->header['x-powered-by']) && (!is_array($this->header['x-powered-by'])) && (preg_match('/^ProcessWire/i', $this->header['x-powered-by'], $matches))) {
 		       return true;
 		    }
-		    if (isset($this->header['X-Powered-By']) && (preg_match('/^ProcessWire/i', $this->header['X-Powered-By'], $matches))) {
+		    if (isset($this->header['X-Powered-By']) && (!is_array($this->header['x-powered-by'])) && (preg_match('/^ProcessWire/i', $this->header['X-Powered-By'], $matches))) {
 		       return true;
 		    }
 

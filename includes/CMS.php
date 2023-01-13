@@ -68,6 +68,8 @@ class CMS {
 	"ASP"
 
     ];
+
+    
     private $common_methods = ["generator_meta", "generator_header", "api", "scripts", "content_string"];
     
     
@@ -207,6 +209,7 @@ class CMS {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (RRZE CheckBot)');
 
         $return = curl_exec($ch);
 
@@ -234,6 +237,7 @@ class CMS {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3);
         curl_setopt($ch, CURLOPT_HEADER, 1);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (RRZE CheckBot)');
 
         $response = curl_exec($ch);
 
