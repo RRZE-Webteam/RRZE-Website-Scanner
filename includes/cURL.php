@@ -132,9 +132,11 @@ class cURL {
 
 		$newdata = $this->get($newurl);
 		$this->header['_http_equiv_from'] = $oldurl;
-		$this->header['_former_location'] = $oldheader['location'];
+		if (!empty($oldheader['location'])) {
+		    $this->header['_former_location'] = $oldheader['location'];
+		    $newdata['meta']['_former_location'] = $oldheader['location'];
+		}
 		$newdata['meta']['_http_equiv_from'] = $oldurl;
-		$newdata['meta']['_former_location'] = $oldheader['location'];
 		$newdata['header'] = $this->header;
 		return $newdata;
 	    } else {

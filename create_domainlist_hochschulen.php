@@ -11,6 +11,8 @@ $config = [
     "output_jsonfile"   => 'current-hochschulen.json',
     "outjson"	=> true,
 ];
+$string_unknown_traeger = 'unbekannt';
+
 
 // Automatische Laden von Klassen.
 spl_autoload_register(function ($class) {
@@ -51,7 +53,10 @@ if ($list) {
 			     $list[$i]['url'] = $resdata['content'];
 			}
 		    } elseif ($key == 'trgerschaft') {
+			$resdata['content'] = sanitize_traeger($resdata['content']);
 			$list[$i]['typ']['traeger'] = $resdata['content'];
+			$list[$i]['trgerschaft'] = $resdata['content'];
+			
 		    } elseif ($key == 'name') {
 			$thistitle = preg_replace('/[\n\r]+/i', ' ', $resdata['title']);
 			$thistitle = remove_refs($thistitle);
@@ -100,7 +105,7 @@ if ($list) {
 	    }
 	 
 	}
-	if ($list[$i]['trger']) {
+	if (isset($list[$i]['trger'])) {
 	    if (isset($list[$i]['typ']) && isset($list[$i]['typ']['traeger'])) {
 		if (isset($list[$i]['typ']['traeger']) && ($list[$i]['typ']['traeger'] == $entry['trger'])) {
 		} else {
@@ -124,8 +129,8 @@ if ($list) {
 		unset($list[$i]['trger']);
 	    }
 	}
-	if ($list[$i]['form']) {
-	    if (isset($entry['form'])) {
+	if (isset($list[$i]['form'])) {
+	    if (!empty($entry['form'])) {
 		if (isset($list[$i]['typ']['form']) && ($list[$i]['typ']['form'] == $entry['form'])) {
 		} else {
 		    $list[$i]['typ']['form2'] = $list[$i]['form'];     
@@ -136,8 +141,8 @@ if ($list) {
 		unset($list[$i]['form']);
 	    }
 	}
-	if ($list[$i]['promotionsrecht']) {
-	    if (isset($entry['promotionsrecht']) ) {
+	if (isset($list[$i]['promotionsrecht'])) {
+	    if (!empty($entry['promotionsrecht']) ) {
 		if (isset($list[$i]['typ']['promotionsrecht']) && ($list[$i]['typ']['promotionsrecht'] == $entry['promotionsrecht'])) {
 		} else {
 		    $list[$i]['typ']['promotionsrecht2'] = remove_refs_janein($list[$i]['promotionsrecht']);
@@ -178,11 +183,13 @@ if ($list) {
 	$n++;
 	
 
-	    echo $i;
+	echo $i;
+	if (!empty($list[$i]['name'])) {
 	    echo ". ".$list[$i]['name'];
-
-	if (isset($list[$i]['url'])) {
-	  
+	} else {
+	    echo ". -KEIN NAME!-";
+	}
+	if (isset($list[$i]['url'])) {  
 	      echo "\t".$list[$i]['url'];
 	} else {
 	    echo "\t-KEINE URL-";
@@ -403,4 +410,37 @@ function removeDubletten($string) {
 	return $string;
     }
     return; 
+}
+
+function sanitize_traeger($traeger = '') {
+    global $string_unknown_traeger;
+    
+    $valid = array("privat", "staatlich", "konfessionell");
+    
+    
+    if (!empty($traeger)) {	
+	if ($traeger == 'öffentlich-rechtlich') {
+	    $traeger = "staatlich";
+	}
+	if ($traeger == 'kirchlich') {
+	    $traeger = "konfessionell";
+	}
+	$traeger = preg_replace('/[^a-z]+/i', '', $traeger);
+	$traeger = strtolower($traeger);
+    }
+    
+    
+    if (in_array($traeger, $valid)) {
+	return $traeger;
+    }
+   
+    $found = $string_unknown_traeger;
+    foreach ($valid as $search) {
+	$sgrep = '/'.$search.'/i';
+	if (preg_match ($sgrep, $traeger, $m)) {
+	    $found = $search;
+	    break;
+	}
+    }
+    return $found;
 }

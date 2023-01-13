@@ -126,6 +126,7 @@ function getDatafromFiles($filelist) {
     
     foreach ($filelist['data'] as $key => $data) {
 	if (!empty($data['filename'])) {
+  
 	    $filedata = file_get_contents($data['filename']);	    
 	    if ($filedata !==false) {
 		$analyse = json_decode($filedata, true);
@@ -141,8 +142,8 @@ function getDatafromFiles($filelist) {
 
 
 		foreach ($analyse['data'] as $num => $hochschule) {
-		    $res['counter']['num']++;
-		    
+		    $res['counter']['num']++;		  
+		    $traeger = '';
 		    
 		    if (!empty($hochschule['httpstatus'])) {
 			if (!isset($res['counter']['status'][$hochschule['httpstatus']])) {
@@ -150,23 +151,25 @@ function getDatafromFiles($filelist) {
 			}
 			$res['counter']['status'][$hochschule['httpstatus']]++;
 		    }
-		    if ((empty($hochschule['trgerschaft'])) && (!empty($hochschule['typ']))) {
-			 if (!empty($hochschule['typ']['traeger'])) {
-			     $hochschule['trgerschaft'] = sanitize_traeger($hochschule['typ']['traeger']);
-			 }
-		    } elseif (!empty($hochschule['trgerschaft'])) {
-			$hochschule['trgerschaft'] = sanitize_traeger($hochschule['trgerschaft']);
-		    }
 		    
-		    
-		    if (!empty($hochschule['trgerschaft'])) {
-			if (!isset($res['counter']['traegerschaft'][$hochschule['trgerschaft']])) {
-			    $res['counter']['traegerschaft'][$hochschule['trgerschaft']] = 0;
+		   if (!empty($hochschule['trgerschaft'])) {
+			$traeger = sanitize_traeger($hochschule['trgerschaft']);
+			
+			if (($traeger == $string_unknown_traeger) && (!empty($hochschule['typ']['traeger']))) {
+			     $traeger = sanitize_traeger($hochschule['typ']['traeger']);
 			}
-			$res['counter']['traegerschaft'][$hochschule['trgerschaft']]++;
-		    } else {
-			$hochschule['trgerschaft'] = $string_unknown_traeger;
-		    }
+		   } else {
+		       if (!empty($hochschule['typ']['traeger'])) {
+			    $traeger = sanitize_traeger($hochschule['typ']['traeger']);
+		       } else {
+			   $traeger = $string_unknown_traeger;
+		       }
+		   }
+			if (!isset($res['counter']['traegerschaft'][$traeger])) {
+			    $res['counter']['traegerschaft'][$traeger] = 0;
+			}
+			$res['counter']['traegerschaft'][$traeger]++;
+		   
 		   
 		    if (!empty($hochschule['generator'])) {
 			if (!isset($res['counter']['generator'][$hochschule['generator']['name']])) {
@@ -174,20 +177,20 @@ function getDatafromFiles($filelist) {
 			}
 			$res['counter']['generator'][$hochschule['generator']['name']]++;
 			
-			if (!isset($res['counter']['generator-traegerschaft'][$hochschule['trgerschaft']][$hochschule['generator']['name']])) {
-			    $res['counter']['generator-traegerschaft'][$hochschule['trgerschaft']][$hochschule['generator']['name']] = 0;
+			if (!isset($res['counter']['generator-traegerschaft'][$traeger][$hochschule['generator']['name']])) {
+			    $res['counter']['generator-traegerschaft'][$traeger][$hochschule['generator']['name']] = 0;
 			}
-			$res['counter']['generator-traegerschaft'][$hochschule['trgerschaft']][$hochschule['generator']['name']]++;
+			$res['counter']['generator-traegerschaft'][$traeger][$hochschule['generator']['name']]++;
 			
 		    } else {
 			if (!isset($res['counter']['generator']['unknown'])) {
 			    $res['counter']['generator']['unknown'] = 0;
 			}
 			$res['counter']['generator']['unknown']++;
-			if (!isset($res['counter']['generator-traegerschaft'][$hochschule['trgerschaft']]['unknown'])) {
-			    $res['counter']['generator-traegerschaft'][$hochschule['trgerschaft']]['unknown'] = 0;
+			if (!isset($res['counter']['generator-traegerschaft'][$traeger]['unknown'])) {
+			    $res['counter']['generator-traegerschaft'][$traeger]['unknown'] = 0;
 			}
-			$res['counter']['generator-traegerschaft'][$hochschule['trgerschaft']]['unknown']++;
+			$res['counter']['generator-traegerschaft'][$traeger]['unknown']++;
 		    }
 			
 		   $filelist['data'][$key]['analyse'] = $res;
@@ -205,12 +208,21 @@ function sanitize_traeger($traeger = '') {
     global $string_unknown_traeger;
     $valid = array("privat", "staatlich", "konfessionell");
     if (!empty($traeger)) {	
+	if ($traeger == 'öffentlich-rechtlich') {
+	    $traeger = "staatlich";
+	}
+	if ($traeger == 'kirchlich') {
+	    $traeger = "konfessionell";
+	}
 	$traeger = preg_replace('/[^a-z]+/i', '', $traeger);
 	$traeger = strtolower($traeger);
     }
+   
+    
     if (in_array($traeger, $valid)) {
 	return $traeger;
     }
+   
     $found = $string_unknown_traeger;
     foreach ($valid as $search) {
 	$sgrep = '/'.$search.'/i';
