@@ -6,12 +6,12 @@ class Contao extends \CMS
 {
 
     public $methods = array(
-        "generator_meta", "api", "content_string"
+        "generator_meta", "api", "content_string", "generator_header"
     );
 
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-	     $this->classname = 'contao';
+	    $this->classname = 'contao';
 	    $this->cmsurl = 'https://contao.org';
 	    $this->url = $url;
 	    $this->tags = $tags;
@@ -99,13 +99,39 @@ class Contao extends \CMS
 	
 	public function content_string() {
 	    if ($this->content) {
-		if (preg_match('/"contao":"http/i', $this->content, $matches)) {
-		       return true;
-		}
+            if (preg_match('/"contao":"http/i', $this->content, $matches)) {
+                   return true;
+            }
 	    }
 	    return FALSE;
 	}
 	
+	/**
+	 * Check for Generator header
+	 * @return [boolean]
+	 */
+	public function generator_header() {
+
+		if (isset($this->header) && is_array($this->header)) {
+            if (!empty($this->header['vary'])) {
+                if (is_array($this->header['vary'])) {
+                    foreach ($this->header['vary'] as $vary => $value) {
+                        if (preg_match('/Contao\-Page\-Layout/i', $value)) {
+                            return true;
+                         }
+                    }
+                } elseif (preg_match('/Contao\-Page\-Layout/i', $this->header['vary'])) {
+                    return true;
+                 }
+            }
+		    
+
+		}
+
+		return FALSE;
+
+	}
+
 	
 
 

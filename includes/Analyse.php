@@ -24,134 +24,135 @@ class Analyse {
     var $canonical;
     
      public function __construct($url) {
-         $this->content = '';
-         $this->url = $url;
-	 $this->canonical = $url;
-	 $this->get_content_filter();
-	 $this->httpstatus = 200;
+        $this->content = '';
+        $this->url = $url;
+        $this->canonical = $url;
+        $this->get_content_filter();
+        $this->httpstatus = 200;
      } 
      
      
     function set_url($url) {
-	  $url = filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
-	  if ($url) {
-	        $this->url = $url;
-	  }
-	  return $this->url;
+        $url = filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED|FILTER_FLAG_HOST_REQUIRED);
+        if ($url) {
+              $this->url = $url;
+        }
+        return $this->url;
     }
+    
     function init($data) {
-	if (empty($data['content'])) {
-	    return false;
-	}
-	$this->content = $data['content'];
-	$doc = new DomDocument();
-	@ $doc->loadHTML($data['content']);
-	$nodes = $doc->getElementsByTagName('title');
-	$this->title = $this->sanitize_string(trim($nodes->item(0)->nodeValue));
-	$this->canonical = $this->get_canonical($data['content']);
-	$this->httpstatus = $data['meta']['http_code'];
-	
-	$link = array();
-	foreach($doc->getElementsByTagName('a') as $linkTag) {
-	    $thislink = array();
-	    if ($linkTag->nodeValue) {
-		$thislink['linktext']  = trim($linkTag->nodeValue);
-	    }  
-	    if($linkTag->getAttribute('href') != "") {
-		$thislink['href'] = $linkTag->getAttribute('href');
-	    }
-	    if($linkTag->getAttribute('name') != "") {
-		$thislink['name'] =  $linkTag->getAttribute('name');
-	    }
-	    if($linkTag->getAttribute('title') != "") {
-		$thislink['title'] =  trim($linkTag->getAttribute('title'));
-	    }
-	    if($linkTag->getAttribute('aria-label') != "") {
-		$thislink['aria-label'] =  trim($linkTag->getAttribute('aria-label'));
-	    }
-	    if (!empty($thislink)) {
-		$link[] = $thislink;
-		
-	//	echo "FOUND LINK: ".$thislink['href']." - ".$thislink['linktext']."\n";
-	    }
-	}
-	$this->links = $link;
-	
-	$metas = $doc->getElementsByTagName('meta');
-	$tags = array();
-	foreach($doc->getElementsByTagName('meta') as $metaTag) {
-	      if($metaTag->getAttribute('name') != "") {
-		  $attrbname = strtolower($metaTag->getAttribute('name'));
-		  
-		  if (!isset($tags[$attrbname])) {
-		      $tags[$attrbname] = $metaTag->getAttribute('content');
-		  } elseif (is_array($tags[$attrbname])) {
-		      $tags[$attrbname][] = $metaTag->getAttribute('content');
-		  } else {
-		      $oldsingle = $tags[$attrbname];
-		      $tags[$attrbname] = array();
-		      $tags[$attrbname][] = $oldsingle;
-		      $tags[$attrbname][] = $metaTag->getAttribute('content');
-		  }
-	     
-	      } else {
-		  if ($metaTag->getAttribute('property') != "") {
-		      $attrbname = strtolower($metaTag->getAttribute('property'));
-		      $tags['_property'][$attrbname] = $metaTag->getAttribute('content');
-		  }
-		  if ($metaTag->getAttribute('http-equiv') != "") {
-		      $attrbname = strtolower($metaTag->getAttribute('http-equiv'));
-		      $tags['_http-equiv'][$attrbname] = $metaTag->getAttribute('content');
-		  }
-		  if ($metaTag->getAttribute('charset') != "") {
-		      $tags['_charset'] = $metaTag->getAttribute('charset');
-		  }
-	      }
-	}
-	$this->meta = $tags;
-	$this->linkrels = $this->get_meta_link($data['content']); 
-	
-	
-	$cms = new CMS($this->url);
-	$cms->add_links($this->links);
-	$cms->add_linkrel($this->linkrels);
-	$cms->add_scripts($this->get_script_link($data['content']));
-	$cms->add_header($this->header);
-	$cms->get_generator($this->meta,$data['content']);
-	
-	if ($cms->name) {
-	   $this->generator['name'] = $this->sanitize_string($cms->name);
-	   if (!empty($cms->version)) {
-	       $ver = $cms->version;
-	       if (is_array($ver)) {
-		   $cms->version = implode(',', $ver);  
-	       }
-	    if (strlen(trim($cms->version))>0) {
-		$this->generator['version'] = $cms->version;
-	    }
-	}
-	    $this->generator['classname'] = $cms->classname;
-	    $this->generator['icon'] = $cms->icon;
-	    $this->generator['url'] = $cms->cmsurl;
-	}
-	
-	
-	$template = $cms->get_cms_template($this->meta,$data['content']);
-	if ($template !== false) {
-	     $this->template = $template['name'];
-	     if (isset($template['version'])) {
-		$this->template_version = $template['version'];
-	     }
-	}
+        if (empty($data['content'])) {
+            return false;
+        }
+        $this->content = $data['content'];
+        $doc = new DomDocument();
+        @ $doc->loadHTML($data['content']);
+        $nodes = $doc->getElementsByTagName('title');
+        $this->title = $this->sanitize_string(trim($nodes->item(0)->nodeValue));
+        $this->canonical = $this->get_canonical($data['content']);
+        $this->httpstatus = $data['meta']['http_code'];
 
-	
-	$this->favicon = $this->get_favicon($data['content']);
-	$this->canonical = $this->get_canonical($data['content']);
-	$this->toslinks = $this->find_tos_links();
-	$this->logosrc =  $this->find_logo();	
-	$this->lang = $this->get_language($data['content']);
-	$this->external = $this->find_external_ressources($data['content']);
-	$this->scripts = $this->get_script_link($data['content']);
+        $link = array();
+        foreach($doc->getElementsByTagName('a') as $linkTag) {
+            $thislink = array();
+            if ($linkTag->nodeValue) {
+                $thislink['linktext']  = trim($linkTag->nodeValue);
+            }  
+            if($linkTag->getAttribute('href') != "") {
+                $thislink['href'] = $linkTag->getAttribute('href');
+            }
+            if($linkTag->getAttribute('name') != "") {
+                $thislink['name'] =  $linkTag->getAttribute('name');
+            }
+            if($linkTag->getAttribute('title') != "") {
+                $thislink['title'] =  trim($linkTag->getAttribute('title'));
+            }
+            if($linkTag->getAttribute('aria-label') != "") {
+                $thislink['aria-label'] =  trim($linkTag->getAttribute('aria-label'));
+            }
+            if (!empty($thislink)) {
+                $link[] = $thislink;
+
+            //	echo "FOUND LINK: ".$thislink['href']." - ".$thislink['linktext']."\n";
+            }
+        }
+        $this->links = $link;
+
+        $metas = $doc->getElementsByTagName('meta');
+        $tags = array();
+        foreach($doc->getElementsByTagName('meta') as $metaTag) {
+              if($metaTag->getAttribute('name') != "") {
+              $attrbname = strtolower($metaTag->getAttribute('name'));
+
+              if (!isset($tags[$attrbname])) {
+                  $tags[$attrbname] = $metaTag->getAttribute('content');
+              } elseif (is_array($tags[$attrbname])) {
+                  $tags[$attrbname][] = $metaTag->getAttribute('content');
+              } else {
+                  $oldsingle = $tags[$attrbname];
+                  $tags[$attrbname] = array();
+                  $tags[$attrbname][] = $oldsingle;
+                  $tags[$attrbname][] = $metaTag->getAttribute('content');
+              }
+
+              } else {
+              if ($metaTag->getAttribute('property') != "") {
+                  $attrbname = strtolower($metaTag->getAttribute('property'));
+                  $tags['_property'][$attrbname] = $metaTag->getAttribute('content');
+              }
+              if ($metaTag->getAttribute('http-equiv') != "") {
+                  $attrbname = strtolower($metaTag->getAttribute('http-equiv'));
+                  $tags['_http-equiv'][$attrbname] = $metaTag->getAttribute('content');
+              }
+              if ($metaTag->getAttribute('charset') != "") {
+                  $tags['_charset'] = $metaTag->getAttribute('charset');
+              }
+              }
+        }
+        $this->meta = $tags;
+        $this->linkrels = $this->get_meta_link($data['content']); 
+
+
+        $cms = new CMS($this->url);
+        $cms->add_links($this->links);
+        $cms->add_linkrel($this->linkrels);
+        $cms->add_scripts($this->get_script_link($data['content']));
+        $cms->add_header($this->header);
+        $cms->get_generator($this->meta,$data['content']);
+
+        if ($cms->name) {
+           $this->generator['name'] = $this->sanitize_string($cms->name);
+           if (!empty($cms->version)) {
+               $ver = $cms->version;
+               if (is_array($ver)) {
+               $cms->version = implode(',', $ver);  
+               }
+            if (strlen(trim($cms->version))>0) {
+            $this->generator['version'] = $cms->version;
+            }
+        }
+            $this->generator['classname'] = $cms->classname;
+            $this->generator['icon'] = $cms->icon;
+            $this->generator['url'] = $cms->cmsurl;
+        }
+
+
+        $template = $cms->get_cms_template($this->meta,$data['content']);
+        if ($template !== false) {
+             $this->template = $template['name'];
+             if (isset($template['version'])) {
+            $this->template_version = $template['version'];
+             }
+        }
+
+
+        $this->favicon = $this->get_favicon($data['content']);
+        $this->canonical = $this->get_canonical($data['content']);
+        $this->toslinks = $this->find_tos_links();
+        $this->logosrc =  $this->find_logo();	
+        $this->lang = $this->get_language($data['content']);
+        $this->external = $this->find_external_ressources($data['content']);
+        $this->scripts = $this->get_script_link($data['content']);
 	
     } 
     
@@ -201,61 +202,61 @@ class Analyse {
     }
     
     function make_absolute_link($uri) {
-	if (empty($uri)) {
-	    return;
-	}
-	
-	$url = $uri;
-	
-	$p = parse_url($uri);
-	if (empty($p['host'])) {
-	    $baseurl = $this->url;
-	   
-	    $baseurl =preg_replace('/\/$/i', '', $baseurl);
-	    $p['path'] = preg_replace('/^\//i', '', $p['path']);
-	    $url = $baseurl.'/'.$p['path'];
-	    if (!empty($p['query'])) {
-		$url .= '?'.$p['query'];
-	    }
-	}
-	return $url;
+        if (empty($uri)) {
+            return;
+        }
+
+        $url = $uri;
+
+        $p = parse_url($uri);
+        if (empty($p['host'])) {
+            $baseurl = $this->url;
+
+            $baseurl =preg_replace('/\/$/i', '', $baseurl);
+            $p['path'] = preg_replace('/^\//i', '', $p['path']);
+            $url = $baseurl.'/'.$p['path'];
+            if (!empty($p['query'])) {
+            $url .= '?'.$p['query'];
+            }
+        }
+        return $url;
 
     }
     
     function find_external_ressources($content = '') {
-	$res = array();
-	if (!isset($this->linkrels)) {
-	    $this->linkrels =  $this->get_meta_link($content);
-	}
+        $res = array();
+        if (!isset($this->linkrels)) {
+            $this->linkrels =  $this->get_meta_link($content);
+        }
 
-	foreach ($this->linkrels as $i => $link) {
-	     if (isset($link['stylesheet'])) {
-		   $p = parse_url($link['stylesheet']['href']);
-		   
-		   if ($this->is_same_host($link['stylesheet']['href'])) {
-		       // same or relative
-		       // do nothing yet...
-		   } else {
-		        $res[] = $link['stylesheet']['href'];
-		   }
-	     }
-	}
-	
-	$scriptsrcs = $this->get_script_link($content);
-	foreach ($scriptsrcs as $link) {
-	       if ($link) {
-		    if ($this->is_same_host($link)) {
-		       // same or relative
-		       // do nothing yet...
-		    } else {
-		        $res[] = $link;
-		    }
-		   
-	       }
-	    
-	}
-	
-	return $res;
+        foreach ($this->linkrels as $i => $link) {
+             if (isset($link['stylesheet'])) {
+               $p = parse_url($link['stylesheet']['href']);
+
+               if ($this->is_same_host($link['stylesheet']['href'])) {
+                   // same or relative
+                   // do nothing yet...
+               } else {
+                    $res[] = $link['stylesheet']['href'];
+               }
+             }
+        }
+
+        $scriptsrcs = $this->get_script_link($content);
+        foreach ($scriptsrcs as $link) {
+               if ($link) {
+                if ($this->is_same_host($link)) {
+                   // same or relative
+                   // do nothing yet...
+                } else {
+                    $res[] = $link;
+                }
+
+               }
+
+        }
+
+        return $res;
     } 
     
     private function is_same_host($someurl) {

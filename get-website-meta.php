@@ -59,13 +59,13 @@ function parse_website($url) {
     $locationchange = $cc->is_url_location_host(false);
 
     if ($data['meta']['http_code'] < 0 ) {
-	echo "Invalid URL to analyse: \"".$url."\"\n";
-	exit;
+        echo "Invalid URL to analyse: \"".$url."\"\n";
+        exit;
     }
 
     echo "Status Code:        ".$data['meta']['http_code']."\n";
     if (($data['meta']['http_code'] >= 300) && ($data['meta']['http_code']<=303)) {
-	echo "Redirect Location:  ".$data['meta']['location']."\n";
+        echo "Redirect Location:  ".$data['meta']['location']."\n";
     }
     echo "connect_time:       ".$data['meta']['connect_time']."\n";
     echo "pretransfer_time:   ".$data['meta']['pretransfer_time']."\n";
@@ -79,50 +79,50 @@ function parse_website($url) {
 
     $certinfo = $cc->get_ssl_info();
     if ($certinfo) {
-//	 var_dump($certinfo);
-	if (isset($certinfo['issuer'])) {
-	    if (isset($certinfo['issuer']['O'])) {
-		echo $certinfo['issuer']['O'];
-	    }
-	    if (isset($certinfo['issuer']['OU'])) {
-		echo ", ".$certinfo['issuer']['OU'];
-	    }
-	     if (isset($certinfo['issuer']['CN'])) {
-		echo ", ".$certinfo['issuer']['CN'];
-	    }
-	    echo "\n";
-	}
-	if (isset($certinfo['extensions'])) {
-	     if (isset($certinfo['extensions']['authorityKeyIdentifier'])) {
-		echo "authorityKeyIdentifier: ".trim($certinfo['extensions']['authorityKeyIdentifier'])."\n";
-	    }
-	///     if (isset($certinfo['extensions']['certificatePolicies'])) {
-	//	echo "\tcertificatePolicies: ".$certinfo['extensions']['certificatePolicies']."\n";
-	//    }
-	      if (isset($certinfo['extensions']['subjectAltName'])) {
-		echo "subjectAltName:     ".$certinfo['extensions']['subjectAltName']."\n";
-	    }
-	}
-	echo "\n";
+    //	 var_dump($certinfo);
+        if (isset($certinfo['issuer'])) {
+            if (isset($certinfo['issuer']['O'])) {
+                echo $certinfo['issuer']['O'];
+            }
+            if (isset($certinfo['issuer']['OU'])) {
+                echo ", ".$certinfo['issuer']['OU'];
+            }
+            if (isset($certinfo['issuer']['CN'])) {
+                echo ", ".$certinfo['issuer']['CN'];
+            }
+            echo "\n";
+        }
+        if (isset($certinfo['extensions'])) {
+            if (isset($certinfo['extensions']['authorityKeyIdentifier'])) {
+                echo "authorityKeyIdentifier: ".trim($certinfo['extensions']['authorityKeyIdentifier'])."\n";
+            }
+        ///     if (isset($certinfo['extensions']['certificatePolicies'])) {
+        //	echo "\tcertificatePolicies: ".$certinfo['extensions']['certificatePolicies']."\n";
+        //    }
+            if (isset($certinfo['extensions']['subjectAltName'])) {
+                echo "subjectAltName:     ".$certinfo['extensions']['subjectAltName']."\n";
+            }
+        }
+        echo "\n";
     } else {
-	echo "*Kein SSL Zugang verfügbar*\n";
+        echo "*Kein SSL Zugang verfügbar*\n";
     }    
     echo "\n";
     echo "Header: \n";
     foreach ($cc->header as $name => $value) {
-	if (is_string($value)) {
-	    echo "\t$name: $value\n";
-	} elseif (is_array($value)) {
-	    echo "\t$name = Array:\n";
-	    foreach ($value as $kv => $vv) {
-		echo "\t\t".$kv.': '.$vv."\n";
-	    }
-	}
+        if (is_string($value)) {
+            echo "\t$name: $value\n";
+        } elseif (is_array($value)) {
+            echo "\t$name = Array:\n";
+            foreach ($value as $kv => $vv) {
+            echo "\t\t".$kv.': '.$vv."\n";
+            }
+        }
     }
     echo "\n"; 
     
     if (empty($data['content'])) {
-	echo "*ACHTUNG: Kein Inhalt erhalten*\n";
+        echo "*ACHTUNG: Kein Inhalt erhalten*\n";
     }
     if (($locationchange) && ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500)) {
 	echo "CHECKE URL ".$cc->url."\n";
@@ -206,54 +206,54 @@ function parse_website($url) {
 	if ($analyse->toslinks) {
 	    echo "\nRechtliche Angaben:\n";
 	    foreach ($analyse->toslinks as $tos => $value) {
-		echo "\t".$tos.":\t".$value['linktext']." (".$value['href'].")\n";
+            echo "\t".$tos.":\t".$value['linktext']." (".$value['href'].")\n";
 	    }
 	}
 	if (!empty($analyse->linkrels)) {
 	    echo "\n<Link> im HTML <meta>:\n";
 	      foreach ($analyse->linkrels as $i => $entry) {
-		  if (is_array($entry)) {
-		      foreach ($entry as $name => $sub) {
-			  echo "\t".$name.":\t";
-			  if (is_array($sub)) {
-			      foreach ($sub as $i => $val) {
-				  echo "$i=\"$val\" ";
-			      }
-			      echo "\n";
-			  } else {
-			      echo $sub."\n";
-			  }
-		      }
-		  } else {
-		      echo "\t".$entry."\n";
-		  }
-	      }
+            if (is_array($entry)) {
+                  foreach ($entry as $name => $sub) {
+                      echo "\t".$name.":\t";
+                      if (is_array($sub)) {
+                          foreach ($sub as $i => $val) {
+                             echo "$i=\"$val\" ";
+                          }
+                          echo "\n";
+                      } else {
+                          echo $sub."\n";
+                      }
+                  }
+            } else {
+                echo "\t".$entry."\n";
+            }
+	    }
 	}
 	if (!empty($analyse->scripts)) {
 	    echo "\nSkripten:\n";
-	      foreach ($analyse->scripts as $i => $entry) {
-		  if (is_array($entry)) {
-		      foreach ($entry as $name => $sub) {
-			  echo "\t".$name.":\t";
-			  if (is_array($sub)) {
-			      foreach ($sub as $i => $val) {
-				  echo "\"$i\"=\"$val\" ";
-			      }
-			      echo "\n";
-			  } else {
-			      echo $sub."\n";
-			  }
-		      }
-		  } else {
-		      echo "\t".$entry."\n";
-		  }
-	      }
+	    foreach ($analyse->scripts as $i => $entry) {
+            if (is_array($entry)) {
+                foreach ($entry as $name => $sub) {
+                    echo "\t".$name.":\t";
+                    if (is_array($sub)) {
+                        foreach ($sub as $i => $val) {
+                             echo "\"$i\"=\"$val\" ";
+                        }
+                        echo "\n";
+                    } else {
+                        echo $sub."\n";
+                    }
+                }
+            } else {
+                echo "\t".$entry."\n";
+            }
+	    }
 	}
 	
 	if (!empty($analyse->external)) {
-	    echo "\nExterne Ressourcen:\n";
-	     foreach ($analyse->external as $link) {
-		echo "\t".$link."\n";
+         echo "\nExterne Ressourcen:\n";
+	    foreach ($analyse->external as $link) {
+                echo "\t".$link."\n";
 	    }
 	}
 	
@@ -270,10 +270,10 @@ function parse_website($url) {
 	    
 	}
     } elseif (!$locationchange) {
-	echo "Domain ".$cc->url." wird umgelenkt auf: ".$cc->header['location']."\n";
-	echo "Bitte diese Domain gesondert analysieren.\n";
+        echo "Domain ".$cc->url." wird umgelenkt auf: ".$cc->header['location']."\n";
+        echo "Bitte diese Domain gesondert analysieren.\n";
     } else {
-	echo "Fehler beim Zugriff: ".$data['meta']['http_code']."\n";
+        echo "Fehler beim Zugriff: ".$data['meta']['http_code']."\n";
     }
 	
 }
@@ -283,7 +283,7 @@ function is_valid_url($urlinput) {
     $url = filter_var($urlinput, FILTER_VALIDATE_URL);
     
     if (empty($url) || (strlen($url) != strlen($urlinput))) {
-	return false;
+        return false;
     }
     return true;
 }

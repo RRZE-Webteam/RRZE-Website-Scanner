@@ -20,52 +20,52 @@ class CMS {
     
     public $systems = [
         "WordPress",
-	"Webbaukasten",
-	"Drupal",
-	"Typo3",
-	"MediaWiki",
-	"DokuWiki",
-	"Joomla",
-	"Contao",
-	"Imperia",
-	"ActiveWeb",
-	"InfoparkFiona",
-	"Roxen",
-	"Zope",
-	"Express",
-	"SixCMS",
-	"GovernmentSiteBuilder",
-	"Plone",
-	"Moodle",
-	"Ilias",
-	"OpenCms",
-	"ProcessWire",
-	"Pimcore",
-	"Mattermost",
-	"Nextcloud",
-	"Sharepoint",
-	"HisInOne",
-	"Neos",
-	"IdM",
-	"PhusionPassenger",
-	"Additor",
-	"Idbase",
-	"Framula",
-	"Tucal",
-	"FirstSpirit",
-	"Sitepark",
-	"CraftCMS",
-	"Magnolia",
-	"Cabacos",
-	"GCMS",
-	"MaGIC",
-	"SilverStripe",
-	"Scrivito",
-	"PlatoCMS",
-	"WebEdition",
-	"XIMS","Liferay", 
-	"HubSpot", "CleanSlate",  "Dreamweaver", "Percussion", "Omni", "DayCMS","Cascade","Kentico",
-	"ASP"
+        "Webbaukasten",
+        "Drupal",
+        "Typo3",
+        "MediaWiki",
+        "DokuWiki",
+        "Joomla",
+        "Contao",
+        "Imperia",
+        "ActiveWeb",
+        "InfoparkFiona",
+        "Roxen",
+        "Zope",
+        "Express",
+        "SixCMS",
+        "GovernmentSiteBuilder",
+        "Plone",
+        "Moodle",
+        "Ilias",
+        "OpenCms",
+        "ProcessWire",
+        "Pimcore",
+        "Mattermost",
+        "Nextcloud",
+        "Sharepoint",
+        "HisInOne",
+        "Neos",
+        "IdM",
+        "PhusionPassenger",
+        "Additor",
+        "Idbase",
+        "Framula",
+        "Tucal",
+        "FirstSpirit",
+        "Sitepark",
+        "CraftCMS",
+        "Magnolia",
+        "Cabacos",
+        "GCMS",
+        "MaGIC",
+        "SilverStripe",
+        "Scrivito",
+        "PlatoCMS",
+        "WebEdition",
+        "XIMS","Liferay", 
+        "HubSpot", "CleanSlate",  "Dreamweaver", "Percussion", "Omni", "DayCMS","Cascade","Kentico",
+        "ASP", "MaxE", "Django"
 
     ];
 
@@ -74,30 +74,30 @@ class CMS {
     
     
     public function __construct($url) {
-         $this->name = '';
-         $this->version = '';
-	 $this->url = $url;
-     } 
+        $this->name = '';
+        $this->version = '';
+        $this->url = $url;
+    } 
      
-     public function add_linkrel($linkrels) {
-	 if (isset($linkrels)) {
-	     $this->linkrels = $linkrels;
-	 }
-     }
-     public function add_scripts($scripts) {
-	 if (isset($scripts)) {
-	     $this->scripts = $scripts;
-	 }
-     }
-     public function add_links($links) {
-	 if (isset($links)) {
-	     $this->links = $links;
-	 }
-     }
-      public function add_header($header) {
-	 if (isset($header)) {
-	     $this->header = $header;
-	 }
+    public function add_linkrel($linkrels) {
+        if (isset($linkrels)) {
+            $this->linkrels = $linkrels;
+        }
+    }
+    public function add_scripts($scripts) {
+        if (isset($scripts)) {
+            $this->scripts = $scripts;
+        }
+    }
+    public function add_links($links) {
+        if (isset($links)) {
+            $this->links = $links;
+        }
+    }
+    public function add_header($header) {
+        if (isset($header)) {
+            $this->header = $header;
+        }
      }
       
 
@@ -110,15 +110,15 @@ class CMS {
         foreach ($this->systems as $system_name) {
             $system_class = 'CMS\\' . $system_name;
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
-	    $system->header = $this->header;
+            $system->header = $this->header;
             foreach ($this->common_methods as $method) {
                 if (method_exists($system, $method)) {
                     if ($system->$method()) {
-			$this->name = $system->name;
-			$this->version = $system->version;
-			$this->classname = $system->classname;
-			$this->icon = $system->icon;
-			$this->cmsurl= $system->cmsurl;
+                        $this->name = $system->name;
+                        $this->version = $system->version;
+                        $this->classname = $system->classname;
+                        $this->icon = $system->icon;
+                        $this->cmsurl= $system->cmsurl;
                         return $this->name;
                     }
                 }
@@ -134,15 +134,15 @@ class CMS {
         foreach ($this->systems as $system_name) {
             $system_class = 'CMS\\' . $system_name;
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
-	    $system->header = $this->header;
+            $system->header = $this->header;
             foreach ($system->methods as $method) {
                 if (!in_array($method, $this->common_methods)) {
                     if ($system->$method()) {
-			$this->name = $system->name;
-			$this->version = $system->version;
-			$this->classname = $system->classname;
-			$this->icon = $system->icon;
-			$this->cmsurl= $system->cmsurl;
+                        $this->name = $system->name;
+                        $this->version = $system->version;
+                        $this->classname = $system->classname;
+                        $this->icon = $system->icon;
+                        $this->cmsurl= $system->cmsurl;
                         return $this->name;
                     }
 
@@ -155,19 +155,19 @@ class CMS {
 	
 	if (isset($tags)) {
 	    if (isset($tags['generator'])) {
-		if (is_array($tags['generator'])) {
-		    $genatorstring = '';
-		    foreach ($tags['generator'] as $entry) {
-			if (!empty($genatorstring)) {
-			    $genatorstring .= ', ';
-			}
-			$genatorstring .= trim($entry);
-		    }
-		} else {
-		    $genatorstring = trim($tags['generator']);
-		}
+            if (is_array($tags['generator'])) {
+                $genatorstring = '';
+                foreach ($tags['generator'] as $entry) {
+                    if (!empty($genatorstring)) {
+                        $genatorstring .= ', ';
+                    }
+                    $genatorstring .= trim($entry);
+                }
+            } else {
+                $genatorstring = trim($tags['generator']);
+            }
 		
-		$this->name = $genatorstring;
+            $this->name = $genatorstring;
 	    }
 	   
 	    return $this->name;
@@ -185,11 +185,11 @@ class CMS {
             $system = new $system_class($this->url, $tags, $content, $this->links, $this->linkrels, $this->scripts);
 
             if (method_exists($system, "get_template")) {
-		$res = $system->get_template();
-		if ($res !== false) {
-		    return  $res;
-		}
-	    }
+                $res = $system->get_template();
+                if ($res !== false) {
+                    return  $res;
+                }
+            }
         }
         return false;
 
@@ -209,7 +209,7 @@ class CMS {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3);
-	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (RRZE CheckBot)');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (RRZE CheckBot)');
 
         $return = curl_exec($ch);
 
@@ -237,7 +237,7 @@ class CMS {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3);
         curl_setopt($ch, CURLOPT_HEADER, 1);
-	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (RRZE CheckBot)');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (RRZE CheckBot)');
 
         $response = curl_exec($ch);
 

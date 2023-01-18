@@ -14,152 +14,157 @@ class cURL {
     
      public function __construct($cookies = true, $cookie = 'cookies.txt', $compression = 'gzip', $proxy='') {
 
-	$this->headers = array(
-	    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-	    'Connection: Keep-Alive',
-	    'Content-type: application/x-www-form-urlencoded;charset=UTF-8'
-	);
-	$this->follow_html_redirection = false;
-	$this->follow_html_redirection_on_samehost = true;
-	$this->user_agent   = 'Mozilla/4.0 (RRZE CheckBot)';
-	$this->compression  = $compression;
-	$this->proxy	    = $proxy;
-	$this->cookies	    = $cookies;
-	$this->header	    = array();
-	$this->body	    = '';
-	$this->original_url = '';
-	if ($this->cookies) {
-		$this->cookie($cookie);
-	}
+        $this->headers = array(
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Connection: Keep-Alive',
+            'Content-type: application/x-www-form-urlencoded;charset=UTF-8'
+        );
+        $this->follow_html_redirection = false;
+        $this->follow_html_redirection_on_samehost = true;
+        $this->user_agent   = 'Mozilla/4.0 (RRZE CheckBot)';
+        $this->compression  = $compression;
+        $this->proxy	    = $proxy;
+        $this->cookies	    = $cookies;
+        $this->header	    = array();
+        $this->body	    = '';
+        $this->original_url = '';
+        if ($this->cookies) {
+            $this->cookie($cookie);
+        }
      } 
 
     public function cookie($cookie_file) {
-	if (file_exists($cookie_file)) {
-	    $this->cookie_file=$cookie_file;
-	} else {
-	    fopen($cookie_file,'w') or $this->error('The cookie file could not be opened. Make sure this directory has the correct permissions');
-	    $this->cookie_file=$cookie_file;
-	    fclose($this->cookie_file);
-	}
+        if (file_exists($cookie_file)) {
+            $this->cookie_file=$cookie_file;
+        } else {
+            fopen($cookie_file,'w') or $this->error('The cookie file could not be opened. Make sure this directory has the correct permissions');
+            $this->cookie_file=$cookie_file;
+            fclose($this->cookie_file);
+        }
     }
+    
+    
     public function get($url) {
-	$res = array(
-	    "content" => '',
-	    "meta" => array(
-		"http_code" => 0
-	    ),
-	);
-	
-	if (!$this->is_valid_url($url)) {
-	    $res['meta']['http_code'] = -1;
-	    return $res;
-	}
-	$process = curl_init($url);
-	$this->url = $url;
-	
-	if (empty($this->original_url)) {
-	    $this->original_url = $url;
-	}
-	curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
-	curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
-	curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
-	curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);
-	
-	curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($process, CURLOPT_HEADER, 1);
-	
-	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEFILE, $this->cookie_file);
-	if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEJAR, $this->cookie_file);
-	
-	curl_setopt($process,CURLOPT_ENCODING , $this->compression);
-	curl_setopt($process, CURLOPT_TIMEOUT, 30);
-	
-	if ($this->proxy) curl_setopt($process, CURLOPT_PROXY, $this->proxy);
-	curl_setopt($process, CURLOPT_POSTREDIR, 7);
-	curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);
-	
-	
-	
-	$response = curl_exec($process);
-	$header_size = curl_getinfo($process, CURLINFO_HEADER_SIZE);
-	
+        $res = array(
+            "content" => '',
+            "meta" => array(
+            "http_code" => 0
+            ),
+        );
 
-	
-	$header = substr($response, 0, $header_size);
-	$this->body = substr($response, $header_size);	
-	$this->parse_header($header);
-	
-	$res['meta'] = curl_getinfo($process);
-	
-	
-	$location = curl_getinfo($process, CURLINFO_EFFECTIVE_URL);
-	if ($location !== $url) {
-	    if (isset($this->header['location'])) {
-		if ($location !== $this->header['location']) {
-		    $this->header['location'] = $location;
-		}
-		
-	    } else {
-		$this->header['location'] = $location;
-	    }
-	    
-	}
-	$this->recheck_location_with_body();
+        if (!$this->is_valid_url($url)) {
+            $res['meta']['http_code'] = -1;
+            return $res;
+        }
+        $process = curl_init($url);
+        $this->url = $url;
 
-	if  (!empty($this->header['_http_equiv-redirection'])) {
-	    if ($this->follow_html_redirection)  {
-		$newurl = $this->header['_http_equiv-redirection'];
-		$oldheader = $this->header;
-		$oldurl =  $this->url;
-		$this->header = array();
+        if (empty($this->original_url)) {
+            $this->original_url = $url;
+        }
+        curl_setopt($process, CURLOPT_HTTPHEADER, $this->headers);
+        curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
+        curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);
 
-		$newdata = $this->get($newurl);
-		$this->header['_http_equiv_from'] = $oldurl;
-		$this->header['_former_location'] = $oldheader['location'];
-		$newdata['meta']['_http_equiv_from'] = $oldurl;
-		$newdata['meta']['_former_location'] = $oldheader['location'];
-		$newdata['header'] = $this->header;
-		return $newdata;
-	    } elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) 
-		    && (!$this->is_local_index_redirection($this->header['_http_equiv-redirection']))) { 
-		$newurl = $this->header['_http_equiv-redirection'];
-		
-		echo "TRY NEW URL CAUSE RDEIRECT: $newurl\n";
-		$oldheader = $this->header;
-		$oldurl =  $this->url;
-		$this->header = array();
+        curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($process, CURLOPT_HEADER, 1);
 
-		$newdata = $this->get($newurl);
-		$this->header['_http_equiv_from'] = $oldurl;
-		if (!empty($oldheader['location'])) {
-		    $this->header['_former_location'] = $oldheader['location'];
-		    $newdata['meta']['_former_location'] = $oldheader['location'];
-		}
-		$newdata['meta']['_http_equiv_from'] = $oldurl;
-		$newdata['header'] = $this->header;
-		return $newdata;
-	    } else {
-		$res['meta']['_http_equiv-redirection'] = $this->header['_http_equiv-redirection'];
-	    }
-	}
-	$res['header'] = $this->header;
-	
-	$httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
-	curl_close($process);
-	$res['meta']['http_code'] = $httpcode;
-	if ($httpcode>=200 && $httpcode<500) {
-	    $res['content'] =   $this->body;	   
-	  
-	} else {
-	    $res['content'] = '';
-	}
-	
+        if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEFILE, $this->cookie_file);
+        if ($this->cookies == TRUE) curl_setopt($process, CURLOPT_COOKIEJAR, $this->cookie_file);
 
-	// if ((empty($res['content'])) && ($httpcode == 303) && ($res['meta']['redirect_url']) && ($res['meta']['redirect_url'] !== $url)) {
-	//     return $this->get($res['meta']['redirect_url']);
-	// }
-	return $res;
+        curl_setopt($process,CURLOPT_ENCODING , $this->compression);
+        curl_setopt($process, CURLOPT_TIMEOUT, 30);
+
+        if ($this->proxy) curl_setopt($process, CURLOPT_PROXY, $this->proxy);
+        curl_setopt($process, CURLOPT_POSTREDIR, 7);
+        curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($process, CURLOPT_FOLLOWLOCATION, 1);
+
+
+
+        $response = curl_exec($process);
+        $header_size = curl_getinfo($process, CURLINFO_HEADER_SIZE);
+
+
+
+        $header = substr($response, 0, $header_size);
+        $this->body = substr($response, $header_size);	
+        $this->parse_header($header);
+
+        $res['meta'] = curl_getinfo($process);
+
+
+        $location = curl_getinfo($process, CURLINFO_EFFECTIVE_URL);
+        if ($location !== $url) {
+            if (isset($this->header['location'])) {
+                if ($location !== $this->header['location']) {
+                    $this->header['location'] = $location;
+                }
+
+            } else {
+                $this->header['location'] = $location;
+            }
+
+        }
+        $this->recheck_location_with_body();
+
+        if  (!empty($this->header['_http_equiv-redirection'])) {
+            if ($this->follow_html_redirection)  {
+                $newurl = $this->header['_http_equiv-redirection'];
+                $oldheader = $this->header;
+                $oldurl =  $this->url;
+                $this->header = array();
+
+                $newdata = $this->get($newurl);
+                $this->header['_http_equiv_from'] = $oldurl;
+                $this->header['_former_location'] = $oldheader['location'];
+                $newdata['meta']['_http_equiv_from'] = $oldurl;
+                $newdata['meta']['_former_location'] = $oldheader['location'];
+                $newdata['header'] = $this->header;
+                return $newdata;
+            } elseif (($this->follow_html_redirection_on_samehost) && $this->is_same_domain($this->url, $this->header['_http_equiv-redirection']) 
+                && (!$this->is_local_index_redirection($this->header['_http_equiv-redirection']))) { 
+                $newurl = $this->header['_http_equiv-redirection'];
+
+                echo "TRY NEW URL CAUSE RDEIRECT: $newurl\n";
+                $oldheader = $this->header;
+                $oldurl =  $this->url;
+                $this->header = array();
+
+                $newdata = $this->get($newurl);
+                $this->header['_http_equiv_from'] = $oldurl;
+                
+                if (!empty($oldheader['location'])) {
+                    $this->header['_former_location'] = $oldheader['location'];
+                    $newdata['meta']['_former_location'] = $oldheader['location'];
+                }
+                
+                $newdata['meta']['_http_equiv_from'] = $oldurl;
+                $newdata['header'] = $this->header;
+                return $newdata;
+            
+            } else {
+                $res['meta']['_http_equiv-redirection'] = $this->header['_http_equiv-redirection'];
+            }
+        }
+        $res['header'] = $this->header;
+
+        $httpcode = curl_getinfo($process, CURLINFO_HTTP_CODE);
+        curl_close($process);
+        $res['meta']['http_code'] = $httpcode;
+        if ($httpcode>=200 && $httpcode<500) {
+            $res['content'] =   $this->body;	   
+
+        } else {
+            $res['content'] = '';
+        }
+
+
+        // if ((empty($res['content'])) && ($httpcode == 303) && ($res['meta']['redirect_url']) && ($res['meta']['redirect_url'] !== $url)) {
+        //     return $this->get($res['meta']['redirect_url']);
+        // }
+        return $res;
     }
      
     public function post($url,$data) {
@@ -254,64 +259,64 @@ class cURL {
     }
 
     public function parse_header($header) {
-	 if (isset($header)) {
-	    $haderlines = preg_split('/[\n\r]+/',$header);
-	    if (!empty($haderlines)) {
-		foreach ($haderlines as $line) {
-		    $cur = trim($line);
-		    if (!empty($cur)) {
-			if (strpos($cur, ': ')) { 
-			    list($name, $value) = explode(": ", $cur);
-			    if ((!empty($name)) && (!empty($value))) {
-				$name = strtolower($name);
-				if ((isset($this->header[$name])) && (is_string($this->header[$name]))) {
-				    if ($value !== $this->header[$name]) {
-					// Nur wenn der neue Wert nicht gleich dem alten ist...
-					$oldval = $this->header[$name];
-					$this->header[$name] = array();
-					$this->header[$name][] = $oldval;
-					$this->header[$name][] = $value;
-				    }
-				} elseif  ((isset($this->header[$name])) && (is_array($this->header[$name]))) {   
-				    $this->header[$name][] = $value;
-				} else {
-				    $this->header[$name] = $value;
-				}
-			    }
-			}
-		    }
-		}
-	    }
-	    return true;
-	 }
-	 $this->header = array();
-	 return false;
+        if (isset($header)) {
+           $haderlines = preg_split('/[\n\r]+/',$header);
+            if (!empty($haderlines)) {
+                foreach ($haderlines as $line) {
+                    $cur = trim($line);
+                    if (!empty($cur)) {
+                        if (strpos($cur, ': ')) { 
+                            list($name, $value) = explode(": ", $cur);
+                            if ((!empty($name)) && (!empty($value))) {
+                                $name = strtolower($name);
+                                if ((isset($this->header[$name])) && (is_string($this->header[$name]))) {
+                                    if ($value !== $this->header[$name]) {
+                                    // Nur wenn der neue Wert nicht gleich dem alten ist...
+                                    $oldval = $this->header[$name];
+                                    $this->header[$name] = array();
+                                    $this->header[$name][] = $oldval;
+                                    $this->header[$name][] = $value;
+                                    }
+                                } elseif  ((isset($this->header[$name])) && (is_array($this->header[$name]))) {   
+                                    $this->header[$name][] = $value;
+                                } else {
+                                    $this->header[$name] = $value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        $this->header = array();
+        return false;
      }
      
      public function is_url_location_host($setnew = false) {
-	 $location = '';
-	 if (!empty($this->header['location'])) {
-	     if (is_array($this->header['location'])) {
-		 $location = end($this->header['location']);
-	     } elseif (is_string($this->header['location'])) {
-		 $location = $this->header['location'];
-	     }
-	 }
-	 
-	 
-	 if (!empty($location)) {
-	     $lu = parse_url($location);     
-	     $lo = parse_url($this->url);
- 
-	    $same = $this->is_same_domain($this->url,$location);
-	    if ($same && $setnew) {
-		$this->url = $location; 
-	    }
-	    return $same;
-		     
-	    
-	 }
-	 return true;
+        $location = '';
+        if (!empty($this->header['location'])) {
+            if (is_array($this->header['location'])) {
+               $location = end($this->header['location']);
+            } elseif (is_string($this->header['location'])) {
+               $location = $this->header['location'];
+            }
+        }
+
+
+        if (!empty($location)) {
+            $lu = parse_url($location);     
+            $lo = parse_url($this->url);
+
+            $same = $this->is_same_domain($this->url,$location);
+            if ($same && $setnew) {
+                 $this->url = $location; 
+            }
+            return $same;
+
+
+        }
+        return true;
      }
      
      // checks if two urls are the same by the host 
