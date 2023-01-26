@@ -53,19 +53,19 @@ class Plone extends \CMS  {
     }
      
     private function get_regexp_matches() {
-	$match_reg = [
-	    '/^Plone /i'
-	];
-	return $match_reg;
+        $match_reg = [
+            '/^Plone /i'
+        ];
+        return $match_reg;
     }   
     public function get_info() {
-	$info = array();
-        $info['icon']	    = $this->icon;
-	$info['classname']  = $this->classname;	   
-	$info['url']	    = $this->url;
-	$info['name']	    = $this->name; 
-	$info['version']    = $this->version; 
-	return $info;
+        $info = array();
+            $info['icon']	    = $this->icon;
+        $info['classname']  = $this->classname;	   
+        $info['url']	    = $this->url;
+        $info['name']	    = $this->name; 
+        $info['version']    = $this->version; 
+        return $info;
     }
     
     
@@ -82,12 +82,12 @@ class Plone extends \CMS  {
 			  foreach($element as $type => $lc) {
 
 			    if ($type == 'shortcut icon') {
-				if (strpos($lc['href'], '/++') !==FALSE)
-				    return true;
+                    if (strpos($lc['href'], '/++') !==FALSE)
+                        return true;
 			    }
 			     if ($type == 'search') {
-				if (strpos($lc['href'], '@@search') !==FALSE)
-				    return true;
+                    if (strpos($lc['href'], '@@search') !==FALSE)
+                        return true;
 			    }
 			    
 			    

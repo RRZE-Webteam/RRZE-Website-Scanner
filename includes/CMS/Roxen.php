@@ -45,16 +45,24 @@ class Roxen extends \CMS
 	public function generator_header() {
 
 		if (isset($this->header) && is_array($this->header)) {
-
-		    if (isset($this->header['server']) && (preg_match('/^Roxen\/([a-z0-9\.\-]+)/i', $this->header['server'], $matches))) {
-			if (isset($matches[1])) {
-			    $this->version = $matches[1];
-			}
-		       return true;
+            if (!empty($this->header['server'])) {
+                if (is_array($this->header['server'])) {
+                    foreach ($this->header['server'] as $vary => $value) {
+                        if (preg_match('/^Roxen\/([a-z0-9\.\-]+)/i', $value, $matches)) {
+                            if (isset($matches[1])) {
+                                $this->version = $matches[1];
+                            }
+                            return true;
+                         }
+                    }
+                } elseif (preg_match('/^Roxen\/([a-z0-9\.\-]+)/i', $this->header['server'], $matches)) {
+                       if (isset($matches[1])) {
+                            $this->version = $matches[1];
+                        }
+                    return true;
+                }
 		    }
-
 		}
-
 		return FALSE;
 
 	}
