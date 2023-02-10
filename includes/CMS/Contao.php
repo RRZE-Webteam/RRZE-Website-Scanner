@@ -24,33 +24,33 @@ class Contao extends \CMS
 
      
     public function generator_meta($string = '') {
-	if ((empty($string)) && isset($this->tags['generator'])) {
-	    $string = $this->tags['generator'];
-	}
-	
-	if (empty($string)) {
-	    return false;
-	}
-	
-	if (is_array($string)) {
-	    foreach ($string as $line) {
-		 $ret = $this->generator_meta($line);
-		 if ($ret !== false) {
-		     return $ret;
-		 }
-	    }
-	} else {
-	    $matches = $this->get_regexp_matches();
-	    foreach ($matches as $m) {
-		if (preg_match($m, $string, $matches)) {
-		    if (isset($matches[1])) {
-			$this->version = $matches[1]; 
-		    }
-		    return $this->get_info();
-		}
-	    }
-	}
-	return false;
+        if ((empty($string)) && isset($this->tags['generator'])) {
+            $string = $this->tags['generator'];
+        }
+
+        if (empty($string)) {
+            return false;
+        }
+
+        if (is_array($string)) {
+            foreach ($string as $line) {
+             $ret = $this->generator_meta($line);
+             if ($ret !== false) {
+                 return $ret;
+             }
+            }
+        } else {
+            $matches = $this->get_regexp_matches();
+            foreach ($matches as $m) {
+            if (preg_match($m, $string, $matches)) {
+                if (isset($matches[1])) {
+                $this->version = $matches[1]; 
+                }
+                return $this->get_info();
+            }
+            }
+        }
+        return false;
 	
     }
 	 private function get_regexp_matches() {
@@ -82,12 +82,10 @@ class Contao extends \CMS
 			  foreach($element as $type => $lc) {
 
 			    if ($type == 'stylesheet') {
-				if (strpos($lc['href'], '/tl_files/') !==FALSE)
-				    return true;
-			    }
-			    
-			    
-			}
+                    if (strpos($lc['href'], '/tl_files/') !==FALSE)
+                        return true;
+                    }
+                }
 		    }
 
 		}
@@ -113,19 +111,9 @@ class Contao extends \CMS
 	public function generator_header() {
 
 		if (isset($this->header) && is_array($this->header)) {
-            if (!empty($this->header['vary'])) {
-                if (is_array($this->header['vary'])) {
-                    foreach ($this->header['vary'] as $vary => $value) {
-                        if (preg_match('/Contao\-Page\-Layout/i', $value)) {
-                            return true;
-                         }
-                    }
-                } elseif (preg_match('/Contao\-Page\-Layout/i', $this->header['vary'])) {
-                    return true;
-                 }
+            if ($this->is_grepmeta($this->header['vary'],'/Contao\-Page\-Layout/i')) {
+                 return $this->get_info();
             }
-		    
-
 		}
 
 		return FALSE;

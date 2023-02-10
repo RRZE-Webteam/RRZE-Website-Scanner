@@ -6,7 +6,7 @@ class ActiveWeb extends \CMS
 {
 
     public $methods = array(
-	"content_string"
+        "content_string"
     );
 
     
@@ -38,12 +38,12 @@ class ActiveWeb extends \CMS
 	
 	public function content_string() {
 	    if ($this->content) {
-		if (preg_match('/page generated with activeWeb contentserver ([a-z0-9\.]+)/mi', $this->content, $matches)) {
-		    
-		        $this->version = $matches[1]; 
-		  
-		       return true;
-		}
+            if (preg_match('/page generated with activeWeb contentserver ([a-z0-9\.]+)/mi', $this->content, $matches)) {
+
+                    $this->version = $matches[1]; 
+
+                   return true;
+            }
 	    }
 	    return FALSE;
 	}

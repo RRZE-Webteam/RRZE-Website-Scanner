@@ -85,7 +85,7 @@ class Joomla extends \CMS {
          * See if README.TXT exists, and check for Drupal 6.xx
          * @return [boolean]
          */
-                if($data = $this->fetch($this->url."/README.txt")) {
+        if($data = $this->fetch($this->url."/README.txt")) {
 			/**
 			 * Loop first 10 lines and look for Joomla text
 			 */
@@ -98,11 +98,10 @@ class Joomla extends \CMS {
 				}
 
 			}
-
               
-                }
-	    return FALSE;
         }
+        return FALSE;
+    }
 	
 	public function api() {
         /* by: https://tfrommen.de/how-to-detect-joomla-websites/ 
@@ -114,18 +113,18 @@ class Joomla extends \CMS {
 	* <!DOCTYPE install PUBLIC "-//Joomla! 2.5//DTD template 1.0//EN" "https://www.joomla.org/xml/dtd/2.5/template-install.dtd">
 	 */
 
-                if($data = $this->fetch($this->url."/templates/protostar/templateDetails.xml")) {
+            if($data = $this->fetch($this->url."/templates/protostar/templateDetails.xml")) {
 
-			preg_match_all('/<\!doctype [^<>"]+ "\-\/\/Joomla\! ([0-9\.a-z]+)\/(.*)">/i', $data, $output_array);
-		    
-			if (!empty($output_array[1])) {
-			    $this->version = $output_array[1];
-			    return true;
-			}
+                preg_match_all('/<\!doctype [^<>"]+ "\-\/\/Joomla\! ([0-9\.a-z]+)\/(.*)">/i', $data, $output_array);
+
+                if (!empty($output_array[1])) {
+                    $this->version = $output_array[1];
+                    return true;
+                }
 
               
-                }
-	    return FALSE;
+            }
+            return FALSE;
         }
 	
 	 /**

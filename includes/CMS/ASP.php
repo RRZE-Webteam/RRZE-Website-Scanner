@@ -45,9 +45,10 @@ class ASP extends \CMS {
 
 		if (isset($this->header) && is_array($this->header)) {
 
-		    if (isset($this->header['x-powered-by']) && (preg_match('/^ASP\.NET/i', $this->header['x-powered-by'], $matches))) {
-		       return true;
-		    }
+            if ($this->is_grepmeta($this->header['x-powered-by'],'/^ASP\.NET/i')) {
+                 return $this->get_info();
+            }
+            
 
 		}
 

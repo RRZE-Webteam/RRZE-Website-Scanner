@@ -8,7 +8,7 @@ class Typo3 extends \CMS
     public $methods = array(
         "generator_meta",
         "scripts",
-	"content_string"
+        "content_string"
     );
 
     
@@ -26,30 +26,30 @@ class Typo3 extends \CMS
 
      
     public function generator_meta($string = '') {
-	if ((empty($string)) && isset($this->tags['generator'])) {
-	    $string = $this->tags['generator'];
-	}
-	
-	if (empty($string)) {
-	    return false;
-	}
-	
-	if (is_array($string)) {
-	    foreach ($string as $line) {
-		 $ret = $this->generator_meta($line);
-		 if ($ret !== false) {
-		     return $ret;
-		 }
-	    }
-	} else {
-	    $matches = $this->get_regexp_matches();
-	    foreach ($matches as $m) {
-		if (preg_match($m, $string, $matches)) {
-		    return $this->get_info();
-		}
-	    }
-	}
-	return false;
+        if ((empty($string)) && isset($this->tags['generator'])) {
+            $string = $this->tags['generator'];
+        }
+
+        if (empty($string)) {
+            return false;
+        }
+
+        if (is_array($string)) {
+            foreach ($string as $line) {
+                $ret = $this->generator_meta($line);
+                if ($ret !== false) {
+                    return $ret;
+                }
+            }
+        } else {
+            $matches = $this->get_regexp_matches();
+            foreach ($matches as $m) {
+                if (preg_match($m, $string, $matches)) {
+                    return $this->get_info();
+                }
+            }
+        }
+        return false;
 	
     }
 	 private function get_regexp_matches() {
@@ -70,9 +70,9 @@ class Typo3 extends \CMS
         
   	public function content_string() {
 	    if ($this->content) {
-		if (preg_match('/This website is powered by TYPO3 /i', $this->content, $matches)) {
-		       return true;
-		}
+            if (preg_match('/This website is powered by TYPO3 /i', $this->content, $matches)) {
+                   return true;
+            }
 	    }
 	    return FALSE;
 	}

@@ -45,13 +45,17 @@ class Zope extends \CMS {
 
 		if (isset($this->header) && is_array($this->header)) {
 
-		    if (isset($this->header['Server']) && (preg_match('/^Zope\/\(([a-z0-9\.\-]+)/i', $this->header['Server'], $matches))) {
-			$this->version = $matches[1];
-		       return true;
-		    }
-		    if (!empty($this->header['x-powered-by']) && (!is_array($this->header['x-powered-by'])) && (preg_match('/^Zope /i', $this->header['x-powered-by'], $matches))) {
-		       return true;
-		    }
+             if ($this->is_grepmeta($this->header['Server'],'/^Zope/i')) {
+                 if (is_string($this->header['Server']) && (preg_match('/^Zope\/\(([a-z0-9\.\-]+)/i', $this->header['Server'], $matches))) {
+                        $this->version = $matches[1];
+                 }
+                 return $this->get_info();
+            }
+            if ($this->is_grepmeta($this->header['x-powered-by'],'/^Zope/i')) {
+                 return $this->get_info();
+            }
+            
+		 
 
 		}
 

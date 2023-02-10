@@ -275,5 +275,30 @@ class CMS {
 
     }
    
+    
+    public function is_grepmeta($metavar, $string) {
+        if (empty($metavar)) {
+            return false;
+        }
+        if (empty($string)) {
+            return false;
+        }
+
+
+        if (is_array($metavar)) {
+            foreach ($metavar as $name => $value) {
+                if ((!empty($value)) && (is_string($value))) {
+                    if (preg_match($string, $value)) {
+                        return true;
+                    }
+                }
+            }
+        } elseif (is_string($metavar)) {
+            if (preg_match($string, $metavar)) {
+                return true;
+            }
+        }
+        return false;
+    }
    
 }

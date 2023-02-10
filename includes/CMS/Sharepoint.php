@@ -97,7 +97,7 @@ class Sharepoint extends \CMS  {
 		if (isset($this->header) && is_array($this->header)) {
 		 
 		    if (isset($this->header['microsoftsharepointteamservices'])) {
-			$this->version = $this->header['microsoftsharepointteamservices'];
+                $this->version = $this->header['microsoftsharepointteamservices'];
 			
 		        return $this->get_info();
 		    }
