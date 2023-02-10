@@ -284,7 +284,9 @@ class CMS {
             return false;
         }
 
-
+        if (!isset($metavar)) {
+            return false;
+        }
         if (is_array($metavar)) {
             foreach ($metavar as $name => $value) {
                 if ((!empty($value)) && (is_string($value))) {

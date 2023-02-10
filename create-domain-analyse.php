@@ -225,7 +225,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		}
 		$cnt = $cnt +1;
 		
-	        $cc = new cURL();
+	    $cc = new cURL();
 		$cc->follow_html_redirection = false;
 		$data = $cc->get($entry['url']);
 		
@@ -328,7 +328,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 			 }
 			
 		    } else {
-			$line .= '<td class="center">[fail]</td><td class="center">[fail]</td><td class="center">[fail]</td>';
+                $line .= '<td class="center">[fail]</td><td class="center">[fail]</td><td class="center">[fail]</td>';
 		    }
 		    
 		    
@@ -347,7 +347,7 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		       $line .= '</td>';
 
 		    } else {
-			$line .= '<td class="generator"></td>';
+                $line .= '<td class="generator"></td>';
 		    }
 	
 		    
@@ -358,26 +358,26 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
 		     $jsonadd =  array_merge($json_grunddata, $analysedata);
 		     
 		     if (!$cc->is_same_domain($jsonadd['url'] , $correctedurl)) {
-			 if (empty($jsonadd['redirect'])) {
-			     $jsonadd['redirect'] = $jsonadd['url'];
-			 }
-			 $jsonadd['url'] = $correctedurl;
+                if (empty($jsonadd['redirect'])) {
+                    $jsonadd['redirect'] = $jsonadd['url'];
+                }
+                $jsonadd['url'] = $correctedurl;
 		     }
 
 		     $json_data[] = $jsonadd;
 	     
-	        } elseif (!$stayonhost) {
+	    } elseif (!$stayonhost) {
 		    // Host hat sich geaendert.
 		    $location = '';
 		    if (!empty($cc->header['location'])) {
-			if (is_array($cc->header['location'])) {
-			    $location = end($cc->header['location']);
-			} else {
-			    $location = $cc->header['location'];
-			}
+                if (is_array($cc->header['location'])) {
+                    $location = end($cc->header['location']);
+                } else {
+                    $location = $cc->header['location'];
+                }
 		    }
 		    if (!empty( $data['meta']['_http_equiv-redirection'])) {
-			$location = $data['meta']['_http_equiv-redirection'];
+                $location = $data['meta']['_http_equiv-redirection'];
 		    }
 		    echo "\t wird umgelenkt auf: ".$location."\n";
 		    $json_grunddata['redirect'] = $location;
@@ -401,51 +401,51 @@ function create_indextable($index, $refstatus = 4, $refserver = array("1"), $wpp
   
     
     if (!empty($table)) {
-	$head = '<table class="sorttable">';
-	$head .= '<thead>';
-	$head .= '<tr class="center">';
-	
-	$head .= '<th scope="col" rowspan="2">Titel / URL</th>';
-	$head .= '<th scope="col" rowspan="2">Logo</th>';
-	$head .= '<th scope="col" rowspan="2">Favicon</th>';
-	$head .= '<th scope="col" colspan="3">Rechtstexte</th>';
-	$head .= '<th scope="col" rowspan="2">CMS</th>';
-	$head .= '</tr>';
-	$head .= '<tr class="center">';
-	$head .= '<td class="small vertical">Impressum</td>';
-	$head .= '<td class="small vertical">Datenschutz</td>';
-	$head .= '<td class="small vertical">Barrierefreiheit</td>';
-	$head .= '</tr>';	
-	$head .= '</thead>'."\n";
-	$output = $head;
-	
-	if ($wppagebreaks) {
-	   $output .= '<tbody>';
-	    foreach ($tablecell as $cell) {
-		
-		$breakcnt = $breakcnt + 1;
-		if ($breakcnt == $breakat) {
-		    $breakcnt = 0;
-		    $output .= '</tbody>';
-		    $output .= '</table>';
-		    
-		   $output .= '<!--nextpage-->'."\n";
-		   
-		   $output .= $head;
-		    $output .= '<tbody>';
-		}
-		$output .= $cell;
+        $head = '<table class="sorttable">';
+        $head .= '<thead>';
+        $head .= '<tr class="center">';
 
-	    }
-	    $output .= '</tbody>';
-	} else {
-	    $output .= '<tbody>';
-	    $output .= $table;
-	    $output .= '</tbody>';
-	}
-	
-	$output .= '</table>';
-	return $output;
+        $head .= '<th scope="col" rowspan="2">Titel / URL</th>';
+        $head .= '<th scope="col" rowspan="2">Logo</th>';
+        $head .= '<th scope="col" rowspan="2">Favicon</th>';
+        $head .= '<th scope="col" colspan="3">Rechtstexte</th>';
+        $head .= '<th scope="col" rowspan="2">CMS</th>';
+        $head .= '</tr>';
+        $head .= '<tr class="center">';
+        $head .= '<td class="small vertical">Impressum</td>';
+        $head .= '<td class="small vertical">Datenschutz</td>';
+        $head .= '<td class="small vertical">Barrierefreiheit</td>';
+        $head .= '</tr>';	
+        $head .= '</thead>'."\n";
+        $output = $head;
+
+        if ($wppagebreaks) {
+           $output .= '<tbody>';
+            foreach ($tablecell as $cell) {
+
+            $breakcnt = $breakcnt + 1;
+            if ($breakcnt == $breakat) {
+                $breakcnt = 0;
+                $output .= '</tbody>';
+                $output .= '</table>';
+
+               $output .= '<!--nextpage-->'."\n";
+
+               $output .= $head;
+                $output .= '<tbody>';
+            }
+            $output .= $cell;
+
+            }
+            $output .= '</tbody>';
+        } else {
+            $output .= '<tbody>';
+            $output .= $table;
+            $output .= '</tbody>';
+        }
+
+        $output .= '</table>';
+        return $output;
 	
     }
     

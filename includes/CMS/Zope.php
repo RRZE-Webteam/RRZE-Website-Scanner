@@ -44,14 +44,14 @@ class Zope extends \CMS {
 	public function generator_header() {
 
 		if (isset($this->header) && is_array($this->header)) {
-
-             if ($this->is_grepmeta($this->header['Server'],'/^Zope/i')) {
+            
+             if (isset($this->header['Server']) && ($this->is_grepmeta($this->header['Server'],'/^Zope/i'))) {
                  if (is_string($this->header['Server']) && (preg_match('/^Zope\/\(([a-z0-9\.\-]+)/i', $this->header['Server'], $matches))) {
                         $this->version = $matches[1];
                  }
                  return $this->get_info();
             }
-            if ($this->is_grepmeta($this->header['x-powered-by'],'/^Zope/i')) {
+            if (isset($this->header['x-powered-by']) && ($this->is_grepmeta($this->header['x-powered-by'],'/^Zope/i'))) {
                  return $this->get_info();
             }
             

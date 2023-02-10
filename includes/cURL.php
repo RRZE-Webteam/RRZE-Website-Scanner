@@ -46,9 +46,9 @@ class cURL {
     
     public function get($url) {
         $res = array(
-            "content" => '',
-            "meta" => array(
-            "http_code" => 0
+                "content" => '',
+                "meta" => array(
+                "http_code" => 0
             ),
         );
 
@@ -66,7 +66,6 @@ class cURL {
         curl_setopt($process, CURLOPT_USERAGENT, $this->user_agent);
         curl_setopt($process, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($process, CURLOPT_SSL_VERIFYPEER, false);
-
         curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($process, CURLOPT_HEADER, 1);
 
