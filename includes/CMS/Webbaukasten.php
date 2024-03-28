@@ -26,43 +26,43 @@ class Webbaukasten extends \CMS  {
     );
      
     public function generator_meta($string = '') {
-	if ((empty($string)) && isset($this->tags['generator'])) {
-	    $string = $this->tags['generator'];
-	}
-	
-	if (empty($string)) {
-	    return false;
-	}
-	
-	if (is_array($string)) {
-	    foreach ($string as $line) {
-		 $ret = $this->generator_meta($line);
-		 if ($ret !== false) {
-		     return $ret;
-		 }
-	    }
-	} else {
-	    $matches = $this->get_regexp_matches();
-	    foreach ($matches as $m) {
-		if (preg_match($m, $string, $matches)) {
+        if ((empty($string)) && isset($this->tags['generator'])) {
+            $string = $this->tags['generator'];
+        }
 
-		    $this->version = $matches[1]; 
-		    return $this->get_info();
-		}
-	    }
-	}
-	return false;
+        if (empty($string)) {
+            return false;
+        }
+
+        if (is_array($string)) {
+            foreach ($string as $line) {
+                $ret = $this->generator_meta($line);
+                if ($ret !== false) {
+                    return $ret;
+                }
+            }
+        } else {
+            $matches = $this->get_regexp_matches();
+            foreach ($matches as $m) {
+                if (preg_match($m, $string, $matches)) {
+
+                    $this->version = $matches[1]; 
+                    return $this->get_info();
+                }
+            }
+        }
+        return false;
 	
     }
      
     private function get_regexp_matches() {
-	$match_reg = [
-	    '/^Web\-Baukasten der Friedrich\-Alexander\-Universität \(([0-9\/\-\.]+)\)$/ui',
-	    '/^Webbaukasten der Friedrich\-Alexander\-Universität \(([0-9\/\-\.]+)\)$/ui',
-	     '/^Web\-baukasten der Friedrich\-Alexander\-Universit&auml;t \(([0-9\/\-\.]+)\)$/ui',
-	    '/^Web\-Baukasten der Friedrich\-Alexander\-Universität\s*\(?([0-9\-\/\.]*)\)?/ui'
-	];
-	return $match_reg;
+        $match_reg = [
+            '/^Web\-Baukasten der Friedrich\-Alexander\-Universität \(([0-9\/\-\.]+)\)$/ui',
+            '/^Webbaukasten der Friedrich\-Alexander\-Universität \(([0-9\/\-\.]+)\)$/ui',
+             '/^Web\-baukasten der Friedrich\-Alexander\-Universit&auml;t \(([0-9\/\-\.]+)\)$/ui',
+            '/^Web\-Baukasten der Friedrich\-Alexander\-Universität\s*\(?([0-9\-\/\.]*)\)?/ui'
+        ];
+        return $match_reg;
 
 	
     }   

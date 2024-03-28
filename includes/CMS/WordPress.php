@@ -25,43 +25,43 @@ class WordPress extends \CMS  {
 
      
     public function generator_meta($string = '') {
-	if ((empty($string)) && isset($this->tags['generator'])) {
-	    $string = $this->tags['generator'];
-	}
-	
-	if (empty($string)) {
-	    return false;
-	}
-	
-	if (is_array($string)) {
-	    foreach ($string as $line) {
-		 $ret = $this->generator_meta($line);
-		 if ($ret !== false) {
-		     return $ret;
-		 }
-	    }
-	} else {
-	    $matches = $this->get_regexp_matches();
-	    foreach ($matches as $m) {
-		if (preg_match($m, $string, $matches)) {
+        if ((empty($string)) && isset($this->tags['generator'])) {
+            $string = $this->tags['generator'];
+        }
 
-		    $this->version = $matches[1]; 
-		    return $this->get_info();
-		}
-	    }
-	}
-	return false;
+        if (empty($string)) {
+            return false;
+        }
+
+        if (is_array($string)) {
+            foreach ($string as $line) {
+             $ret = $this->generator_meta($line);
+             if ($ret !== false) {
+                 return $ret;
+             }
+            }
+        } else {
+            $matches = $this->get_regexp_matches();
+            foreach ($matches as $m) {
+            if (preg_match($m, $string, $matches)) {
+
+                $this->version = $matches[1]; 
+                return $this->get_info();
+            }
+            }
+        }
+        return false;
 	
     }
      
     private function get_regexp_matches() {
-	$match_reg = [
-	    '/^WordPress\s*([0-9\.]+)$/i',
-	    '/^WordPress/i',
-	    '/^WPML /i'
-	    
-	];
-	return $match_reg;
+        $match_reg = [
+            '/^WordPress\s*([0-9\.]+)$/i',
+            '/^WordPress/i',
+            '/^WPML /i'
+
+        ];
+        return $match_reg;
     }   
     public function get_info() {
 	$info = array();
@@ -203,20 +203,20 @@ class WordPress extends \CMS  {
 		 
 		    if (isset($this->header['link'])) {
 			
-			if (is_array($this->header['link'])) {
-			    foreach($this->header['link'] as $i => $element) {
-				if (strpos($element, '/wp-json/') !==FALSE)
-					return $this->get_info();	
-				if (strpos($element, 'rel="https://api.w.org/"') !==FALSE)
-					return $this->get_info();	
-			    }
-			} else {
-			    if (strpos($this->header['link'], '/wp-json/') !==FALSE)
-					return $this->get_info();	
-			    if (strpos($this->header['link'], 'https://api.w.org/') !==FALSE)
-					return $this->get_info();	
-			}
-			
+                if (is_array($this->header['link'])) {
+                    foreach($this->header['link'] as $i => $element) {
+                    if (strpos($element, '/wp-json/') !==FALSE)
+                        return $this->get_info();	
+                    if (strpos($element, 'rel="https://api.w.org/"') !==FALSE)
+                        return $this->get_info();	
+                    }
+                } else {
+                    if (strpos($this->header['link'], '/wp-json/') !==FALSE)
+                        return $this->get_info();	
+                    if (strpos($this->header['link'], 'https://api.w.org/') !==FALSE)
+                        return $this->get_info();	
+                }
+
 					
 		    }
 		   

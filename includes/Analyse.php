@@ -82,31 +82,31 @@ class Analyse {
         $tags = array();
         foreach($doc->getElementsByTagName('meta') as $metaTag) {
               if($metaTag->getAttribute('name') != "") {
-              $attrbname = strtolower($metaTag->getAttribute('name'));
+                $attrbname = strtolower($metaTag->getAttribute('name'));
 
-              if (!isset($tags[$attrbname])) {
-                  $tags[$attrbname] = $metaTag->getAttribute('content');
-              } elseif (is_array($tags[$attrbname])) {
-                  $tags[$attrbname][] = $metaTag->getAttribute('content');
-              } else {
-                  $oldsingle = $tags[$attrbname];
-                  $tags[$attrbname] = array();
-                  $tags[$attrbname][] = $oldsingle;
-                  $tags[$attrbname][] = $metaTag->getAttribute('content');
+                if (!isset($tags[$attrbname])) {
+                    $tags[$attrbname] = $metaTag->getAttribute('content');
+                } elseif (is_array($tags[$attrbname])) {
+                    $tags[$attrbname][] = $metaTag->getAttribute('content');
+                } else {
+                    $oldsingle = $tags[$attrbname];
+                    $tags[$attrbname] = array();
+                    $tags[$attrbname][] = $oldsingle;
+                    $tags[$attrbname][] = $metaTag->getAttribute('content');
               }
 
               } else {
-              if ($metaTag->getAttribute('property') != "") {
-                  $attrbname = strtolower($metaTag->getAttribute('property'));
-                  $tags['_property'][$attrbname] = $metaTag->getAttribute('content');
-              }
-              if ($metaTag->getAttribute('http-equiv') != "") {
-                  $attrbname = strtolower($metaTag->getAttribute('http-equiv'));
-                  $tags['_http-equiv'][$attrbname] = $metaTag->getAttribute('content');
-              }
-              if ($metaTag->getAttribute('charset') != "") {
-                  $tags['_charset'] = $metaTag->getAttribute('charset');
-              }
+                if ($metaTag->getAttribute('property') != "") {
+                    $attrbname = strtolower($metaTag->getAttribute('property'));
+                    $tags['_property'][$attrbname] = $metaTag->getAttribute('content');
+                }
+                if ($metaTag->getAttribute('http-equiv') != "") {
+                    $attrbname = strtolower($metaTag->getAttribute('http-equiv'));
+                    $tags['_http-equiv'][$attrbname] = $metaTag->getAttribute('content');
+                }
+                if ($metaTag->getAttribute('charset') != "") {
+                    $tags['_charset'] = $metaTag->getAttribute('charset');
+                }
               }
         }
         $this->meta = $tags;
@@ -305,143 +305,144 @@ class Analyse {
     }
     
     function get_canonical($content) {
-	$canonical = '';
-	if (preg_match_all('/<link rel="canonical" href="([^<>"]+)"[^<>]*>/iU', $content, $matches)) {
-		if ((isset($matches)) && (isset($matches[1]))) {
-		    $canonical = $matches[1][0];
-		}
-	}
-	
-	if (empty($canonical)) {
-	    $canonical = $this->url;
-	}
-	
-	$canonical = preg_replace('/\/$/i', '', $canonical);
-	
-	return $canonical;
+        $canonical = '';
+        if (preg_match_all('/<link rel="canonical" href="([^<>"]+)"[^<>]*>/iU', $content, $matches)) {
+            if ((isset($matches)) && (isset($matches[1]))) {
+                $canonical = $matches[1][0];
+            }
+        }
+
+        if (empty($canonical)) {
+            $canonical = $this->url;
+        }
+
+        $canonical = preg_replace('/\/$/i', '', $canonical);
+
+        return $canonical;
     }
     function get_favicon($content) {
-	if (!isset($this->linkrels)) {
-	    $this->linkrels =  $this->get_meta_link($content);
-	}
-	$res = array();
-	$maxw = $maxh = 0;
-	$maxhref = '';
-	$icontype = '';
-	
-	foreach ($this->linkrels as $i => $link) {
+        if (!isset($this->linkrels)) {
+            $this->linkrels =  $this->get_meta_link($content);
+        }
+        $res = array();
+        $maxw = $maxh = 0;
+        $maxhref = '';
+        $icontype = '';
 
-	    if ((isset($link['icon'])) || (isset($link['shortcut icon']))|| (isset($link['apple-touch-icon']))) {
-		$icontype = 'icon';
-		if (isset($link['shortcut icon'])) {
-		    $icontype = 'shortcut icon';
-		}
-		if (isset($link['apple-touch-icon'])) {
-		    $icontype = 'apple-touch-icon';
-		}
-	    }
-	    if ($icontype) {
-		
-		$width = $height = 0;
-		$href = $sizes = '';
-		 if (isset($link[$icontype]['href'])) {
-		     $href = $this->make_absolute_link($link[$icontype]['href']);
-		 }
-		  if (isset($link[$icontype]['sizes'])) {
-		     $sizes = $link[$icontype]['sizes'];
-		     list($width, $height) = explode("x", $sizes);
-		 }
-		
-		 if (empty($sizes)) {
-		     // no sizes => use this as main favicon
-		     $res['href'] = $href;
-		     $res['sizes'] = '';
-		     return $res;
-		 } else {
-		     if ($width > $maxw) {
-			$maxw = $width;
-			$maxh = $height;
-			$maxhref = $href;
-		     }
+        foreach ($this->linkrels as $i => $link) {
 
-		 }
-		 
-	    }
-	   
-	}
-	 if (!empty($maxhref)) {
-		$res['href'] = $maxhref;
-		$res['sizes'] = $maxw.'x'.$maxh;
-		return $res;
-	    }
+            if ((isset($link['icon'])) || (isset($link['shortcut icon']))|| (isset($link['apple-touch-icon']))) {
+            $icontype = 'icon';
+            if (isset($link['shortcut icon'])) {
+                $icontype = 'shortcut icon';
+            }
+            if (isset($link['apple-touch-icon'])) {
+                $icontype = 'apple-touch-icon';
+            }
+            }
+            if ($icontype) {
+
+            $width = $height = 0;
+            $href = $sizes = '';
+             if (isset($link[$icontype]['href'])) {
+                 $href = $this->make_absolute_link($link[$icontype]['href']);
+             }
+              if (isset($link[$icontype]['sizes'])) {
+                 $sizes = $link[$icontype]['sizes'];
+                 list($width, $height) = explode("x", $sizes);
+             }
+
+             if (empty($sizes)) {
+                 // no sizes => use this as main favicon
+                 $res['href'] = $href;
+                 $res['sizes'] = '';
+                 return $res;
+             } else {
+                 if ($width > $maxw) {
+                $maxw = $width;
+                $maxh = $height;
+                $maxhref = $href;
+                 }
+
+             }
+
+            }
+
+        }
+         if (!empty($maxhref)) {
+            $res['href'] = $maxhref;
+            $res['sizes'] = $maxw.'x'.$maxh;
+            return $res;
+            }
     }
+    
     function get_language($content) {
-	$lang = '';
-	if (preg_match_all('/<html\s*[^<>]*lang="([a-z\-]+)"[^<>]*>/Ui', $content, $matches)) {
-		if ((isset($matches)) && (isset($matches[1]))) {
-		    $lang = $matches[1][0];
-		}
-	}
-	return $lang;
+        $lang = '';
+        if (preg_match_all('/<html\s*[^<>]*lang="([a-z\-]+)"[^<>]*>/Ui', $content, $matches)) {
+            if ((isset($matches)) && (isset($matches[1]))) {
+                $lang = $matches[1][0];
+            }
+        }
+        return $lang;
     }
     
     function get_meta_link($content) {
-	$linkrels = array();
-	if (preg_match_all('/<link ([^<>]+)\s*\/?>/mi', $content, $matches)) {
-		foreach ($matches[0] as $line) {
-		   $plink = $this->parse_content_link($line);
-		   if ($plink) {
-		       $linkrels[] = $plink; 
-		   }
-		}
-	}
-	return $linkrels;
+        $linkrels = array();
+        if (preg_match_all('/<link ([^<>]+)\s*\/?>/mi', $content, $matches)) {
+            foreach ($matches[0] as $line) {
+               $plink = $this->parse_content_link($line);
+               if ($plink) {
+                   $linkrels[] = $plink; 
+               }
+            }
+        }
+        return $linkrels;
     }
 
 
     function parse_content_link($string) {
-	 if (empty($string)) return;
-	 $rel = false;
-	 if (preg_match('/rel=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
-	     $rel = $matches[1]; 
-	 }
-	 $res = array();
-	 if ($rel) {
-	     
-	    if (preg_match('/href=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
-		$res[$rel]['href'] = $matches[1]; 
-	    }
-	    if (preg_match('/sizes=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
-		$res[$rel]['sizes'] = $matches[1]; 
-	    }
-	    if (preg_match('/id=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
-		$res[$rel]['id'] = $matches[1]; 
-	    }
-	    if (preg_match('/type=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
-		$res[$rel]['type'] = $matches[1]; 
-	    }
-	    if (preg_match('/title=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
-		$res[$rel]['title'] = $matches[1]; 
-	    }
-	    if (preg_match('/media=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
-		$res[$rel]['media'] = $matches[1]; 
-	    }
+        if (empty($string)) return;
+        $rel = false;
+        if (preg_match('/rel=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
+            $rel = $matches[1]; 
+        }
+        $res = array();
+        if ($rel) {
 
-	 }
-	 return $res;
+           if (preg_match('/href=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
+           $res[$rel]['href'] = $matches[1]; 
+           }
+           if (preg_match('/sizes=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
+           $res[$rel]['sizes'] = $matches[1]; 
+           }
+           if (preg_match('/id=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
+           $res[$rel]['id'] = $matches[1]; 
+           }
+           if (preg_match('/type=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
+           $res[$rel]['type'] = $matches[1]; 
+           }
+           if (preg_match('/title=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
+           $res[$rel]['title'] = $matches[1]; 
+           }
+           if (preg_match('/media=[\'"]([^"\']*)[\'"]/i', $string, $matches)) {
+           $res[$rel]['media'] = $matches[1]; 
+           }
+
+        }
+        return $res;
     }
 
     function get_script_link($content) {
-	$scripturls = array();
-	if (preg_match_all('/<script ([^<>]+)>/i', $content, $matches)) {
-		foreach ($matches[0] as $line) {
-		   $plink = $this->parse_content_script($line);
-		   if ($plink) {
-		       $scripturls[] = $plink; 
-		   }
-		}
-	}
-	return $scripturls;
+        $scripturls = array();
+        if (preg_match_all('/<script ([^<>]+)>/i', $content, $matches)) {
+            foreach ($matches[0] as $line) {
+               $plink = $this->parse_content_script($line);
+               if ($plink) {
+                   $scripturls[] = $plink; 
+               }
+            }
+        }
+        return $scripturls;
     }
 
 

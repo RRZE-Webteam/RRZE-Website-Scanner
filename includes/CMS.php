@@ -20,7 +20,6 @@ class CMS {
     
     public $systems = [
         "WordPress",
-        "Webbaukasten",
         "Drupal",
         "Typo3",
         "MediaWiki",
@@ -38,6 +37,8 @@ class CMS {
         "Plone",
         "Moodle",
         "Ilias",
+        "Gitlab",
+        "Webbaukasten",
         "OpenCms",
         "ProcessWire",
         "Pimcore",
