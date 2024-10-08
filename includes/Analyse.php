@@ -9,6 +9,9 @@ class Analyse {
     var $url;
     var $title;
     var $linkrels;
+    var $httpstatus;
+    var $header;
+    var $scripts;
     var $meta;
     var $links;
     var $template;

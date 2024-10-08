@@ -10,9 +10,15 @@ class cURL {
     var $compression;
     var $cookie_file;
     var $proxy;
+    var $follow_html_redirection;
+    var $header;
+    var $cookies;
+    var $body;
+    var $original_url;
+    var $url;
+    var $follow_html_redirection_on_samehost;
     
-    
-     public function __construct($cookies = true, $cookie = 'cookies.txt', $compression = 'gzip', $proxy='') {
+    public function __construct($cookies = true, $cookie = 'cookies.txt', $compression = 'gzip', $proxy='') {
 
         $this->headers = array(
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',

@@ -17,6 +17,8 @@ class CMS {
     var $links;
     var $scripts;
     var $linkrels;
+    var $tags;
+    var $header;
     
     public $systems = [
         "WordPress",

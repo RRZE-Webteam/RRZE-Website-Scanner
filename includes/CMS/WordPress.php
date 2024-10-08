@@ -9,15 +9,15 @@ class WordPress extends \CMS  {
     
     
     public function __construct($url, $tags, $content, $links, $linkrels, $scripts) {
-         $this->classname = 'wordpress';
-	 $this->cmsurl = 'https://de.wordpress.com';
-	 $this->url = $url;
-	 $this->tags = $tags;
-	 $this->content = $content;
-	 $this->name = "WordPress";
-	 $this->links = $links;
-	 $this->linkrels = $linkrels;
-	 $this->scripts = $scripts;
+        $this->classname = 'wordpress';
+        $this->cmsurl = 'https://de.wordpress.com';
+        $this->url = $url;
+        $this->tags = $tags;
+        $this->content = $content;
+        $this->name = "WordPress";
+        $this->links = $links;
+        $this->linkrels = $linkrels;
+        $this->scripts = $scripts;
      } 
      public $methods = array(
 	 "generator_meta", "button_css", "api", "scripts", "content_string", "generator_header"
