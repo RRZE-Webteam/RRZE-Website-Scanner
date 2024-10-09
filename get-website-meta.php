@@ -58,6 +58,7 @@ function parse_website($url) {
     $data = $cc->get($url);
     $locationchange = $cc->is_url_location_host(false);
 
+
     if ($data['meta']['http_code'] < 0 ) {
         echo "Invalid URL to analyse: \"".$url."\"\n";
         exit;
