@@ -161,47 +161,47 @@ class Analyse {
     
     
     public function get_analyse_data() {
-	$res = array();
-	$res['url'] = $this->url;
-	$res['httpstatus'] = $this->httpstatus;
-	$res['canonical'] = $this->canonical;
-	$res['title'] = $this->title;
-	if (isset($this->logosrc)) {
-	    $res['logo_src'] = $this->logosrc;
-	}
-	if (isset($this->favicon['href'])) {
-	    $res['favicon_src'] =$this->favicon['href'];
-	}
-	$res['meta'] =  $this->meta;
-//	$res['content']['links'] = $this->links;
-	$res['content']['lang'] =  $this->lang;
-	$res['content']['tos'] =  $this->toslinks;
-	$res['content']['external'] = $this->external;
-	
-	if (isset($this->generator['name'])) {
-	    $res['generator']['name'] =  $this->generator['name']; 
-	}
-	if (isset($this->generator['version'])) {
-	    $res['generator']['version'] =  $this->generator['version'];
-	}
-	if (isset($this->generator['icon'])) {
-	    $res['generator']['icon'] =  $this->generator['icon'];
-	}
-	if (isset($this->generator['url'])) {
-	    $res['generator']['url'] =  $this->generator['url'];
-	}
-	if (isset($this->generator['classname'])) {
-	    $res['generator']['classname'] =  $this->generator['classname']; 
-	}
-	if (isset($this->template)) {
-	    $res['template']['name'] =  $this->template; 
-	}
-	if (isset($this->template_version)) {
-	    $res['template']['version'] =  $this->template_version;  
-	}
-	
+        $res = array();
+        $res['url'] = $this->url;
+        $res['httpstatus'] = $this->httpstatus;
+        $res['canonical'] = $this->canonical;
+        $res['title'] = $this->title;
+        if (isset($this->logosrc)) {
+            $res['logo_src'] = $this->logosrc;
+        }
+        if (isset($this->favicon['href'])) {
+            $res['favicon_src'] =$this->favicon['href'];
+        }
+        $res['meta'] =  $this->meta;
+    //	$res['content']['links'] = $this->links;
+        $res['content']['lang'] =  $this->lang;
+        $res['content']['tos'] =  $this->toslinks;
+        $res['content']['external'] = $this->external;
 
-	return $res;
+        if (isset($this->generator['name'])) {
+            $res['generator']['name'] =  $this->generator['name']; 
+        }
+        if (isset($this->generator['version'])) {
+            $res['generator']['version'] =  $this->generator['version'];
+        }
+        if (isset($this->generator['icon'])) {
+            $res['generator']['icon'] =  $this->generator['icon'];
+        }
+        if (isset($this->generator['url'])) {
+            $res['generator']['url'] =  $this->generator['url'];
+        }
+        if (isset($this->generator['classname'])) {
+            $res['generator']['classname'] =  $this->generator['classname']; 
+        }
+        if (isset($this->template)) {
+            $res['template']['name'] =  $this->template; 
+        }
+        if (isset($this->template_version)) {
+            $res['template']['version'] =  $this->template_version;  
+        }
+
+
+        return $res;
     }
     
     function make_absolute_link($uri) {

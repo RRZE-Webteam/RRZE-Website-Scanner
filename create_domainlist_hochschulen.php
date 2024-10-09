@@ -111,14 +111,14 @@ if ($list) {
 		} else {
 		    
 		    if ($list[$i]['trger'] == 'privat') {
-			$list[$i]['typ']['traeger-text'] = $list[$i]['typ']['traeger'];
-			$list[$i]['typ']['traeger'] = 'privat';
+                $list[$i]['typ']['traeger-text'] = $list[$i]['typ']['traeger'];
+                $list[$i]['typ']['traeger'] = 'privat';
 		    } elseif ($list[$i]['trger'] == 'konfessionell') {
-			$list[$i]['typ']['traeger-text'] = $list[$i]['typ']['traeger'];
-			$list[$i]['typ']['traeger'] = 'konfessionell';
+        		$list[$i]['typ']['traeger-text'] = $list[$i]['typ']['traeger'];
+                $list[$i]['typ']['traeger'] = 'konfessionell';
 			
 		    } else {
-			 $list[$i]['typ']['traeger2'] = $list[$i]['trger'];
+            	 $list[$i]['typ']['traeger2'] = $list[$i]['trger'];
 		    }
 		   
 		    
@@ -143,14 +143,14 @@ if ($list) {
 	}
 	if (isset($list[$i]['promotionsrecht'])) {
 	    if (!empty($entry['promotionsrecht']) ) {
-		if (isset($list[$i]['typ']['promotionsrecht']) && ($list[$i]['typ']['promotionsrecht'] == $entry['promotionsrecht'])) {
-		} else {
-		    $list[$i]['typ']['promotionsrecht2'] = remove_refs_janein($list[$i]['promotionsrecht']);
-		}
-		unset($list[$i]['promotionsrecht']);
+            if (isset($list[$i]['typ']['promotionsrecht']) && ($list[$i]['typ']['promotionsrecht'] == $entry['promotionsrecht'])) {
+            } else {
+                $list[$i]['typ']['promotionsrecht2'] = remove_refs_janein($list[$i]['promotionsrecht']);
+            }
+            unset($list[$i]['promotionsrecht']);
 	    } else {
-		$list[$i]['typ']['promotionsrecht'] = remove_refs_janein($list[$i]['promotionsrecht']);
-		unset($list[$i]['promotionsrecht']);
+            $list[$i]['typ']['promotionsrecht'] = remove_refs_janein($list[$i]['promotionsrecht']);
+            unset($list[$i]['promotionsrecht']);
 	    }
 	}
 	if (isset($list[$i]['studierende'])) {
@@ -241,9 +241,9 @@ function get_hochschullist_from_wikipedia() {
 			  if ($headcells) {
 			      $c=0;
 			      foreach ($headcells as $h) {
-				  $headtitle[$c] = correctNodebreaks($h->nodeValue);
-				  $headattrib[$c] = make_attribut($headtitle[$c]);
-				  $c++;
+                    $headtitle[$c] = correctNodebreaks($h->nodeValue);
+                    $headattrib[$c] = make_attribut($headtitle[$c]);
+                    $c++;
 			      }
 			  }
 			  
@@ -255,32 +255,40 @@ function get_hochschullist_from_wikipedia() {
 				  if ($c==0) {
 				      $link = $cell->getElementsByTagName('a');
 				      if ($link) {
-					  $href = $link->item(0)->getAttribute('href');
-					  if (preg_match('/^\//', $href)) {
-					      $href = $config['wikipedia_base_url'].$href;
-					  }
-					  $tablecontent[$r]['wiki-url'] = $href;
+                        $href = $link->item(0)->getAttribute('href');
+                        if (preg_match('/^\//', $href)) {
+                            $href = $config['wikipedia_base_url'].$href;
+                        }
+                        if (preg_match('/action=edit/', $href)) {
+                            // ignore edit links
+                            $href = '';
+                        }
+                        $tablecontent[$r]['wiki-url'] = $href;
 				      }   
 				      $tablecontent[$r][$attrib] = correctNodebreaks($cell->nodeValue);
 
 				  } elseif ($c==1) {
 				       $link = $cell->getElementsByTagName('a');
 				        if ($link) {
-					  $href = $link->item(0)->getAttribute('href');
-					  if (preg_match('/^\//', $href)) {
-					      $href = $config['wikipedia_base_url'].$href;
-					  }
-					  $tablecontent[$r]['bundesland']['href'] = $href;
-					  $landttitle = $link->item(0)->getAttribute('title');
-					  if ($landttitle) {
-					      $landttitle = removeDubletten($landttitle);
-					      if (strlen($landttitle) < 4) {
-						   $tablecontent[$r]['bundesland']['kurzform'] = $landttitle;
-					      } else {
-						   $tablecontent[$r]['bundesland']['title'] = $landttitle;
-					      }
-					     
-					  }
+                            $href = $link->item(0)->getAttribute('href');
+                            if (preg_match('/^\//', $href)) {
+                                $href = $config['wikipedia_base_url'].$href;
+                            }
+                            if (preg_match('/action=edit/', $href)) {
+                                // ignore edit links
+                                $href = '';
+                            }
+                            $tablecontent[$r]['bundesland']['href'] = $href;
+                            $landttitle = $link->item(0)->getAttribute('title');
+                            if ($landttitle) {
+                                $landttitle = removeDubletten($landttitle);
+                                if (strlen($landttitle) < 4) {
+                                 $tablecontent[$r]['bundesland']['kurzform'] = $landttitle;
+                                } else {
+                                 $tablecontent[$r]['bundesland']['title'] = $landttitle;
+                                }
+
+                            }
 					  
 				      }
 				       

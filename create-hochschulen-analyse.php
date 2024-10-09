@@ -128,9 +128,9 @@ function sanitize_filename($name) {
 	$file = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $name);
 	// Remove any runs of periods (thanks falstro!)
 	$file = mb_ereg_replace("([\.]{2,})", '', $file);
-	return $file;
+        return $file;
     } else {
-	return "";
+        return "";
     }
 }
 
@@ -138,16 +138,16 @@ function create_indextable($index, $wppagebreaks = true) {
     global $json_data;
     
     if (!isset($index)){
-	return;
+        return;
     }
     
     $cnt = 0;
     $maxcnt = 2000;
      
     if (isset($index['data'])) {
-	$domainindex = $index['data'];
+        $domainindex = $index['data'];
     } else {
-	$domainindex = $index;
+        $domainindex = $index;
     }
     
     foreach ($domainindex as $num => $entry) {
@@ -156,65 +156,73 @@ function create_indextable($index, $wppagebreaks = true) {
 	$json_grunddata = $entry;
 	// Notice: Bei allen Hochschulen wird die JSON zum speichern zu gross. Daher hier nur die Analysedaten-Ergebnisse
 	    if ($cnt > $maxcnt) {
-		break;
+            break;
 	    }
 	    $cnt = $cnt +1;
 	     
 	
 	    if (isset($entry['aktivitaet'])) {
-		// diese Hochschule ist inaktiv, wird uebersprungen
-		echo "Skipping  ".$entry['name']." (".$entry['wiki-url'].") \t\tInaktiv\n";
-		continue;
+            // diese Hochschule ist inaktiv, wird uebersprungen
+            echo "Skipping  ".$entry['name']." (".$entry['wiki-url'].") \t\tInaktiv\n";
+            continue;
 	    }
+        if ( (!isset($entry['name'])) || (!isset($entry['url'])) ) {
+            echo "Skipping $num entry without Name or URL (".$entry['wiki-url'].") \t\tMissing Data\n";
+            continue;
+        }
 	   
 	    $json_grunddata['name'] = $entry['name'];
 	    $json_grunddata['wiki-url'] = $entry['wiki-url'];
 	    
 	    if (isset($entry['url'])) {
-//		continue;
-	        $cc = new cURL();
-		$data = $cc->get($entry['url']);
-		$locationchange = $cc->is_url_location_host(true);
-		$certinfo = $cc->get_ssl_info();
-		
-		echo $cc->url;
-		$json_grunddata['url'] = $entry['url'];
-		$json_grunddata['httpstatus'] = $data['meta']['http_code'];
-		
-		
-		if ($locationchange &&  $data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
-		   
-		    $analyse = new Analyse($cc->url);
-		    $analyse->header = $cc->header;
-		    @ $analyse->init($data);
-    
-		    echo " \t Ok\n";
-		
-		     $analysedata = $analyse->get_analyse_data();  
-		     
-		     $jsonadd =  array_merge($json_grunddata, $analysedata);
-		     $json_data[] = $jsonadd;
-	     
-	        } elseif (!$locationchange) {
-		    echo "\t (".$entry['wiki-url'].") wird umgelenkt auf: ".$cc->header['location']."\n";
-		    
-		    $json_grunddata['redirect'] = $cc->header['location'];
-		    $json_data[] = $json_grunddata;
-		    
-		} else {
-		    echo " \t Status Error (".$data['meta']['http_code'].")  bei ".$entry['name']." (".$entry['wiki-url'].")\n";
-		    $json_data[] = $json_grunddata;
-		}
-		sleep(1);
+            $cc = new cURL();
+            $data = $cc->get($entry['url']);
+            $locationchange = $cc->is_url_location_host(true);
+            $certinfo = $cc->get_ssl_info();
+
+            echo $cc->url;
+            $json_grunddata['url'] = $entry['url'];
+            $json_grunddata['httpstatus'] = $data['meta']['http_code'];
+
+
+            if ($locationchange &&  $data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 500) {
+
+                $analyse = new Analyse($cc->url);
+                $analyse->header = $cc->header;
+                @ $analyse->init($data);
+
+                echo " \t Ok\n";
+
+                 $analysedata = $analyse->get_analyse_data();  
+                 
+                 $jsonadd =  array_merge($json_grunddata, $analysedata);
+                 $json_data[] = $jsonadd;
+                
+                 if ((!isset($analysedata['title'])) || (empty($analysedata['title']))) {
+                     echo "\t\tWARNING: Analysedata missing for Entry URL ".$cc->url." : \n";
+                     print_r($analysedata);
+                 }
+
+             } elseif (!$locationchange) {
+                echo "\t (".$entry['wiki-url'].") wird umgelenkt auf: ".$cc->header['location']."\n";
+
+                $json_grunddata['redirect'] = $cc->header['location'];
+                $json_data[] = $json_grunddata;
+
+            } else {
+                echo " \t Status Error (".$data['meta']['http_code'].")  bei ".$entry['name']." (".$entry['wiki-url'].")\n";
+                $json_data[] = $json_grunddata;
+            }
+            sleep(1);
 	    } else {
-		 echo " \t Keine URL bei ".$entry['name']." (".$entry['wiki-url']."). ";
-		 if (isset($entry['aktivitaet'])) {
-		     echo "Aktivität: ".$entry['aktivitaet'];
-		 } else {
-		     echo "Kein Eintrag bei Aktivität.";
-		 }
-		 echo "\n";
-		$json_data[] = $json_grunddata;
+            echo " \t Keine URL bei ".$entry['name']." (".$entry['wiki-url']."). ";
+            if (isset($entry['aktivitaet'])) {
+                echo "Aktivität: ".$entry['aktivitaet'];
+            } else {
+                echo "Kein Eintrag bei Aktivität.";
+            }
+            echo "\n";
+           $json_data[] = $json_grunddata;
 	    }
     }
     return $json_data;
@@ -254,13 +262,12 @@ function get_index() {
 	$indexurl = 'https://statistiken.rrze.fau.de/webauftritte/hochschulen/hochschulen-index-'.$month.'.'.$year.'.json';
 	// echo "Missing current month index file. Trying last: ".$indexurl."\n";
 	echo "Lese ".$indexurl."\n";
-	$data = $index->get($indexurl);
+        $data = $index->get($indexurl);
     }
     $res = array();
     
     if ($data['meta']['http_code'] >= 200 && $data['meta']['http_code'] < 400) {
-	$res = json_decode($data['content'], true);
-	
+        $res = json_decode($data['content'], true);
     }
     return $res;
 }
@@ -289,7 +296,7 @@ function oldutf8ize( $mixed ) {
 	    $d->$key = utf8ize($value);
         }       
     } else if (is_string ($d)) {
-	 return mb_convert_encoding($d, "UTF-8", "UTF-8");
+        return mb_convert_encoding($d, "UTF-8", "UTF-8");
     }
     return $d;
 }
